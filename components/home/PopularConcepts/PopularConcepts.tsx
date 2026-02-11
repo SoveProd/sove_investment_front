@@ -67,7 +67,7 @@ export default function PopularConcepts() {
   return (
     <section className="w-full bg-bg">
       <Container>
-        <div className=" px-4 py-10 sm:py-14">
+        <div className=" px-4 py-20 sm:py-20">
           <PopularConceptsClient title="Популярные концепции" tabs={tabs} />
         </div>
       </Container>
