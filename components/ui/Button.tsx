@@ -62,7 +62,8 @@ export function Button(props: ButtonAsLink | ButtonAsButton) {
       "border border-white/70 text-white hover:bg-white hover:text-graphite",
   };
 
-  const width = fullWidth ? "w-full" : "w-full max-w-[481px]";
+const width = fullWidth ? "w-full" : "w-fit";
+
 
   const styles = clsx(base, sizes[size], variants[variant], width, className);
 

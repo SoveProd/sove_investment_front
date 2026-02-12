@@ -15,16 +15,22 @@ export function ArrowButton({
 }: ArrowButtonProps) {
   const base =
     "inline-flex items-center justify-between " +
-    "h-[71px] w-[291px] rounded-full bg-[#A05035] " +
+    "h-[71px] rounded-full bg-primary " +
     "pl-10 pr-3 text-white " +
     "transition hover:opacity-90";
 
   const content = (
     <>
-      <span className="text-[18px] font-medium">{label}</span>
+      <span className="text-[18px] font-medium whitespace-nowrap">{label}</span>
 
-      <span className="grid h-[55px] w-[55px] place-items-center rounded-full bg-white shadow-[0_10px_30px_rgba(0,0,0,0.12)]">
-        <img src="/objects/Arrow.svg" alt="" width={17} height={17} className="block text-gray-400" />
+      <span className="ml-6 grid h-[55px] w-[55px] place-items-center rounded-full bg-white shadow-[0_10px_30px_rgba(0,0,0,0.12)]">
+        <img
+          src="/objects/Arrow.svg"
+          alt=""
+          width={17}
+          height={17}
+          className="block"
+        />
       </span>
     </>
   );

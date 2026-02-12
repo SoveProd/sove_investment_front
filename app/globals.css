@@ -20,6 +20,11 @@
 
   /* Graphite */
   --color-graphite: #383838;
+
+--color-slot-fill: #EDEDED;
+--color-slot-stroke: #D8D8D8;
+
+
 }
 
 /* Tailwind v4 theme tokens */
@@ -38,10 +43,15 @@
   --color-primary-hover: var(--color-primary-hover);
 
   --color-graphite: var(--color-graphite);
+  
+--color-slot-fill: var(--color-slot-fill);
+--color-slot-stroke: var(--color-slot-stroke);
+
+
 }
 
 body {
   background: var(--color-bg);
   color: var(--color-text);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-main), Arial, Helvetica, sans-serif;
 }

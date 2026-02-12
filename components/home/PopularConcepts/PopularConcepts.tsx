@@ -36,8 +36,8 @@ const readyProjects: ConceptCard[] = [
     id: "ready-1",
     title: "READY PROJECT",
     subtitle: "Готовый проект — адаптация под ваш объект",
-    availabilityLabel: "Доступно 3/5 слотов",
-    totalSlots: 5,
+    availabilityLabel: "Доступно 3/10 слотов",
+    totalSlots: 10,
     availableSlots: 3,
     image: {
       src: "/images/pathimg.jpg",
@@ -48,8 +48,8 @@ const readyProjects: ConceptCard[] = [
     id: "ready-2",
     title: "READY PROJECT",
     subtitle: "Готовый проект — адаптация под ваш объект",
-    availabilityLabel: "Доступно 2/5 слотов",
-    totalSlots: 5,
+    availabilityLabel: "Доступно 2/10 слотов",
+    totalSlots: 10,
     availableSlots: 2,
     image: {
       src: "/images/pathimg.jpg",

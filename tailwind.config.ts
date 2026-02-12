@@ -4,6 +4,10 @@ const config: Config = {
   content: ["./app/**/*.{js,ts,jsx,tsx}", "./components/**/*.{js,ts,jsx,tsx}"],
   theme: {
     extend: {
+      fontFamily: {
+        main: ["var(--font-main)"],
+      },
+
       colors: {
         bg: "var(--color-bg)",
         surface: "var(--color-surface)",
@@ -19,6 +23,9 @@ const config: Config = {
         primaryHover: "var(--color-primary-hover)",
 
         graphite: "var(--color-graphite)",
+        
+        slotFill: "var(--color-slot-fill)",
+        slotStroke: "var(--color-slot-stroke)",
       },
     },
   },

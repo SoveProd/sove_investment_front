@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { Container } from "../Container";
 
 type NavItem = { label: string; href: string };
@@ -28,7 +29,7 @@ export function NavBar() {
     <header
       className={[
         "fixed left-0 right-0 top-0 z-50",
-        "transition",
+        "transition-colors duration-200",
         scrolled ? "bg-black/35 backdrop-blur-md" : "bg-transparent",
       ].join(" ")}
     >
@@ -41,23 +42,26 @@ export function NavBar() {
           <Link
             href="/"
             aria-label="SOVE Group"
-            className="select-none text-[18px] tracking-[0.25em] text-white/90 hover:text-white transition"
+            className="inline-flex items-center select-none"
           >
-            SOVE<span className="mx-1 text-white/40">·</span>GROUP
+            <Image
+              src="/logo.svg"
+              alt="SOVE Group"
+              width={300}
+              height={100}
+              priority
+            />
           </Link>
 
           {/* Right block: menu + burger */}
           <div className="flex items-center gap-6">
-            <nav
-              className="hidden items-center md:flex"
-              aria-label="Главная навигация"
-            >
+            <nav className="hidden items-center md:flex" aria-label="Главная навигация">
               <ul className="flex items-center gap-8">
                 {NAV_ITEMS.map((item) => (
                   <li key={item.href}>
                     <Link
                       href={item.href}
-                      className="text-[18px] text-white/80 hover:text-white transition"
+                      className="text-[18px] text-white/80 transition-colors hover:text-white"
                     >
                       {item.label}
                     </Link>
@@ -70,7 +74,7 @@ export function NavBar() {
             <button
               type="button"
               aria-label="Открыть меню"
-              className="inline-flex h-10 w-10 items-center justify-center rounded-full text-white/85 hover:text-white hover:bg-white/10 transition"
+              className="inline-flex h-10 w-10 items-center justify-center rounded-full text-white/85 transition hover:bg-white/10 hover:text-white"
             >
               <span className="sr-only">Menu</span>
               <span className="relative block h-4 w-5">

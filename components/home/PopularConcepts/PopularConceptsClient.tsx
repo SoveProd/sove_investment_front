@@ -42,8 +42,8 @@ export default function PopularConceptsClient({ title, tabs }: Props) {
           {title}
         </h2>
 
-        {/* Tabs (как на скрине: белый контейнер, тонкая обводка, активный тёмный) */}
-        <div className="inline-flex w-fit items-center rounded-full border border-border bg-bg p-1">
+
+        <div className="inline-flex w-fit items-center rounded-full border border-border bg-bg p-1 flex gap-4">
           {tabs.map((tab) => {
             const isActive = tab.key === activeKey;
 
@@ -53,10 +53,10 @@ export default function PopularConceptsClient({ title, tabs }: Props) {
                 type="button"
                 onClick={() => setActiveKey(tab.key)}
                 className={[
-                  "h-10 rounded-full px-5 text-sm font-medium transition",
+                  "h-10 rounded-full px-10  text-sm font-medium transition",
                   isActive
                     ? "bg-graphite text-white"
-                    : "bg-bg text-textSecondary hover:text-text",
+                    : "bg-bg border text-textSecondary hover:text-text",
                 ].join(" ")}
               >
                 {tab.label}
@@ -97,15 +97,15 @@ function ConceptCardView({ card }: { card: ConceptCard }) {
 
       {/* Text */}
       <div className="mt-5">
-        <h3 className="text-[18px] font-semibold tracking-wide text-text sm:text-[20px]">
+        <h3 className="text-[18px] font-semibold tracking-wide text-text sm:text-[33px]">
           {card.title}
         </h3>
 
-        <p className="mt-1 text-[13px] leading-relaxed text-textSecondary sm:text-[14px]">
+        <p className="mt-1 text-[13px] leading-relaxed text-textSecondary sm:text-[21px]">
           {card.subtitle}
         </p>
 
-        <p className="mt-3 text-[12px] text-textSecondary">
+        <p className="mt-3 text-[18px] text-textSecondary">
           {card.availabilityLabel}
         </p>
 
@@ -138,7 +138,7 @@ function SlotsBar({ total, filled }: { total: number; filled: number }) {
   const safeFilled = Math.min(Math.max(0, filled), safeTotal);
 
   return (
-    <div className="mt-3 flex flex-wrap gap-2">
+    <div className="mt-3 flex w-full gap-2">
       {Array.from({ length: safeTotal }).map((_, idx) => {
         const isFilled = idx < safeFilled;
 
@@ -146,8 +146,8 @@ function SlotsBar({ total, filled }: { total: number; filled: number }) {
           <span
             key={idx}
             className={[
-              "h-[10px] w-[44px] rounded-full",
-              isFilled ? "bg-primary" : "bg-surfaceAlt",
+              "h-[19px] flex-1 rounded-full transition-colors",
+              isFilled ? "bg-primary" : "bg-slotFill border border-[#D8D8D8]",
             ].join(" ")}
             aria-hidden="true"
           />
