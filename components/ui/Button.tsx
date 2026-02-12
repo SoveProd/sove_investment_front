@@ -1,5 +1,5 @@
 import Link from "next/link";
-import React, { ReactNode } from "react";
+import { ReactNode } from "react";
 import clsx from "clsx";
 
 type ButtonVariant = "primary" | "outline";
@@ -15,7 +15,7 @@ type CommonProps = {
 };
 
 type ButtonAsLink = CommonProps & {
-  href: string;          // ✅ ОБЯЗАТЕЛЬНО
+  href: string;
   onClick?: never;
   type?: never;
   disabled?: never;
@@ -28,9 +28,7 @@ type ButtonAsButton = CommonProps & {
   disabled?: boolean;
 };
 
-export type ButtonProps = ButtonAsLink | ButtonAsButton;
-
-export function Button(props: ButtonProps) {
+export function Button(props: ButtonAsLink | ButtonAsButton) {
   const {
     children,
     variant = "primary",
@@ -39,13 +37,35 @@ export function Button(props: ButtonProps) {
     className,
   } = props;
 
-  const styles = clsx(
+  const base = clsx(
     "inline-flex items-center justify-center select-none",
-    fullWidth && "w-full",
-    variant === "primary" ? "bg-red-600 text-white" : "border border-red-600 text-red-600",
-    size === "lg" ? "h-12 px-6 text-base" : "h-10 px-4 text-sm",
-    className
+    "rounded-full",
+    "transition-all duration-200",
+    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-transparent",
+    "uppercase font-medium leading-none",
+    "disabled:pointer-events-none disabled:opacity-50",
   );
+
+  const sizes: Record<ButtonSize, string> = {
+    lg: clsx(
+      "h-[60px] px-6 text-[16px]",
+      "sm:h-[68px] sm:px-8 sm:text-[18px]",
+      "lg:h-[77px] lg:px-[21px] lg:text-[22px]",
+    ),
+    md: clsx("h-[52px] px-6 text-[16px]", "sm:h-[56px] sm:text-[16px]"),
+  };
+
+  const variants: Record<ButtonVariant, string> = {
+    primary: "bg-primary text-white hover:bg-primaryHover",
+
+    outline:
+      "border border-white/70 text-white hover:bg-white hover:text-graphite",
+  };
+
+const width = fullWidth ? "w-full" : "w-fit";
+
+
+  const styles = clsx(base, sizes[size], variants[variant], width, className);
 
 if (props.href) {
   return (
