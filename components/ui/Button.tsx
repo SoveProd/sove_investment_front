@@ -48,33 +48,42 @@ export function Button(props: ButtonAsLink | ButtonAsButton) {
 
   const sizes: Record<ButtonSize, string> = {
     lg: clsx(
-      "h-[60px] px-6 text-[16px]",
-      "sm:h-[68px] sm:px-8 sm:text-[18px]",
-      "lg:h-[77px] lg:px-[21px] lg:text-[22px]",
+      // mobile
+      "h-[52px] px-5 text-[14px]",
+      // sm
+      "sm:h-[58px] sm:px-6 sm:text-[16px]",
+      // ноутбук (lg)
+      "lg:h-[60px] lg:px-7 lg:text-[16px]",
+      // большие экраны (xl+)
+      "xl:h-[68px] xl:px-8 xl:text-[18px]",
+      // если хочешь прям крупно только на 2xl:
+      "2xl:h-[77px] 2xl:px-[21px] 2xl:text-[22px]",
     ),
-    md: clsx("h-[52px] px-6 text-[16px]", "sm:h-[56px] sm:text-[16px]"),
+    md: clsx(
+      "h-[48px] px-5 text-[14px]",
+      "sm:h-[52px] sm:px-6 sm:text-[15px]",
+      "lg:h-[54px] lg:text-[15px]",
+      "xl:h-[56px] xl:text-[16px]",
+    ),
   };
 
   const variants: Record<ButtonVariant, string> = {
     primary: "bg-primary text-white hover:bg-primaryHover",
-
     outline:
       "border border-white/70 text-white hover:bg-white hover:text-graphite",
   };
 
-const width = fullWidth ? "w-full" : "w-fit";
-
+ const width = fullWidth ? "w-full" : "w-full max-w-[481px]";
 
   const styles = clsx(base, sizes[size], variants[variant], width, className);
 
-if (props.href) {
-  return (
-    <Link href={props.href} className={styles} aria-label={props.ariaLabel}>
-      {children}
-    </Link>
-  );
-}
-
+  if (props.href) {
+    return (
+      <Link href={props.href} className={styles} aria-label={props.ariaLabel}>
+        {children}
+      </Link>
+    );
+  }
 
   return (
     <button

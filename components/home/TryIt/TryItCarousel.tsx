@@ -24,10 +24,7 @@ export function TryItCarousel({ items, activeIndex, setActiveIndex }: Props) {
     [activeIndex, total],
   );
 
-  // prevIndex нужен только для слоя, который “уходит”
   const [prevIndex, setPrevIndex] = useState(activeIndex);
-
-  // isFading=true: prev уходит (0), current приходит (1)
   const [isFading, setIsFading] = useState(false);
 
   const rafRef = useRef<number | null>(null);
@@ -38,14 +35,9 @@ export function TryItCarousel({ items, activeIndex, setActiveIndex }: Props) {
   const currentNext = items[nextIndex];
   const prevNext = items[(prevIndex + 1) % total];
 
-  // стартуем кроссфейд когда activeIndex поменялся
   useEffect(() => {
     if (activeIndex === prevIndex) return;
 
-    // фиксируем предыдущий индекс как “уходящий”
-    setPrevIndex((prevIdx) => prevIdx); // no-op, просто чтобы подчеркнуть смысл
-
-    // старт анимации в следующий кадр, чтобы браузер успел применить DOM
     setIsFading(false);
     if (rafRef.current) cancelAnimationFrame(rafRef.current);
 
@@ -58,47 +50,22 @@ export function TryItCarousel({ items, activeIndex, setActiveIndex }: Props) {
     };
   }, [activeIndex, prevIndex]);
 
-  // как только сменили индекс извне — нужно запомнить “старый” как prev
-  useEffect(() => {
-    // если activeIndex уже новый, а prevIndex старый — ок
-    // но если prevIndex вдруг равен activeIndex, ничего не делаем
-    // (prevIndex обновим на конце transition)
-  }, [activeIndex]);
-
-  // завершение анимации (повесим на current-layer)
   const handleFadeEnd = () => {
-    // после завершения: prevIndex становится current, анимация выключается
     setPrevIndex(activeIndex);
     setIsFading(false);
   };
 
-  // ✅ циклическая навигация
   const goPrev = () => setActiveIndex((activeIndex - 1 + total) % total);
   const goNext = () => setActiveIndex((activeIndex + 1) % total);
 
   const arrowBtnClass = [
-    "flex h-[40px] w-[120px] items-center justify-center rounded-full",
+    "flex h-[40px] w-[110px] sm:w-[120px] items-center justify-center rounded-full",
     "bg-border",
     "text-borderSoft",
     "transition-colors duration-200",
     "hover:bg-graphite hover:text-surface",
   ].join(" ");
 
-  // ВАЖНО: когда анимации нет — current должен быть 100% видим, prev скрыт
-  const prevLayerClass = [
-    "absolute inset-0 transition-opacity ease-out",
-    `duration-[${TRANSITION_MS}ms]`,
-    isFading ? "opacity-0" : "opacity-0",
-  ].join(" ");
-
-  const currentLayerClass = [
-    "absolute inset-0 transition-opacity ease-out",
-    `duration-[${TRANSITION_MS}ms]`,
-    isFading ? "opacity-100" : "opacity-100",
-  ].join(" ");
-
-  // Чтобы был именно кроссфейд: делаем prev видимым ДО старта,
-  // а затем при isFading=true он уходит. Поэтому добавим отдельный флаг.
   const showPrev = activeIndex !== prevIndex;
 
   const prevOpacity = showPrev
@@ -114,9 +81,21 @@ export function TryItCarousel({ items, activeIndex, setActiveIndex }: Props) {
 
   return (
     <div className="w-full">
-      <div className="flex items-start gap-8">
+      <div className="flex items-start gap-6 lg:gap-8">
         {/* LEFT BIG */}
-        <div className="relative h-[777px] w-[573px] overflow-hidden rounded-[40px] max-lg:h-[420px] max-lg:w-full">
+        <div
+          className={[
+            "relative w-full overflow-hidden rounded-[28px] sm:rounded-[32px] lg:rounded-[40px]",
+            // высота для разных экранов
+            "h-[360px] sm:h-[420px] md:h-[480px]",
+            // на lg делаем меньше, чтобы не было гиганта
+            "lg:h-[520px]",
+            // на xl/2xl можно возвращать большие
+            "xl:h-[640px] 2xl:h-[777px]",
+            // ширина: на десктопе ограничиваем
+            "lg:max-w-[520px] xl:max-w-[560px] 2xl:max-w-[573px]",
+          ].join(" ")}
+        >
           {/* prev image layer */}
           <div
             className={[
@@ -129,7 +108,7 @@ export function TryItCarousel({ items, activeIndex, setActiveIndex }: Props) {
               src={prev.img}
               alt={prev.title}
               fill
-              sizes="573px"
+              sizes="(max-width: 1024px) 100vw, (max-width: 1280px) 60vw, 573px"
               className="object-cover"
               priority
             />
@@ -148,19 +127,20 @@ export function TryItCarousel({ items, activeIndex, setActiveIndex }: Props) {
               src={current.img}
               alt={current.title}
               fill
-              sizes="573px"
+              sizes="(max-width: 1024px) 100vw, (max-width: 1280px) 60vw, 573px"
               className="object-cover"
               priority
             />
           </div>
 
-          {/* Title inside big image (fade like images) */}
-          <div className="absolute bottom-8 left-0 right-0 grid place-items-center text-center">
-            <div className="relative h-[28px] w-full">
+          {/* Title inside big image */}
+          <div className="absolute bottom-6 sm:bottom-7 lg:bottom-8 left-0 right-0 grid place-items-center text-center px-4">
+            <div className="relative h-[26px] w-full">
               <div
                 className={[
                   "absolute inset-0 grid place-items-center",
-                  "text-[22px] font-medium tracking-[0.14em] text-white drop-shadow",
+                  "font-medium tracking-[0.14em] text-white drop-shadow",
+                  "text-[16px] sm:text-[18px] lg:text-[20px] 2xl:text-[22px]",
                   "transition-opacity ease-out",
                   `duration-[${TRANSITION_MS}ms]`,
                   prevOpacity,
@@ -172,7 +152,8 @@ export function TryItCarousel({ items, activeIndex, setActiveIndex }: Props) {
               <div
                 className={[
                   "absolute inset-0 grid place-items-center",
-                  "text-[22px] font-medium tracking-[0.14em] text-white drop-shadow",
+                  "font-medium tracking-[0.14em] text-white drop-shadow",
+                  "text-[16px] sm:text-[18px] lg:text-[20px] 2xl:text-[22px]",
                   "transition-opacity ease-out",
                   `duration-[${TRANSITION_MS}ms]`,
                   currOpacity,
@@ -184,10 +165,15 @@ export function TryItCarousel({ items, activeIndex, setActiveIndex }: Props) {
           </div>
         </div>
 
-        {/* RIGHT COLUMN */}
-        <div className="flex w-[573px] flex-col items-center max-lg:hidden">
+        {/* RIGHT COLUMN (показываем только с lg, а на xl/2xl оставляем как было по вайбу) */}
+        <div className="hidden lg:flex flex-col items-center w-[280px] xl:w-[360px] 2xl:w-[573px]">
           {/* SMALL IMAGE */}
-          <div className="relative h-[641px] w-[573px] overflow-hidden rounded-[40px]">
+          <div
+            className={[
+              "relative w-full overflow-hidden rounded-[28px] xl:rounded-[40px]",
+              "h-[420px] xl:h-[520px] 2xl:h-[641px]",
+            ].join(" ")}
+          >
             <div
               className={[
                 "absolute inset-0 transition-opacity ease-out",
@@ -199,7 +185,7 @@ export function TryItCarousel({ items, activeIndex, setActiveIndex }: Props) {
                 src={prevNext.img}
                 alt={prevNext.title}
                 fill
-                sizes="573px"
+                sizes="(max-width: 1280px) 35vw, 573px"
                 className="object-cover"
               />
             </div>
@@ -215,15 +201,15 @@ export function TryItCarousel({ items, activeIndex, setActiveIndex }: Props) {
                 src={currentNext.img}
                 alt={currentNext.title}
                 fill
-                sizes="573px"
+                sizes="(max-width: 1280px) 35vw, 573px"
                 className="object-cover"
               />
             </div>
           </div>
 
           {/* Title under small image */}
-          <div className="mt-8 text-center text-[22px] font-medium tracking-[0.12em] text-text">
-            <span className="relative inline-block h-[28px] w-[573px]">
+          <div className="mt-6 xl:mt-8 text-center font-medium tracking-[0.12em] text-text text-[16px] xl:text-[20px] 2xl:text-[22px]">
+            <span className="relative block h-[26px] w-full justify-center">
               <span
                 className={[
                   "absolute inset-0 grid place-items-center",
@@ -249,7 +235,7 @@ export function TryItCarousel({ items, activeIndex, setActiveIndex }: Props) {
           </div>
 
           {/* Arrows */}
-          <div className="mt-4 flex items-center justify-center gap-4">
+          <div className="mt-3 xl:mt-4 flex items-center justify-center gap-4">
             <button
               type="button"
               onClick={goPrev}
@@ -268,6 +254,26 @@ export function TryItCarousel({ items, activeIndex, setActiveIndex }: Props) {
             </button>
           </div>
         </div>
+      </div>
+
+      {/* MOBILE arrows (когда правой колонки нет) */}
+      <div className="mt-5 flex items-center justify-center gap-4 lg:hidden">
+        <button
+          type="button"
+          onClick={goPrev}
+          aria-label="Назад"
+          className={arrowBtnClass}
+        >
+          ←
+        </button>
+        <button
+          type="button"
+          onClick={goNext}
+          aria-label="Вперёд"
+          className={arrowBtnClass}
+        >
+          →
+        </button>
       </div>
     </div>
   );

@@ -1,4 +1,3 @@
-// components/try-it/TryItSection.tsx
 "use client";
 
 import { useState } from "react";
@@ -18,15 +17,15 @@ export default function TryItSection() {
   const [activeIndex, setActiveIndex] = useState(0);
 
   return (
-    <section className="w-full bg-white pb-[150px] max-lg:py-[80px]">
+    <section className="w-full bg-white py-[90px] sm:py-[100px] lg:py-[110px] 2xl:py-[150px]">
       <Container>
-        <div className="rounded-[48px] bg-surface py-[120px] max-lg:px-6 max-lg:py-10">
-          <div className="grid grid-cols-12 gap-10 items-stretch">
-            {/* LEFT (1/3) */}
-            <div className="col-span-4 flex flex-col justify-between max-lg:col-span-12">
+        <div className="rounded-[32px] sm:rounded-[40px] 2xl:rounded-[48px] bg-surface px-5 sm:px-8 lg:px-10 2xl:px-0 py-10 lg:py-14 2xl:py-[120px]">
+          <div className="grid grid-cols-12 gap-8 lg:gap-10 items-stretch">
+            {/* LEFT */}
+            <div className="col-span-12 lg:col-span-4 flex flex-col justify-between">
               {/* Top block */}
               <div>
-                <div className="flex items-center gap-3">
+                <div className="flex flex-wrap items-center gap-3">
                   {fakeData.map((_, index) => {
                     const isActive = index === activeIndex;
 
@@ -38,7 +37,7 @@ export default function TryItSection() {
                         aria-label={`Переключить на ${index + 1}`}
                         className={[
                           "transition-opacity duration-200",
-                          "h-[17px] w-[53px] rounded-[42px]",
+                          "h-[14px] w-[46px] sm:h-[16px] sm:w-[52px] rounded-[42px]",
                           isActive
                             ? "bg-primary opacity-100"
                             : "bg-border-soft opacity-100",
@@ -48,26 +47,26 @@ export default function TryItSection() {
                   })}
                 </div>
 
-                <p className="mt-7 max-w-sm text-[24px] leading-relaxed text-text-graphite">
+                <p className="mt-5 sm:mt-7 max-w-sm text-[16px] sm:text-[18px] lg:text-[18px] 2xl:text-[24px] leading-relaxed text-text-graphite">
                   “SOVE — это полный сервис управления real estate
                   инвестициями.”
                 </p>
               </div>
 
               {/* Bottom block */}
-              <div className="mt-16 max-lg:mt-10">
-                <h2 className="text-[56px] font-medium tracking-tight text-text max-lg:text-[36px]">
+              <div className="mt-10 lg:mt-12 2xl:mt-16">
+                <h2 className="font-medium tracking-tight text-text text-[30px] sm:text-[34px] lg:text-[34px] 2xl:text-[56px]">
                   Или попробуй сам
                 </h2>
 
-                <div className="mt-6">
+                <div className="mt-5 2xl:mt-6">
                   <ArrowButton label="Попробовать" href="#" />
                 </div>
               </div>
             </div>
 
-            {/* RIGHT (2/3) */}
-            <div className="col-span-8 max-lg:col-span-12">
+            {/* RIGHT */}
+            <div className="col-span-12 lg:col-span-8">
               <TryItCarousel
                 items={fakeData}
                 activeIndex={activeIndex}
