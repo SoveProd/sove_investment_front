@@ -38,7 +38,7 @@ export function CtaBanner({
               ЗАПОЛНИТЬ ЗАЯВКУ
             </Button>
 
-            <Button href="/consultation" variant="outline">
+            <Button href="/consultation" variant="outlineDark">
               ПРОКОНСУЛЬТИРОВАТЬСЯ
             </Button>
           </div>

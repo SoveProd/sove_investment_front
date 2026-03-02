@@ -8,13 +8,12 @@ import { Container } from "../Container";
 type NavItem = { label: string; href: string };
 
 const NAV_ITEMS: NavItem[] = [
-  { label: "О сервисе", href: "#about" },
-  { label: "Концепции", href: "#concepts" },
-  { label: "Пакеты", href: "#packages" },
-  { label: "Кейсы", href: "#cases" },
-  { label: "Метод ремонта", href: "#method" },
+  { label: "О сервисе", href: "/about" },        
+  { label: "Концепции", href: "/concepts" },
+  { label: "Пакеты", href: "/packages" },
+  { label: "Кейсы", href: "/cases" },
+  { label: "Метод ремонта", href: "/method" },
 ];
-
 export function NavBar() {
   const [scrolled, setScrolled] = useState(false);
 

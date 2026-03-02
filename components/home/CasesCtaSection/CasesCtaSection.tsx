@@ -1,45 +1,46 @@
+import clsx from "clsx";
 import { Container } from "@/components/layout/Container";
-import { ArrowButton } from "../../ui/ArrowBtn";
+import { ArrowButton } from "@/components/ui/ArrowBtn";
 
-type CasesCtaSectionProps = {
-  topLine: string; // "МЫ РАБОТАЕМ"
-  middleLine: string; // "ТОЛЬКО С ПРОВЕРЕННЫМИ ОБЪЕКТАМИ И ОПЫТНЫМИ КОМАНДАМИ."
-  bottomLine: string; // "ТВОЙ КАПИТАЛ ВСЕГДА ПОД КОНТРОЛЕМ."
+type Props = {
+  // серое/чёрное/серое/чёрное/серое
+  beforeAccent1: string;
+  accent1: string;
+  betweenAccents: string;
+  accent2: string;
+  afterAccent2: string;
+
   buttonLabel: string;
   href: string;
   className?: string;
 };
 
 export function CasesCtaSection({
-  topLine,
-  middleLine,
-  bottomLine,
+  beforeAccent1,
+  accent1,
+  betweenAccents,
+  accent2,
+  afterAccent2,
   buttonLabel,
   href,
   className = "",
-}: CasesCtaSectionProps) {
+}: Props) {
   return (
-    <section
-      className={[
-        "w-full bg-white py-[140px] max-lg:py-[80px]",
-        className,
-      ].join(" ")}
-    >
+    <section className={clsx("w-full bg-white py-[140px] max-lg:py-[80px]", className)}>
       <Container>
         <div className="flex flex-col items-center text-center">
           <h2
-            className={[
-              "max-w-5xl uppercase",
+            className={clsx(
+              "max-w-5xl uppercase font-normal",
               "text-[55px] leading-[1.15] tracking-[0.02em]",
-              "max-lg:text-[28px]",
-              "font-normal",
-            ].join(" ")}
+              "max-lg:text-[28px]"
+            )}
           >
-            <span className="text-text/70">{topLine}</span>
-           
-            <span className="text-dark">{middleLine}</span>
-
-            <span className="text-text/70">{bottomLine}</span>
+            <span className="text-text/40">{beforeAccent1} </span>
+            <span className="text-dark">{accent1} </span>
+            <span className="text-text/40">{betweenAccents} </span>
+            <span className="text-dark">{accent2} </span>
+            <span className="text-text/40">{afterAccent2}</span>
           </h2>
 
           <div className="mt-10">

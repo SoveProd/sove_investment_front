@@ -43,13 +43,16 @@ export default function Home() {
 
       <SectionReveal>
         <CasesCtaSection
-          topLine="Мы работаем"
-          middleLine="Только с проверенными объектами и опытными командами."
-          bottomLine="Твой капитал всегда под контролем."
+          beforeAccent1="Мы меняем правила ремонта!"
+          accent1="Теперь вы сами решаете -"
+          betweenAccents="доверить управление всеми процессами SOVE"
+          accent2="или использовать всех"
+          afterAccent2="наших подрядчиков самостоятельно"
           buttonLabel="Посмотри наши кейсы"
           href="/cases"
         />
       </SectionReveal>
+
 
       <SectionReveal>
         <DesignMosaicSection />
@@ -64,7 +67,23 @@ export default function Home() {
       </SectionReveal>
 
       <SectionReveal>
-        <ThreeHoverZones />
+        <ThreeHoverZones
+          imageSrc="/images/hero.jpg"
+          zones={[
+            {
+              title: "Современный дизайн",
+              text: "Наши дизайнеры создают концепции...",
+            },
+            {
+              title: "Профессиональное\nуправление",
+              text: "Берём на себя процесс...",
+            },
+            {
+              title: "Гарантированная ROI",
+              text: "Работаем на результат...",
+            },
+          ]}
+        />
       </SectionReveal>
 
       <SectionReveal>
@@ -74,6 +93,8 @@ export default function Home() {
       <SectionReveal>
         <CtaBanner />
       </SectionReveal>
+
+
     </>
   );
 }
