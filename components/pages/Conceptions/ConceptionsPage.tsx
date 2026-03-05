@@ -1,31 +1,44 @@
 import { PageHero } from "@/components/sections/PageHero/PageHero";
-import { CtaBanner } from "@/components/home/CtaBanner/CtaBanner";
 import { PopularConceptsSection } from "@/components/sections/PopularConcepts/PopularConceptsSection";
 import { CasesCtaSection } from "@/components/home/CasesCtaSection/CasesCtaSection";
-import PopularConcepts from "@/components/home/PopularConcepts/PopularConcepts";
 import TryItSection from "@/components/home/TryIt/TryItSection";
+import { SectionReveal } from "@/components/ui/SectionReveal";
 
 export function ConceptsPage() {
   return (
     <main className="bg-white text-black">
-      <PageHero
-        title={["КОНЦЕПЦИИ"]}
-        subtitle="Выберите готовые решения для вашего проекта из ограниченных дропов"
-        imageSrc="/images/PageHero/packagesHero.png" // поставь сюда нужную картинку
-      />
-<PopularConceptsSection />
+      {/* Hero — можно анимировать мягко при первом рендере */}
+      <SectionReveal delay={0}>
+        <PageHero
+          title={["КОНЦЕПЦИИ"]}
+          subtitle={`Выберите готовые решения для вашего
+проекта из ограниченных дропов`}
+          imageSrc="/images/PageHero/packagesHero.png"
+        />
+      </SectionReveal>
 
-      <CtaBanner />
-      <CasesCtaSection
-  beforeAccent1="Мы меняем правила ремонта!"
-  accent1="Теперь вы сами решаете -"
-  betweenAccents="доверить управление всеми процессами SOVE"
-  accent2="или использовать всех"
-  afterAccent2="наших подрядчиков самостоятельно"
-  buttonLabel="Посмотри наши кейсы"
-  href="/cases"
-/>
-  <TryItSection />
+      {/* Список концептов */}
+      <SectionReveal delay={0.05} className="mt-6">
+        <PopularConceptsSection />
+      </SectionReveal>
+
+      {/* CTA кейсов */}
+      <SectionReveal delay={0.08} className="mt-10">
+        <CasesCtaSection
+          beforeAccent1="Мы меняем правила ремонта!"
+          accent1="Теперь вы сами решаете -"
+          betweenAccents="доверить управление всеми процессами SOVE"
+          accent2="или использовать всех"
+          afterAccent2="наших подрядчиков самостоятельно"
+          buttonLabel="Посмотри наши кейсы"
+          href="/cases"
+        />
+      </SectionReveal>
+
+      {/* Try it */}
+      <SectionReveal delay={0.1} className="mt-10">
+        <TryItSection />
+      </SectionReveal>
     </main>
   );
 }

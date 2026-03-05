@@ -46,7 +46,7 @@ export function Button(props: ButtonAsLink | ButtonAsButton) {
     "transition-all duration-200",
     "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-transparent",
     "font-medium leading-none",
-    "disabled:pointer-events-none disabled:opacity-50"
+    "disabled:pointer-events-none disabled:opacity-50",
   );
 
   const sizes: Record<ButtonSize, string> = {
@@ -55,13 +55,13 @@ export function Button(props: ButtonAsLink | ButtonAsButton) {
       "sm:h-[58px] sm:px-6 sm:text-[16px]",
       "lg:h-[60px] lg:px-7 lg:text-[16px]",
       "xl:h-[68px] xl:px-8 xl:text-[18px]",
-      "2xl:h-[77px] 2xl:px-[21px] 2xl:text-[22px]"
+      "2xl:h-[77px] 2xl:px-[21px] 2xl:text-[22px]",
     ),
     md: clsx(
       "h-[48px] px-5 text-[14px] uppercase",
       "sm:h-[52px] sm:px-6 sm:text-[15px]",
       "lg:h-[54px] lg:text-[15px]",
-      "xl:h-[56px] xl:text-[16px]"
+      "xl:h-[56px] xl:text-[16px]",
     ),
     sm: clsx("h-[71px] px-8 text-[18px] normal-case", "rounded-[62px]"),
   };

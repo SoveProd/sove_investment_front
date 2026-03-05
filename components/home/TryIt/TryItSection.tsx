@@ -47,9 +47,11 @@ export default function TryItSection() {
                   })}
                 </div>
 
-                <p className="mt-5 sm:mt-7 max-w-sm text-[16px] sm:text-[18px] lg:text-[18px] 2xl:text-[24px] leading-relaxed text-text-graphite">
-                  “SOVE — это полный сервис управления real estate
-                  инвестициями.”
+                <p className="mt-5 sm:mt-7 text-[16px] sm:text-[18px] lg:text-[18px] 2xl:text-[24px] leading-relaxed text-text-graphite">
+                  METOD ремонта —это возможность самостоятельно реализовать
+                  готовые, просчитанные и реализованные в SOVE интерьерные
+                  концепции с помощью закрытых предложений на мебель и отделку
+                  до 40%, с отобранными материалами и проверенными мастерами
                 </p>
               </div>
 

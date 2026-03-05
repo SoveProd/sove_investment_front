@@ -86,13 +86,9 @@ export function TryItCarousel({ items, activeIndex, setActiveIndex }: Props) {
         <div
           className={[
             "relative w-full overflow-hidden rounded-[28px] sm:rounded-[32px] lg:rounded-[40px]",
-            // высота для разных экранов
             "h-[360px] sm:h-[420px] md:h-[480px]",
-            // на lg делаем меньше, чтобы не было гиганта
             "lg:h-[520px]",
-            // на xl/2xl можно возвращать большие
             "xl:h-[640px] 2xl:h-[777px]",
-            // ширина: на десктопе ограничиваем
             "lg:max-w-[520px] xl:max-w-[560px] 2xl:max-w-[573px]",
           ].join(" ")}
         >
@@ -135,11 +131,13 @@ export function TryItCarousel({ items, activeIndex, setActiveIndex }: Props) {
 
           {/* Title inside big image */}
           <div className="absolute bottom-6 sm:bottom-7 lg:bottom-8 left-0 right-0 grid place-items-center text-center px-4">
-            <div className="relative h-[26px] w-full">
+            {/* ✅ было: h-[26px] → делаем min-h и нормальный line-height */}
+            <div className="relative w-full min-h-[28px] sm:min-h-[30px] lg:min-h-[32px] 2xl:min-h-[34px]">
               <div
                 className={[
                   "absolute inset-0 grid place-items-center",
                   "font-medium tracking-[0.14em] text-white drop-shadow",
+                  "leading-none",
                   "text-[16px] sm:text-[18px] lg:text-[20px] 2xl:text-[22px]",
                   "transition-opacity ease-out",
                   `duration-[${TRANSITION_MS}ms]`,
@@ -153,6 +151,7 @@ export function TryItCarousel({ items, activeIndex, setActiveIndex }: Props) {
                 className={[
                   "absolute inset-0 grid place-items-center",
                   "font-medium tracking-[0.14em] text-white drop-shadow",
+                  "leading-none",
                   "text-[16px] sm:text-[18px] lg:text-[20px] 2xl:text-[22px]",
                   "transition-opacity ease-out",
                   `duration-[${TRANSITION_MS}ms]`,
@@ -165,7 +164,7 @@ export function TryItCarousel({ items, activeIndex, setActiveIndex }: Props) {
           </div>
         </div>
 
-        {/* RIGHT COLUMN (показываем только с lg, а на xl/2xl оставляем как было по вайбу) */}
+        {/* RIGHT COLUMN */}
         <div className="hidden lg:flex flex-col items-center w-[280px] xl:w-[360px] 2xl:w-[573px]">
           {/* SMALL IMAGE */}
           <div
@@ -207,56 +206,60 @@ export function TryItCarousel({ items, activeIndex, setActiveIndex }: Props) {
             </div>
           </div>
 
-          {/* Title under small image */}
-          <div className="mt-6 xl:mt-8 text-center font-medium tracking-[0.12em] text-text text-[16px] xl:text-[20px] 2xl:text-[22px]">
-            <span className="relative block h-[26px] w-full justify-center">
-              <span
-                className={[
-                  "absolute inset-0 grid place-items-center",
-                  "transition-opacity ease-out",
-                  `duration-[${TRANSITION_MS}ms]`,
-                  prevOpacity,
-                ].join(" ")}
-              >
-                {prevNext.title.toUpperCase()}
-              </span>
+{/* Title + Arrows aligned as one block */}
+<div className="mt-6 xl:mt-8 flex w-full flex-col items-center">
+  {/* ширина равна зоне стрелок */}
+  <div className="w-[236px] sm:w-[256px]">
+    {/* Title under small image */}
+    <div className="text-center font-medium tracking-[0.12em] text-text text-[16px] xl:text-[20px] 2xl:text-[22px] leading-none">
+      <span className="relative block w-full min-h-[28px] xl:min-h-[30px] 2xl:min-h-[34px]">
+        <span
+          className={[
+            "absolute inset-0 grid place-items-center",
+            "transition-opacity ease-out",
+            `duration-[${TRANSITION_MS}ms]`,
+            prevOpacity,
+          ].join(" ")}
+        >
+          {prevNext.title.toUpperCase()}
+        </span>
 
-              <span
-                className={[
-                  "absolute inset-0 grid place-items-center",
-                  "transition-opacity ease-out",
-                  `duration-[${TRANSITION_MS}ms]`,
-                  currOpacity,
-                ].join(" ")}
-              >
-                {currentNext.title.toUpperCase()}
-              </span>
-            </span>
-          </div>
+        <span
+          className={[
+            "absolute inset-0 grid place-items-center",
+            "transition-opacity ease-out",
+            `duration-[${TRANSITION_MS}ms]`,
+            currOpacity,
+          ].join(" ")}
+        >
+          {currentNext.title.toUpperCase()}
+        </span>
+      </span>
+    </div>
 
-          {/* Arrows */}
-          <div className="mt-3 xl:mt-4 flex items-center justify-center gap-4">
-            <button
-              type="button"
-              onClick={goPrev}
-              aria-label="Назад"
-              className={arrowBtnClass}
-            >
-              ←
-            </button>
-            <button
-              type="button"
-              onClick={goNext}
-              aria-label="Вперёд"
-              className={arrowBtnClass}
-            >
-              →
-            </button>
-          </div>
-        </div>
-      </div>
+    {/* Arrows */}
+    <div className="mt-3 xl:mt-4 flex items-center justify-center gap-4">
+      <button
+        type="button"
+        onClick={goPrev}
+        aria-label="Назад"
+        className={arrowBtnClass}
+      >
+        ←
+      </button>
+      <button
+        type="button"
+        onClick={goNext}
+        aria-label="Вперёд"
+        className={arrowBtnClass}
+      >
+        →
+      </button>
+    </div>
+  </div>
+</div>
 
-      {/* MOBILE arrows (когда правой колонки нет) */}
+      {/* MOBILE arrows */}
       <div className="mt-5 flex items-center justify-center gap-4 lg:hidden">
         <button
           type="button"
@@ -275,6 +278,8 @@ export function TryItCarousel({ items, activeIndex, setActiveIndex }: Props) {
           →
         </button>
       </div>
+    </div>
+    </div>
     </div>
   );
 }

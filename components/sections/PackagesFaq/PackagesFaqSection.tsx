@@ -37,10 +37,10 @@ export function PackagesFaqSection({ items = DEFAULT_ITEMS }: Props) {
   return (
     <section className="bg-white">
       <Container className="py-16 sm:py-20">
-        <div className="grid gap-10 lg:grid-cols-[320px_1fr] lg:gap-16">
+        <div className="grid gap-10 lg:grid-cols-[320px_1fr] lg:gap-36">
           {/* Left: logo */}
           <div className="flex items-start">
-            <div className="relative h-[28px] w-[190px] sm:h-[32px] sm:w-[210px]">
+            <div className="relative h-[28px] w-[190px] sm:h-[32px] sm:w-[210px] md:w-[485px]">
               <Image
                 src="/logo_dark.svg"
                 alt="SOVE GROUP"

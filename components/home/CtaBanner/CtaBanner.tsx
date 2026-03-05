@@ -8,7 +8,7 @@ type Props = {
 };
 
 export function CtaBanner({
-  title = "ГОТОВ НАЧАТЬ\nИНВЕСТИРОВАТЬ?",
+  title = "Начни свой инвест\n ремонт с SOVE",
   bgSrc = "/images/banner.png",
 }: Props) {
   return (
@@ -29,7 +29,7 @@ export function CtaBanner({
       {/* Content */}
       <Container className="relative">
         <div className="flex min-h-screen flex-col justify-between py-32 max-lg:py-12">
-          <h2 className="whitespace-pre-line text-[60px] font-medium leading-[1.05] tracking-[-0.02em] text-white max-lg:text-[60px]">
+          <h2 className="whitespace-pre-line text-[60px] font-medium leading-[1.05] tracking-[-0.02em] text-white uppercase max-lg:text-[60px]">
             {title}
           </h2>
 

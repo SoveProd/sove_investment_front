@@ -17,11 +17,12 @@ export function FindYourPathSection() {
         <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
           <div>
             <h2 className="font-medium tracking-[-0.02em] text-dark text-[34px] sm:text-[38px] lg:text-[40px] 2xl:text-[55px]">
-              Найди свой путь вперед с SOVE
+              SOVE сделает объект активом
             </h2>
 
             <p className="mt-3 max-w-2xl text-text text-[15px] sm:text-[16px] lg:text-[16px] 2xl:text-[18px]">
-              SOVE — это полный сервис управления real estate инвестициями.
+              SOVE — стратегия, дизайн и ремонт, запуск объекта  в прозрачной
+              системе управления на всех этапах.
             </p>
           </div>
 

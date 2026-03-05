@@ -13,6 +13,7 @@ import { TestimonialsSection } from "@/components/home/TestimonialsSection/Testi
 import { CtaBanner } from "@/components/home/CtaBanner/CtaBanner";
 
 import { SectionReveal } from "@/components/ui/SectionReveal";
+import Image from "next/image";
 
 export default function Home() {
   return (
@@ -30,6 +31,18 @@ export default function Home() {
       </SectionReveal>
 
       <SectionReveal>
+        <CasesCtaSection
+          beforeAccent1="Мы меняем правила ремонта!"
+          accent1="Теперь вы сами решаете -"
+          betweenAccents="доверить управление всеми процессами SOVE"
+          accent2="или использовать всех"
+          afterAccent2="наших подрядчиков самостоятельно"
+          buttonLabel="Посмотри наши кейсы"
+          href="/cases"
+        />
+      </SectionReveal>
+
+      <SectionReveal>
         <TryItSection />
       </SectionReveal>
 
@@ -42,48 +55,44 @@ export default function Home() {
       </SectionReveal>
 
       <SectionReveal>
-        <CasesCtaSection
-          beforeAccent1="Мы меняем правила ремонта!"
-          accent1="Теперь вы сами решаете -"
-          betweenAccents="доверить управление всеми процессами SOVE"
-          accent2="или использовать всех"
-          afterAccent2="наших подрядчиков самостоятельно"
-          buttonLabel="Посмотри наши кейсы"
-          href="/cases"
-        />
-      </SectionReveal>
-
-
-      <SectionReveal>
         <DesignMosaicSection />
       </SectionReveal>
 
       <SectionReveal>
         <HowItWorksSection />
       </SectionReveal>
-
       <SectionReveal>
-        <WhyInvestAccordionSection />
-      </SectionReveal>
+        <div className="bg-white">
+          {/* Логотип НАД блоком */}
+          <div className="flex justify-center pt-10 pb-6">
+            <Image
+              src="/logo_dark.svg"
+              alt="SOVE GROUP"
+              width={443}
+              height={42}
+              priority
+              className="opacity-90"
+            />
+          </div>
 
-      <SectionReveal>
-        <ThreeHoverZones
-          imageSrc="/images/hero.jpg"
-          zones={[
-            {
-              title: "Современный дизайн",
-              text: "Наши дизайнеры создают концепции...",
-            },
-            {
-              title: "Профессиональное\nуправление",
-              text: "Берём на себя процесс...",
-            },
-            {
-              title: "Гарантированная ROI",
-              text: "Работаем на результат...",
-            },
-          ]}
-        />
+          <ThreeHoverZones
+            imageSrc="/images/hero.jpg"
+            zones={[
+              {
+                title: "Современный дизайн",
+                text: "Наши дизайнеры создают концепции...",
+              },
+              {
+                title: "Профессиональное\nуправление",
+                text: "Берём на себя процесс...",
+              },
+              {
+                title: "Гарантированная ROI",
+                text: "Работаем на результат...",
+              },
+            ]}
+          />
+        </div>
       </SectionReveal>
 
       <SectionReveal>
@@ -93,8 +102,6 @@ export default function Home() {
       <SectionReveal>
         <CtaBanner />
       </SectionReveal>
-
-
     </>
   );
 }

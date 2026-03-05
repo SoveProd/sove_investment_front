@@ -4,6 +4,7 @@ import "./globals.css";
 
 import { Header } from "@/components/layout/Header/Header";
 import { Footer } from "@/components/layout/Footer/Footer";
+import { TransitionProvider } from "./TransitionProvider";
 
 const montserrat = localFont({
   src: [
@@ -48,8 +49,11 @@ export default function RootLayout({
         className={`${montserrat.variable} font-main antialiased bg-white text-black`}
       >
         <Header />
-        <main className="min-h-screen">{children}</main>
-        
+
+        <main className="min-h-screen">
+          <TransitionProvider>{children}</TransitionProvider>
+        </main>
+
         <Footer />
       </body>
     </html>

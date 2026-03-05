@@ -98,7 +98,7 @@ function FaqRow({
   const panelId = `faq-panel-${item.id}`;
 
   return (
-    <div className="py-4 sm:py-5">
+    <div className="pt-[14px] pb-[14px]">
       <button
         id={btnId}
         type="button"
@@ -119,7 +119,7 @@ function FaqRow({
           <span
             className={cn(
               "relative block h-4 w-4 transition-transform duration-300 ease-out",
-              isOpen && "rotate-45"
+              isOpen && "rotate-45",
             )}
           >
             {/* плюс */}

@@ -1,11 +1,10 @@
 import Image from "next/image";
-import Link from "next/link";
 import type { CaseItem } from "./CasesCatalogSection";
 import { Button } from "@/components/ui/Button";
 
 export function CaseCard({ item }: { item: CaseItem }) {
   return (
-    <article>
+    <article className="w-full">
       <div className="relative overflow-hidden rounded-[24px]">
         <div className="relative aspect-[16/9] w-full">
           <Image
@@ -21,22 +20,31 @@ export function CaseCard({ item }: { item: CaseItem }) {
         {item.title}
       </h3>
 
-      <div className="mt-3 grid grid-cols-2 gap-y-2 text-[13px] text-black/70">
-        <div><span className="font-medium">Бюджет:</span> {item.budget}</div>
-        <div><span className="font-medium">Сроки реализации:</span> 6 мес.</div>
-        <div><span className="font-medium">ROI:</span> {item.roi}</div>
-        <div><span className="font-medium">Локация:</span> {item.location}</div>
-        <div><span className="font-medium">Метраж:</span> {item.area}</div>
-        <div><span className="font-medium">ЖК:</span> {item.complex}</div>
+      <div className="mt-3 grid grid-cols-2 gap-x-6 gap-y-2 text-[13px] text-black/70">
+        <div>
+          <span className="font-medium text-black">Бюджет:</span> {item.budget}
+        </div>
+        <div>
+          <span className="font-medium text-black">Локация:</span>{" "}
+          {item.location}
+        </div>
+        <div>
+          <span className="font-medium text-black">ROI:</span> {item.roi}
+        </div>
+        <div>
+          <span className="font-medium text-black">ЖК:</span> {item.complex}
+        </div>
+        <div>
+          <span className="font-medium text-black">Сроки реализации:</span>{" "}
+          {item.duration ?? "6 мес."}
+        </div>
+        <div>
+          <span className="font-medium text-black">Метраж:</span> {item.area}
+        </div>
       </div>
 
       <div className="mt-5">
-        <Button
-          href={item.href}
-          variant="secondaryLight"
-          size="lg"
-          maxWidth={false}
-        >
+        <Button href={item.href} variant="outlinePill" size="md" maxWidth>
           Подробнее
         </Button>
       </div>

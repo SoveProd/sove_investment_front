@@ -8,6 +8,8 @@ export type CaseItem = {
   location: string;
   complex: string;
   href: string;
+  subtitle?: string;
+  duration?: string;
 };
 
 
