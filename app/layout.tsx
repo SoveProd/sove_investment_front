@@ -44,9 +44,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="ru">
+    <html lang="ru" className="overflow-x-hidden">
       <body
-        className={`${montserrat.variable} font-main antialiased bg-white text-black`}
+        className={`${montserrat.variable} font-main antialiased bg-white text-black overflow-x-hidden`}
       >
         <Header />
 

@@ -1,7 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 
 type Item = {
   title: string;
@@ -11,73 +12,44 @@ type Item = {
 type Props = {
   items: Item[];
   activeIndex: number;
-  setActiveIndex: (index: number) => void;
+  setActiveIndex: React.Dispatch<React.SetStateAction<number>>;
 };
 
-const TRANSITION_MS = 350;
+const IMAGE_TRANSITION = {
+  duration: 0.75,
+  ease: [0.22, 1, 0.36, 1],
+};
+
+const TITLE_TRANSITION = {
+  duration: 0.55,
+  ease: [0.22, 1, 0.36, 1],
+};
 
 export function TryItCarousel({ items, activeIndex, setActiveIndex }: Props) {
   const total = items.length;
 
-  const nextIndex = useMemo(
-    () => (activeIndex + 1) % total,
-    [activeIndex, total],
-  );
-
-  const [prevIndex, setPrevIndex] = useState(activeIndex);
-  const [isFading, setIsFading] = useState(false);
-
-  const rafRef = useRef<number | null>(null);
+  const nextIndex = useMemo(() => {
+    return (activeIndex + 1) % total;
+  }, [activeIndex, total]);
 
   const current = items[activeIndex];
-  const prev = items[prevIndex];
-
   const currentNext = items[nextIndex];
-  const prevNext = items[(prevIndex + 1) % total];
 
-  useEffect(() => {
-    if (activeIndex === prevIndex) return;
-
-    setIsFading(false);
-    if (rafRef.current) cancelAnimationFrame(rafRef.current);
-
-    rafRef.current = requestAnimationFrame(() => {
-      setIsFading(true);
-    });
-
-    return () => {
-      if (rafRef.current) cancelAnimationFrame(rafRef.current);
-    };
-  }, [activeIndex, prevIndex]);
-
-  const handleFadeEnd = () => {
-    setPrevIndex(activeIndex);
-    setIsFading(false);
+  const goPrev = () => {
+    setActiveIndex((prev) => (prev - 1 + total) % total);
   };
 
-  const goPrev = () => setActiveIndex((activeIndex - 1 + total) % total);
-  const goNext = () => setActiveIndex((activeIndex + 1) % total);
+  const goNext = () => {
+    setActiveIndex((prev) => (prev + 1) % total);
+  };
 
   const arrowBtnClass = [
     "flex h-[40px] w-[110px] sm:w-[120px] items-center justify-center rounded-full",
-    "bg-border",
-    "text-borderSoft",
-    "transition-colors duration-200",
+    "bg-border text-borderSoft",
+    "transition-all duration-300",
     "hover:bg-graphite hover:text-surface",
+    "active:scale-[0.98]",
   ].join(" ");
-
-  const showPrev = activeIndex !== prevIndex;
-
-  const prevOpacity = showPrev
-    ? isFading
-      ? "opacity-0"
-      : "opacity-100"
-    : "opacity-0";
-  const currOpacity = showPrev
-    ? isFading
-      ? "opacity-100"
-      : "opacity-0"
-    : "opacity-100";
 
   return (
     <div className="w-full">
@@ -92,80 +64,52 @@ export function TryItCarousel({ items, activeIndex, setActiveIndex }: Props) {
             "lg:max-w-[520px] xl:max-w-[560px] 2xl:max-w-[573px]",
           ].join(" ")}
         >
-          {/* prev image layer */}
-          <div
-            className={[
-              "absolute inset-0 transition-opacity ease-out",
-              `duration-[${TRANSITION_MS}ms]`,
-              prevOpacity,
-            ].join(" ")}
-          >
-            <Image
-              src={prev.img}
-              alt={prev.title}
-              fill
-              sizes="(max-width: 1024px) 100vw, (max-width: 1280px) 60vw, 573px"
-              className="object-cover"
-              priority
-            />
-          </div>
-
-          {/* current image layer */}
-          <div
-            className={[
-              "absolute inset-0 transition-opacity ease-out",
-              `duration-[${TRANSITION_MS}ms]`,
-              currOpacity,
-            ].join(" ")}
-            onTransitionEnd={handleFadeEnd}
-          >
-            <Image
-              src={current.img}
-              alt={current.title}
-              fill
-              sizes="(max-width: 1024px) 100vw, (max-width: 1280px) 60vw, 573px"
-              className="object-cover"
-              priority
-            />
-          </div>
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={current.img}
+              className="absolute inset-0"
+              initial={{ opacity: 0, scale: 1.04 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.985 }}
+              transition={IMAGE_TRANSITION}
+            >
+              <Image
+                src={current.img}
+                alt={current.title}
+                fill
+                sizes="(max-width: 1024px) 100vw, (max-width: 1280px) 60vw, 573px"
+                className="object-cover"
+                priority
+              />
+            </motion.div>
+          </AnimatePresence>
 
           {/* Title inside big image */}
-          <div className="absolute bottom-6 sm:bottom-7 lg:bottom-8 left-0 right-0 grid place-items-center text-center px-4">
-            {/* ✅ было: h-[26px] → делаем min-h и нормальный line-height */}
+          <div className="absolute bottom-6 left-0 right-0 z-10 grid place-items-center px-4 text-center sm:bottom-7 lg:bottom-8">
             <div className="relative w-full min-h-[28px] sm:min-h-[30px] lg:min-h-[32px] 2xl:min-h-[34px]">
-              <div
-                className={[
-                  "absolute inset-0 grid place-items-center",
-                  "font-medium tracking-[0.14em] text-white drop-shadow",
-                  "leading-none",
-                  "text-[16px] sm:text-[18px] lg:text-[20px] 2xl:text-[22px]",
-                  "transition-opacity ease-out",
-                  `duration-[${TRANSITION_MS}ms]`,
-                  prevOpacity,
-                ].join(" ")}
-              >
-                {prev.title.toUpperCase()}
-              </div>
-
-              <div
-                className={[
-                  "absolute inset-0 grid place-items-center",
-                  "font-medium tracking-[0.14em] text-white drop-shadow",
-                  "leading-none",
-                  "text-[16px] sm:text-[18px] lg:text-[20px] 2xl:text-[22px]",
-                  "transition-opacity ease-out",
-                  `duration-[${TRANSITION_MS}ms]`,
-                  currOpacity,
-                ].join(" ")}
-              >
-                {current.title.toUpperCase()}
-              </div>
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={current.title}
+                  className={[
+                    "absolute inset-0 grid place-items-center",
+                    "font-medium tracking-[0.14em] text-white drop-shadow",
+                    "leading-none",
+                    "text-[16px] sm:text-[18px] lg:text-[20px] 2xl:text-[22px]",
+                  ].join(" ")}
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -8 }}
+                  transition={TITLE_TRANSITION}
+                >
+                  {current.title.toUpperCase()}
+                </motion.div>
+              </AnimatePresence>
             </div>
           </div>
         </div>
 
         {/* RIGHT COLUMN */}
-        <div className="hidden lg:flex flex-col items-center w-[280px] xl:w-[360px] 2xl:w-[573px]">
+        <div className="hidden w-[280px] flex-col items-center lg:flex xl:w-[360px] 2xl:w-[573px]">
           {/* SMALL IMAGE */}
           <div
             className={[
@@ -173,98 +117,75 @@ export function TryItCarousel({ items, activeIndex, setActiveIndex }: Props) {
               "h-[420px] xl:h-[520px] 2xl:h-[641px]",
             ].join(" ")}
           >
-            <div
-              className={[
-                "absolute inset-0 transition-opacity ease-out",
-                `duration-[${TRANSITION_MS}ms]`,
-                prevOpacity,
-              ].join(" ")}
-            >
-              <Image
-                src={prevNext.img}
-                alt={prevNext.title}
-                fill
-                sizes="(max-width: 1280px) 35vw, 573px"
-                className="object-cover"
-              />
-            </div>
-
-            <div
-              className={[
-                "absolute inset-0 transition-opacity ease-out",
-                `duration-[${TRANSITION_MS}ms]`,
-                currOpacity,
-              ].join(" ")}
-            >
-              <Image
-                src={currentNext.img}
-                alt={currentNext.title}
-                fill
-                sizes="(max-width: 1280px) 35vw, 573px"
-                className="object-cover"
-              />
-            </div>
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={currentNext.img}
+                className="absolute inset-0"
+                initial={{ opacity: 0, scale: 1.04 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.985 }}
+                transition={IMAGE_TRANSITION}
+              >
+                <Image
+                  src={currentNext.img}
+                  alt={currentNext.title}
+                  fill
+                  sizes="(max-width: 1280px) 35vw, 573px"
+                  className="object-cover"
+                />
+              </motion.div>
+            </AnimatePresence>
           </div>
 
-{/* Title + Arrows aligned as one block */}
-<div className="mt-6 xl:mt-8 flex w-full flex-col items-center">
-  {/* ширина равна зоне стрелок */}
-  <div className="w-[236px] sm:w-[256px]">
-    {/* Title under small image */}
-    <div className="text-center font-medium tracking-[0.12em] text-text text-[16px] xl:text-[20px] 2xl:text-[22px] leading-none">
-      <span className="relative block w-full min-h-[28px] xl:min-h-[30px] 2xl:min-h-[34px]">
-        <span
-          className={[
-            "absolute inset-0 grid place-items-center",
-            "transition-opacity ease-out",
-            `duration-[${TRANSITION_MS}ms]`,
-            prevOpacity,
-          ].join(" ")}
-        >
-          {prevNext.title.toUpperCase()}
-        </span>
+          {/* Title + Arrows */}
+          <div className="mt-6 flex w-full flex-col items-center xl:mt-8">
+            <div className="w-[236px] sm:w-[256px]">
+              <div className="text-center text-[16px] font-medium leading-none tracking-[0.12em] text-text xl:text-[20px] 2xl:text-[22px]">
+                <span className="relative block w-full min-h-[28px] xl:min-h-[30px] 2xl:min-h-[34px]">
+                  <AnimatePresence mode="wait">
+                    <motion.span
+                      key={currentNext.title}
+                      className="absolute inset-0 grid place-items-center"
+                      initial={{ opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -8 }}
+                      transition={TITLE_TRANSITION}
+                    >
+                      {currentNext.title.toUpperCase()}
+                    </motion.span>
+                  </AnimatePresence>
+                </span>
+              </div>
 
-        <span
-          className={[
-            "absolute inset-0 grid place-items-center",
-            "transition-opacity ease-out",
-            `duration-[${TRANSITION_MS}ms]`,
-            currOpacity,
-          ].join(" ")}
-        >
-          {currentNext.title.toUpperCase()}
-        </span>
-      </span>
-    </div>
-
-    {/* Arrows */}
-    <div className="mt-3 xl:mt-4 flex items-center justify-center gap-4">
-      <button
-        type="button"
-        onClick={goPrev}
-        aria-label="Назад"
-        className={arrowBtnClass}
-      >
-        ←
-      </button>
-      <button
-        type="button"
-        onClick={goNext}
-        aria-label="Вперёд"
-        className={arrowBtnClass}
-      >
-        →
-      </button>
-    </div>
-  </div>
-</div>
+              <div className="mt-3 flex items-center justify-center gap-4 xl:mt-4">
+                <button
+                  type="button"
+                  onClick={goPrev}
+                  aria-label="Previous slide"
+                  className={arrowBtnClass}
+                >
+                  ←
+                </button>
+                <button
+                  type="button"
+                  onClick={goNext}
+                  aria-label="Next slide"
+                  className={arrowBtnClass}
+                >
+                  →
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
       {/* MOBILE arrows */}
       <div className="mt-5 flex items-center justify-center gap-4 lg:hidden">
         <button
           type="button"
           onClick={goPrev}
-          aria-label="Назад"
+          aria-label="Previous slide"
           className={arrowBtnClass}
         >
           ←
@@ -272,14 +193,12 @@ export function TryItCarousel({ items, activeIndex, setActiveIndex }: Props) {
         <button
           type="button"
           onClick={goNext}
-          aria-label="Вперёд"
+          aria-label="Next slide"
           className={arrowBtnClass}
         >
           →
         </button>
       </div>
-    </div>
-    </div>
     </div>
   );
 }

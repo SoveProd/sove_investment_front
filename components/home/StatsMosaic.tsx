@@ -127,8 +127,8 @@ export function StatsMosaic() {
           {/* ROW 1 */}
           <div className="col-span-3 h-[280px] min-[1280px]:h-[300px] min-[1440px]:h-[340px] min-[1536px]:h-[389px]">
             <StatNotchedCard
-              value="150"
-              label={"Реализованных\nпроектов"}
+              value="1–5"
+              label={"Показов до сделки \nили аренды"}
               notchSide="br"
               variant="dark"
             />
@@ -141,8 +141,8 @@ export function StatsMosaic() {
 
           <div className="col-span-3 h-[280px] min-[1280px]:h-[300px] min-[1440px]:h-[340px] min-[1536px]:h-[389px]">
             <StatNotchedCard
-              value="150"
-              label={"Активных\nклиентов"}
+              value="200К"
+              label={"Средняя цена аренды \nквартиры SOVE"}
               notchSide="bl"
               variant="dark"
             />
@@ -156,7 +156,7 @@ export function StatsMosaic() {
                   6 месяцев
                 </div>
                 <div className="mt-2 min-[1440px]:mt-3 text-[14px] lg:text-[15px] min-[1536px]:text-[18px] text-text-secondary">
-                  Среднее время
+                  От ремонта до выхода на рынок
                 </div>
               </div>
             </div>

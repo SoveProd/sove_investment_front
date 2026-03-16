@@ -11,6 +11,8 @@ export type ConceptHeroData = {
 
   image: { src: string; alt: string };
 
+  gallery?: { src: string; alt: string }[];
+
   ctaLabel: string;
   ctaHref: string;
 };

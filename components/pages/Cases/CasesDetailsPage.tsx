@@ -1,5 +1,6 @@
-import { CaseHero } from "@/components/sections/CaseHero/CaseHero";
-import type { CaseHeroData } from "@/components/sections/CaseHero/types";
+import CaseHero, {
+  CaseHeroData,
+} from "@/components/sections/CaseHero/CaseHero";
 import { CtaBanner } from "@/components/home/CtaBanner/CtaBanner";
 
 type Props = {

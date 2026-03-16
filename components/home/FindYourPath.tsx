@@ -20,9 +20,8 @@ export function FindYourPathSection() {
               SOVE сделает объект активом
             </h2>
 
-            <p className="mt-3 max-w-2xl text-text text-[15px] sm:text-[16px] lg:text-[16px] 2xl:text-[18px]">
-              SOVE — стратегия, дизайн и ремонт, запуск объекта  в прозрачной
-              системе управления на всех этапах.
+            <p className="mt-3  text-text text-[15px] sm:text-[16px] lg:text-[16px] 2xl:text-[18px]">
+              SOVE — стратегия, дизайн и ремонт, запуск объекта  в прозрачной системе управления на всех этапах.
             </p>
           </div>
 

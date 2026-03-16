@@ -93,10 +93,11 @@ export default function HowItWorksSection() {
                   type="button"
                   onClick={() => setActive(idx)}
                   className={[
-                    "h-[44px] w-full rounded-full border px-5 text-[14px] font-medium transition",
+                    "flex h-[79px] w-full items-center justify-center rounded-[79px] px-6 text-center transition-all duration-300",
+                    "text-[18px] font-medium leading-none xl:text-[20px]",
                     isActive
-                      ? "border-graphite bg-graphite text-white"
-                      : "border-border bg-white text-text hover:border-graphite/40",
+                      ? "bg-[#383838] text-white"
+                      : "border border-border bg-white text-text hover:border-[#383838]/40",
                   ].join(" ")}
                 >
                   {s.tabLabel}
@@ -114,8 +115,8 @@ export default function HowItWorksSection() {
                 <div key={s.id} className="flex items-center justify-center">
                   <span
                     className={[
-                      "block h-[5px] w-[5px] rounded-full transition",
-                      isActive ? "bg-graphite" : "bg-borderSoft",
+                      "block h-[6px] w-[6px] rounded-full transition-all duration-300",
+                      isActive ? "bg-[#383838]" : "bg-borderSoft",
                     ].join(" ")}
                   />
                 </div>

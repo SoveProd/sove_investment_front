@@ -17,7 +17,7 @@ export function ConceptHeroSection({ concept }: Props) {
   const available = clamp(concept.availableSlots, 0, total);
 
   return (
-    <section className="relative min-h-screen w-full text-white">
+    <section className="relative min-h-screen w-full min-w-0 overflow-x-hidden text-white">
       {/* BACKGROUND IMAGE */}
       <Image
         src={concept.image.src}
@@ -31,11 +31,11 @@ export function ConceptHeroSection({ concept }: Props) {
       <div className="absolute inset-0 bg-black/10" />
 
       {/* BOTTOM PANEL */}
-      <div className="absolute bottom-0 left-0 w-full bg-[#3B3B3B] h-[380px]">
-        <Container className="h-full">
-          <div className="grid h-full grid-cols-12 items-center gap-45 max-lg:gap-8">
+      <div className="absolute bottom-0 left-0 w-full min-w-0 bg-[#3B3B3B] h-[380px] overflow-hidden">
+        <Container className="h-full min-w-0">
+          <div className="grid h-full grid-cols-12 items-center gap-8 lg:gap-12 max-lg:gap-8">
             {/* LEFT */}
-            <div className="col-span-12 lg:col-span-6">
+            <div className="col-span-12 min-w-0 lg:col-span-6">
               <div className="flex items-center gap-4">
                 <h1 className="text-[40px] font-medium leading-none tracking-[0.06em] max-lg:text-[34px]">
                   {concept.title}
@@ -70,7 +70,7 @@ export function ConceptHeroSection({ concept }: Props) {
             </div>
 
             {/* RIGHT */}
-            <div className="col-span-12 lg:col-span-6">
+            <div className="col-span-12 min-w-0 lg:col-span-6">
               <div className="max-w-[560px] text-[14px] leading-relaxed text-white/60 whitespace-pre-line">
                 {concept.shortRightText}
               </div>
@@ -116,7 +116,7 @@ function SegmentBar({
   const safeAvailable = clamp(available, 0, safeTotal);
 
   return (
-    <div className="flex gap-2">
+    <div className="flex flex-wrap gap-2 min-w-0">
       {Array.from({ length: safeTotal }).map((_, idx) => {
         const isAvailable = idx < safeAvailable;
         return (
