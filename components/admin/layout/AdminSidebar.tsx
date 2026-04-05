@@ -1,50 +1,49 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import clsx from "clsx";
-import {
-  BriefcaseBusiness,
-  ClipboardList,
-  FileText,
-  PenSquare,
-  UserCog,
-  Settings,
-  ChevronDown,
-} from "lucide-react";
+import { ChevronDown } from "lucide-react";
 
-const navItems = [
+type NavItem = {
+  label: string;
+  href: string;
+  iconSrc: string;
+  withArrow?: boolean;
+};
+
+const navItems: NavItem[] = [
   {
     label: "Проекты",
     href: "/admin/projects",
-    icon: BriefcaseBusiness,
-    active: true,
+    iconSrc: "/admin/icons/Group 1.svg",
   },
   {
     label: "Заявки",
     href: "/admin/requests",
-    icon: ClipboardList,
+    iconSrc: "/admin/icons/Calendar Checked.svg",
   },
   {
     label: "База клиентов",
     href: "/admin/clients",
-    icon: FileText,
+    iconSrc: "/admin/icons/Document Align Center 1.svg",
   },
   {
     label: "Content Tools",
     href: "/admin/content-tools/home",
-    icon: PenSquare,
+    iconSrc: "/admin/icons/Edit.svg",
     withArrow: true,
   },
   {
     label: "Управление",
     href: "/admin/management",
-    icon: UserCog,
+    iconSrc: "/admin/icons/Other.svg",
   },
   {
     label: "Профиль",
     href: "/admin/profile",
-    icon: Settings,
+    iconSrc: "/admin/icons/Settings.svg",
   },
 ];
 
@@ -56,16 +55,23 @@ export function AdminSidebar() {
       <div className="min-h-[calc(100vh-40px)] overflow-hidden rounded-[34px] bg-white px-[22px] py-8">
         <Link
           href="/admin/content-tools/home"
-          className="mb-14 inline-flex px-[10px] text-[56px] font-bold leading-none text-[#A05035]"
+          className="mb-14 inline-flex px-[10px]"
+          aria-label="Sove Group admin"
         >
-          SG
+          <Image
+            src="/footerLogo.svg"
+            alt="Sove Group"
+            width={104}
+            height={58}
+            className="h-auto w-[104px]"
+            priority
+          />
         </Link>
 
         <nav className="flex flex-col gap-4">
           {navItems.map((item) => {
             const isActive =
               pathname === item.href || pathname.startsWith(`${item.href}/`);
-            const Icon = item.icon;
 
             return (
               <Link
@@ -77,12 +83,12 @@ export function AdminSidebar() {
                 )}
               >
                 <span className="flex items-center gap-[17px]">
-                  <Icon
-                    size={28}
-                    strokeWidth={2}
-                    className={clsx(
-                      isActive ? "text-[#A05035]" : "text-[#5B5B5B]",
-                    )}
+                  <Image
+                    src={item.iconSrc}
+                    alt=""
+                    width={32}
+                    height={32}
+                    className="h-8 w-8 shrink-0 object-contain"
                   />
 
                   <span
