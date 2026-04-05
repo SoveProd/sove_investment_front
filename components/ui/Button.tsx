@@ -10,7 +10,6 @@ type CommonProps = {
   variant?: ButtonVariant;
   size?: ButtonSize;
   fullWidth?: boolean;
-  /** NEW: если false — не ставим max-w-[481px] */
   maxWidth?: boolean;
   className?: string;
   ariaLabel?: string;
@@ -57,13 +56,19 @@ export function Button(props: ButtonAsLink | ButtonAsButton) {
       "xl:h-[68px] xl:px-8 xl:text-[18px]",
       "2xl:h-[77px] 2xl:px-[21px] 2xl:text-[22px]",
     ),
+
     md: clsx(
       "h-[48px] px-5 text-[14px] uppercase",
       "sm:h-[52px] sm:px-6 sm:text-[15px]",
       "lg:h-[54px] lg:text-[15px]",
       "xl:h-[56px] xl:text-[16px]",
     ),
-    sm: clsx("h-[71px] px-8 text-[18px] normal-case", "rounded-[62px]"),
+
+    sm: clsx(
+      "h-[45px] min-w-[129px] px-4 text-[12px] normal-case rounded-full",
+      "sm:h-[50px] sm:min-w-[150px] sm:px-5 sm:text-[14px]",
+      "lg:h-[56px] lg:min-w-0 lg:px-6 lg:text-[16px]",
+    ),
   };
 
   const variants: Record<ButtonVariant, string> = {
@@ -78,7 +83,7 @@ export function Button(props: ButtonAsLink | ButtonAsButton) {
     ? "w-full"
     : maxWidth
       ? "w-full max-w-[481px]"
-      : "w-full";
+      : "w-auto";
 
   const styles = clsx(base, sizes[size], variants[variant], width, className);
 

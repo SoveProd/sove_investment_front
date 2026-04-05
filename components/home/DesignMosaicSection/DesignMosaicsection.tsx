@@ -5,7 +5,7 @@ import { Container } from "@/components/layout/Container";
 type TextCard = {
   type: "text";
   id: string;
-  indexLabel: string; // "[1]"
+  indexLabel: string;
   title: string;
   description: string;
   href: string;
@@ -25,64 +25,89 @@ const items: MosaicItem[] = [
     type: "text",
     id: "t1",
     indexLabel: "[1]",
-    title: "Персональное\nсопровождение",
+    title: "ТЕХНОЛОГИЧНОСТЬ",
     description:
-      "Наш опытный менеджер проведет вас через каждый этап инвестиций. Мы предоставляем детальные консультации, помогаем выбрать лучший объект и поддерживаем на протяжении всего проекта.",
+      "Платформа объединяет все этапы от выбора инвестиционного объекта до сдачи в аренду и обслуживания управляющей.",
     href: "#",
   },
   { type: "image", id: "i1", imageSrc: "/images/statsimg1.jpg", imageAlt: "" },
 
   {
     type: "text",
-    id: "t3",
-    indexLabel: "[3]",
-    title: "Гарантированная\nбезопасность",
+    id: "t2",
+    indexLabel: "[2]",
+    title: "БЕЗОПАСНОСТЬ",
     description:
-      "Мы гарантируем, что каждый проект безопасен и защищен. Все объекты проходят тщательную проверку, привлекаются эксперты и страхование, чтобы защитить ваши интересы.",
+      "Вы видите реальную смету и расписание платежей. Юридические решения, техническая и финансовая система без серых зон.",
     href: "#",
   },
   { type: "image", id: "i2", imageSrc: "/images/hero.jpg", imageAlt: "" },
 
-  { type: "image", id: "i3", imageSrc: "/images/statsimg1.jpg", imageAlt: "" },
-
   {
     type: "text",
-    id: "t2",
-    indexLabel: "[2]",
-    title: "Экспертиза\nи опыт",
+    id: "t3",
+    indexLabel: "[3]",
+    title: "СТАНДАРТ",
     description:
-      "Нет времени становиться экспертом в сфере недвижимости? Это хорошо, мы здесь. Наша команда имеет многолетний опыт в подборе, управлении и оптимизации инвестиционных проектов.",
+      "SOVE работает как операционная система в девелопменте, исключающая хаос, двойную бухгалтерию и зависимость от случайных решений.",
     href: "#",
   },
-
-  { type: "image", id: "i4", imageSrc: "/images/statsimg1.jpg", imageAlt: "" },
+  { type: "image", id: "i3", imageSrc: "/images/pathimg.jpg", imageAlt: "" },
 
   {
     type: "text",
     id: "t4",
     indexLabel: "[4]",
-    title: "Максимальная\nдоходность",
+    title: "КОНТРОЛЬ",
     description:
-      "Наш опытный менеджер проводит вас через каждый этап инвестиций. Мы предоставляем детальные консультации, помогаем выбрать лучший объект и поддерживаем на протяжении всего проекта.",
+      "Используйте готовые регламентированные решения SOVE в закупке, логистике, ремонте, финансировании и масштабировании.",
     href: "#",
   },
+  { type: "image", id: "i4", imageSrc: "/images/statsimg2.jpg", imageAlt: "" },
 ];
 
 export function DesignMosaicSection() {
   return (
-    <section className="w-full bg-bg py-[150px] max-lg:py-[80px]">
+    <section className="w-full bg-bg py-[56px] sm:py-[80px] lg:py-[150px]">
       <Container>
-        <h2 className="text-center text-[55px] font-medium tracking-[-0.02em] text-dark max-lg:text-[34px]">
-          Инвестируйте в дизайн недвижимости под ключ
+        <h2 className="text-center text-[28px] font-medium leading-[1.08] tracking-[-0.02em] text-dark sm:text-[34px] lg:text-[55px]">
+          Инвестируйте в дизайн
+          <br className="sm:hidden" /> недвижимости под ключ
         </h2>
 
-        <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        {/* MOBILE */}
+        <div className="mt-8 grid grid-cols-1 gap-4 sm:hidden">
+          {items.map((item) => {
+            if (item.type === "image") {
+              return (
+                <MobileImageCard
+                  key={item.id}
+                  src={item.imageSrc}
+                  alt={item.imageAlt}
+                />
+              );
+            }
+
+            return (
+              <MobileTextFeatureCard
+                key={item.id}
+                indexLabel={item.indexLabel}
+                title={item.title}
+                description={item.description}
+                href={item.href}
+              />
+            );
+          })}
+        </div>
+
+        {/* TABLET / DESKTOP */}
+        <div className="mt-12 hidden sm:grid grid-cols-2 gap-6 lg:grid-cols-4">
           {items.map((item) => {
             if (item.type === "image") {
               return (
                 <div
                   key={item.id}
-                  className="group relative overflow-hidden rounded-[48px] bg-white"
+                  className="group relative overflow-hidden rounded-[36px] lg:rounded-[48px] bg-white"
                 >
                   <div className="relative aspect-[4/5] w-full">
                     <Image
@@ -93,6 +118,7 @@ export function DesignMosaicSection() {
                       className="object-cover grayscale transition-all duration-500 ease-out group-hover:grayscale-0 group-hover:scale-[1.02]"
                     />
                   </div>
+
                   <div className="pointer-events-none absolute inset-0 bg-black/5 opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
                 </div>
               );
@@ -114,9 +140,76 @@ export function DesignMosaicSection() {
   );
 }
 
+function MobileImageCard({ src, alt }: { src: string; alt: string }) {
+  return (
+    <div className="group relative overflow-hidden rounded-[16px] bg-white">
+      <div className="relative h-[257px] w-full">
+        <Image
+          src={src}
+          alt={alt}
+          fill
+          sizes="343px"
+          className="object-cover grayscale transition-all duration-500 ease-out group-hover:grayscale-0 group-hover:scale-[1.02]"
+        />
+      </div>
+    </div>
+  );
+}
+function MobileTextFeatureCard({
+  indexLabel,
+  title,
+  description,
+  href,
+}: {
+  indexLabel: string;
+  title: string;
+  description: string;
+  href: string;
+}) {
+  return (
+    <Link href={href} className="group block" aria-label={title}>
+      <div className="relative h-[257px] w-full rounded-[28px] bg-graphite p-6">
+        <span className="text-[12px] text-white/70">{indexLabel}</span>
 
+        <h3 className="mt-4 text-[18px] font-medium text-white">{title}</h3>
 
+        <p className="mt-6 max-w-[240px] text-[12px] leading-[1.4] text-white/70">
+          {description}
+        </p>
 
+        {/* SPACE FOR ARROW */}
+        <div className="absolute bottom-0 right-0 h-[90px] w-[90px]" />
+
+        {/* ARROW */}
+        <div className="absolute bottom-3 right-3 grid h-[52px] w-[52px] place-items-center rounded-full bg-white shadow-[0_10px_25px_rgba(0,0,0,0.15)]">
+          <ArrowIcon />
+        </div>
+      </div>
+    </Link>
+  );
+}
+
+function MobileMaskedPanel({ children }: { children: React.ReactNode }) {
+  const shapeFill = "var(--color-graphite)";
+
+  return (
+    <div className="relative h-[257px] w-full">
+      <svg
+        viewBox="0 0 343 257"
+        className="absolute inset-0 h-full w-full"
+        aria-hidden="true"
+        preserveAspectRatio="none"
+      >
+        <path
+          d="M0 24C0 10.7452 10.7452 0 24 0H319C332.255 0 343 10.7452 343 24V196C343 209.255 332.255 220 319 220H302C283.775 220 269 234.775 269 253V257H24C10.7452 257 0 246.255 0 233V24Z"
+          fill={shapeFill}
+        />
+      </svg>
+
+      <div className="relative z-[2] h-full w-full">{children}</div>
+    </div>
+  );
+}
 function TextFeatureCard({
   indexLabel,
   title,
@@ -131,7 +224,6 @@ function TextFeatureCard({
   return (
     <Link href={href} className="group block" aria-label={title}>
       <div className="relative h-full w-full">
-        {/* SVG SHAPE + CONTENT */}
         <MaskedPanel>
           <div className="flex h-full flex-col p-8">
             <span className="text-[14px] text-white/70">{indexLabel}</span>
@@ -146,7 +238,6 @@ function TextFeatureCard({
           </div>
         </MaskedPanel>
 
-        {/* Arrow in notch */}
         <div className="absolute bottom-4 right-4 z-[3] grid h-[52px] w-[52px] place-items-center rounded-full bg-white text-dark shadow-[0_10px_30px_rgba(0,0,0,0.12)] transition-transform duration-200 group-hover:scale-[1.03]">
           <ArrowIcon />
         </div>
@@ -156,13 +247,10 @@ function TextFeatureCard({
 }
 
 function MaskedPanel({ children }: { children: React.ReactNode }) {
-  // ВАЖНО: чтобы использовать ваши токены — лучше fill через CSS-переменную как в StatsMosaic
-  // Если у тебя bg-dark === var(--color-graphite), то так будет идеально.
   const shapeFill = "var(--color-graphite)";
 
   return (
     <div className="relative aspect-[4/5] w-full">
-      {/* SVG SHAPE */}
       <svg
         viewBox="0 0 419 546"
         className="absolute inset-0 h-full w-full"
@@ -175,15 +263,19 @@ function MaskedPanel({ children }: { children: React.ReactNode }) {
         />
       </svg>
 
-      {/* CONTENT */}
       <div className="relative z-[2] h-full w-full">{children}</div>
     </div>
   );
 }
 
-function ArrowIcon() {
+function ArrowIcon({ small = false }: { small?: boolean }) {
   return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+    <svg
+      width={small ? "14" : "18"}
+      height={small ? "14" : "18"}
+      viewBox="0 0 24 24"
+      fill="none"
+    >
       <path
         d="M7 17L17 7"
         stroke="currentColor"

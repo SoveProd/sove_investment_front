@@ -40,9 +40,72 @@ export function ThreeHoverZones({
         <div className={`absolute inset-0 ${overlayClassName}`} />
       </div>
 
-      {/* Zones */}
+      {/* MOBILE */}
+      {/* MOBILE */}
+      <div className="relative z-20 h-full lg:hidden">
+        <div className="flex h-full flex-col py-[80px]">
+          {zones.map((z, idx) => (
+            <div
+              key={idx}
+              className="relative flex flex-1 items-center justify-center px-6 text-center"
+            >
+              {idx !== 0 && (
+                <div className="absolute top-0 left-1/2 h-[1px] w-[173px] -translate-x-1/2 bg-white/40" />
+              )}
+
+              <div className="flex max-w-[250px] flex-col items-center">
+                <h3 className="whitespace-pre-line text-[18px] font-medium leading-[1.08] text-white">
+                  {z.title}
+                </h3>
+
+                {z.text && (
+                  <p className="mt-3 text-[12px] leading-[1.35] text-white/88">
+                    {z.text}
+                  </p>
+                )}
+
+                {z.ctaLabel && z.ctaHref && (
+                  <div className="mt-5">
+                    <Link
+                      href={z.ctaHref}
+                      className="inline-flex h-[45px] min-w-[183px] items-center justify-between rounded-full bg-white pl-5 pr-[4px] text-[12px] font-medium text-[#7B7B7B] shadow-[0_10px_30px_rgba(0,0,0,0.12)]"
+                    >
+                      <span className="whitespace-nowrap">{z.ctaLabel}</span>
+
+                      <span className="ml-3 grid h-[32px] w-[32px] shrink-0 place-items-center rounded-full bg-[#3F3F3F]">
+                        <svg
+                          width="10"
+                          height="10"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          aria-hidden="true"
+                        >
+                          <path
+                            d="M7 17L17 7"
+                            stroke="white"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                          />
+                          <path
+                            d="M9 7H17V15"
+                            stroke="white"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                          />
+                        </svg>
+                      </span>
+                    </Link>
+                  </div>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* DESKTOP */}
       <div
-        className="relative grid h-full w-full"
+        className="relative hidden h-full w-full lg:grid"
         style={{ gridTemplateColumns: `repeat(${zones.length}, 1fr)` }}
       >
         {zones.map((z, idx) => {
@@ -58,7 +121,6 @@ export function ThreeHoverZones({
               onMouseEnter={() => setActive(idx)}
               onMouseLeave={() => setActive(null)}
             >
-              {/* Click layer for accessibility */}
               <button
                 type="button"
                 className="absolute inset-0 z-10 h-full w-full outline-none"
@@ -67,8 +129,7 @@ export function ThreeHoverZones({
                 aria-label={z.title}
               />
 
-              {/* Blur overlay */}
-              <div className="absolute inset-0 pointer-events-none">
+              <div className="pointer-events-none absolute inset-0">
                 <div
                   className={[
                     "absolute inset-0 bg-black/25",
@@ -80,7 +141,6 @@ export function ThreeHoverZones({
                 />
               </div>
 
-              {/* Content */}
               <div className="absolute inset-0 z-20 grid place-items-center px-6 text-center">
                 <div className="max-w-[320px]">
                   <div className="whitespace-pre-line text-[24px] font-medium leading-[1.1] text-white">
@@ -99,7 +159,6 @@ export function ThreeHoverZones({
                     </p>
                   )}
 
-                  {/* CTA */}
                   {z.ctaLabel && z.ctaHref && (
                     <div
                       className={[

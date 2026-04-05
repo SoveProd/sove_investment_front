@@ -91,7 +91,7 @@ export function PackagesPage() {
       </SectionReveal>
 
       <SectionReveal delay={0.1} className="mt-[80px] bg-[#f3f3f3]">
-        <div className="py-10 text-center text-[50px] font-medium text-[#1f1f1f]">
+        <div className="hidden lg:block py-10 text-center text-[50px] font-medium text-[#1f1f1f]">
           Другие наши услуги
         </div>
 
