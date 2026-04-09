@@ -8,11 +8,15 @@ import type { MetricsBlockData } from "@/app/(admin)/admin/content-tools/home/ty
 type MetricsBlockEditorProps = {
   value: MetricsBlockData;
   onChange: (value: MetricsBlockData) => void;
+  onFieldBlur?: () => void;
+  isSaving?: boolean;
 };
 
 export function MetricsBlockEditor({
   value,
   onChange,
+  onFieldBlur,
+  isSaving = false,
 }: MetricsBlockEditorProps) {
   const handleMetricChange = (
     id: number,
@@ -52,6 +56,7 @@ export function MetricsBlockEditor({
                 onChange={(fieldValue) =>
                   handleMetricChange(item.id, "title", fieldValue)
                 }
+                onBlur={onFieldBlur}
               />
 
               <AdminSmallTextField
@@ -60,6 +65,7 @@ export function MetricsBlockEditor({
                 onChange={(fieldValue) =>
                   handleMetricChange(item.id, "value", fieldValue)
                 }
+                onBlur={onFieldBlur}
               />
 
               <AdminMediaField
@@ -71,6 +77,10 @@ export function MetricsBlockEditor({
             </div>
           </div>
         ))}
+
+        {isSaving ? (
+          <p className="text-[13px] text-[#8D8D8D]">Сохраняем...</p>
+        ) : null}
       </div>
     </AdminSectionCard>
   );

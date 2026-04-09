@@ -6,17 +6,29 @@ import type { RepeatableFeatureBlockData } from "@/app/(admin)/admin/content-too
 type MakeWithSoveBlockEditorProps = {
   value: RepeatableFeatureBlockData;
   onChange: (value: RepeatableFeatureBlockData) => void;
+  onTitleBlur?: () => void;
+  onDescriptionBlur?: () => void;
+  onButtonBlur?: () => void;
+  isSaving?: boolean;
 };
 
 export function MakeWithSoveBlockEditor({
   value,
   onChange,
+  onTitleBlur,
+  onDescriptionBlur,
+  onButtonBlur,
+  isSaving = false,
 }: MakeWithSoveBlockEditorProps) {
   return (
     <RepeatableFeatureBlockEditor
       sectionTitle='Блок "сделай с SOVE"'
       value={value}
       onChange={onChange}
+      onTitleBlur={onTitleBlur}
+      onDescriptionBlur={onDescriptionBlur}
+      onButtonBlur={onButtonBlur}
+      isSaving={isSaving}
       topTitleLabel="Основной заголовок"
       topDescriptionLabel="Описание краткое"
       topButtonLabel="Кнопка"

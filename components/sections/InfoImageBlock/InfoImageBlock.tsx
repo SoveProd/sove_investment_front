@@ -3,14 +3,14 @@ import clsx from "clsx";
 import { Container } from "@/components/layout/Container";
 
 type Props = {
-  index: number | string; // 1 / 2 / 3 ...
+  index: number | string;
   title: string;
   text: string;
   image: {
     src: string;
     alt: string;
   };
-  reverse?: boolean; // если true — картинка слева, текст справа
+  reverse?: boolean;
   className?: string;
 };
 
@@ -23,41 +23,56 @@ export function InfoImageBlock({
   className = "",
 }: Props) {
   return (
-    <section className={clsx("w-full bg-white py-14", className)}>
+    <section className={clsx("w-full bg-white py-8 lg:py-14", className)}>
       <Container>
         <div
           className={clsx(
-            "grid grid-cols-12 items-stretch gap-6",
+            "grid grid-cols-1 gap-4 lg:grid-cols-12 lg:gap-6",
             reverse ? "lg:[&>*:first-child]:order-2" : "",
           )}
         >
           {/* TEXT CARD */}
-          <div className="col-span-12 lg:col-span-6">
+          <div className="lg:col-span-6">
             <div
               className={clsx(
-                "h-full rounded-[28px] bg-white",
-                "px-12 py-12 max-lg:px-8 max-lg:py-10",
-                // очень лёгкий бордер + мягкая тень как на скрине
-                "border border-black/5 shadow-[0_12px_40px_rgba(0,0,0,0.06)]",
+                "h-full rounded-[24px] border border-black/5 bg-white shadow-[0_12px_40px_rgba(0,0,0,0.06)]",
+                "px-7 py-7",
+                "lg:rounded-[28px] lg:px-12 lg:py-12",
               )}
             >
-              <div className="text-[28px] font-medium text-black/10 max-lg:text-[24px]">
+              <div className="text-[18px] font-medium text-black/10 lg:text-[28px]">
                 [{index}]
               </div>
 
-              <h3 className="mt-16 text-[38px] font-medium leading-[1.05] text-black max-lg:mt-10 max-lg:text-[30px]">
+              <h3
+                className={clsx(
+                  "mt-6 text-[18px] font-medium leading-[1.15] text-black italic",
+                  "lg:mt-16 lg:text-[38px] lg:leading-[1.05]",
+                )}
+              >
                 {title}
               </h3>
 
-              <p className="mt-5 max-w-[520px] whitespace-pre-line text-[18px] leading-[1.35] text-black/55 max-lg:text-[16px]">
+              <p
+                className={clsx(
+                  "mt-4 max-w-[520px] whitespace-pre-line text-[12px] leading-[1.3] text-black/60",
+                  "lg:mt-5 lg:text-[18px] lg:leading-[1.35] lg:text-black/55",
+                )}
+              >
                 {text}
               </p>
             </div>
           </div>
 
           {/* IMAGE */}
-          <div className="col-span-12 lg:col-span-6">
-            <div className="relative h-full min-h-[520px] overflow-hidden rounded-[28px] bg-black/[0.02] max-lg:min-h-[360px]">
+          <div className="lg:col-span-6">
+            <div
+              className={clsx(
+                "relative overflow-hidden rounded-[24px] bg-black/[0.02]",
+                "min-h-[360px]",
+                "lg:min-h-[520px] lg:rounded-[28px]",
+              )}
+            >
               <Image
                 src={image.src}
                 alt={image.alt}

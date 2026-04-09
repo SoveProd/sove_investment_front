@@ -11,6 +11,11 @@ type RepeatableFeatureBlockEditorProps = {
   value: RepeatableFeatureBlockData;
   onChange: (value: RepeatableFeatureBlockData) => void;
 
+  onTitleBlur?: () => void;
+  onDescriptionBlur?: () => void;
+  onButtonBlur?: () => void;
+  isSaving?: boolean;
+
   topTitleLabel?: string;
   topDescriptionLabel?: string;
   topButtonLabel?: string;
@@ -32,6 +37,10 @@ export function RepeatableFeatureBlockEditor({
   sectionTitle,
   value,
   onChange,
+  onTitleBlur,
+  onDescriptionBlur,
+  onButtonBlur,
+  isSaving = false,
   topTitleLabel = "Основной заголовок",
   topDescriptionLabel = "Описание краткое",
   topButtonLabel = "Кнопка",
@@ -106,6 +115,7 @@ export function RepeatableFeatureBlockEditor({
             value={value.title}
             placeholder={topTitlePlaceholder}
             onChange={(fieldValue) => handleTopFieldChange("title", fieldValue)}
+            onBlur={onTitleBlur}
           />
 
           <AdminTextareaField
@@ -115,6 +125,7 @@ export function RepeatableFeatureBlockEditor({
             onChange={(fieldValue) =>
               handleTopFieldChange("description", fieldValue)
             }
+            onBlur={onDescriptionBlur}
           />
 
           <AdminSmallTextField
@@ -124,6 +135,7 @@ export function RepeatableFeatureBlockEditor({
             onChange={(fieldValue) =>
               handleTopFieldChange("buttonLabel", fieldValue)
             }
+            onBlur={onButtonBlur}
           />
         </div>
 
@@ -159,6 +171,10 @@ export function RepeatableFeatureBlockEditor({
             {addButtonText}
           </button>
         </div>
+
+        {isSaving ? (
+          <p className="text-[13px] text-[#8D8D8D]">Сохраняем...</p>
+        ) : null}
       </div>
     </AdminSectionCard>
   );

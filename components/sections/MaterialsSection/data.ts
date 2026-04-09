@@ -10,9 +10,9 @@ export const MATERIALS_TABS: MaterialsTab[] = [
       { id: "m1", title: "Красное дерево", imageSrc: "/images/red_wood.jpg" },
       { id: "m2", title: "Алюминий", imageSrc: "/images/red_wood.jpg" },
       { id: "m3", title: "Велюр", imageSrc: "/images/red_wood.jpg" },
-      { id: "m4", title: "Красное дерево", imageSrc: "/images/red_wood.jpg" },
-      { id: "m4", title: "Красное дерево", imageSrc: "/images/red_wood.jpg" },
-      { id: "m4", title: "Красное дерево", imageSrc: "/images/red_wood.jpg" },
+      { id: "m5", title: "Красное дерево", imageSrc: "/images/red_wood.jpg" },
+      { id: "m6", title: "Красное дерево", imageSrc: "/images/red_wood.jpg" },
+      { id: "m7", title: "Красное дерево", imageSrc: "/images/red_wood.jpg" },
       // можно больше — карусель прокрутит
     ],
   },

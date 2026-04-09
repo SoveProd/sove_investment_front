@@ -1,9 +1,15 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useMemo, useState } from "react";
 import clsx from "clsx";
 import { Button } from "@/components/ui/Button";
+
+export type PopularConceptImage = {
+  src: string;
+  alt: string;
+};
 
 export type PopularConcept = {
   id: string;
@@ -15,10 +21,12 @@ export type PopularConcept = {
   availableSlots: number;
   style: string;
   drop: string;
-  image: { src: string; alt: string };
+  images: PopularConceptImage[];
   bookingHref: string;
   detailsHref: string;
 };
+
+
 
 type Props = {
   title: string;
@@ -39,6 +47,8 @@ const UI = {
     accent: "var(--color-accent, #9B5A45)",
     segmentInactive: "rgba(0,0,0,0.10)",
     title: "#1f1f1f",
+    dotInactive: "rgba(255,255,255,0.65)",
+    dotActive: "#1f1f1f",
   },
 };
 
@@ -217,14 +227,26 @@ function MobileConceptCard({ item }: { item: PopularConcept }) {
   const available = clamp(item.availableSlots, 0, total);
   const soldOut = available === 0;
 
+  const slides = item.images?.length
+    ? item.images
+    : [{ src: "", alt: item.title }];
+  const [currentSlide, setCurrentSlide] = useState(0);
+
+  const goPrev = () => {
+    setCurrentSlide((prev) => (prev === 0 ? slides.length - 1 : prev - 1));
+  };
+
+  const goNext = () => {
+    setCurrentSlide((prev) => (prev === slides.length - 1 ? 0 : prev + 1));
+  };
+
   return (
     <article className="w-full">
-      {/* image */}
       <div className="relative overflow-hidden rounded-[18px]">
         <div className="relative aspect-[343/214] w-full">
           <Image
-            src={item.image.src}
-            alt={item.image.alt}
+            src={slides[currentSlide].src}
+            alt={slides[currentSlide].alt}
             fill
             className="object-cover"
             sizes="100vw"
@@ -232,47 +254,101 @@ function MobileConceptCard({ item }: { item: PopularConcept }) {
           />
         </div>
 
-        {/* pills */}
-        <div className="absolute left-2 top-2">
+        <div className="absolute left-2 top-2 z-10">
           <span className="inline-flex items-center rounded-full bg-white px-2.5 py-1 text-[9px] font-medium text-[#6b6b6b] shadow-sm">
             {item.drop}
           </span>
         </div>
 
-        <div className="absolute right-2 top-2">
-          <span className="inline-flex items-center rounded-full bg-white/30 px-2.5 py-1 text-[9px] font-medium text-white backdrop-blur-sm">
+        <div className="absolute right-2 top-2 z-10">
+          <span className="inline-flex items-center rounded-full bg-white/35 px-2.5 py-1 text-[9px] font-medium text-white backdrop-blur-sm">
             {item.style}
           </span>
         </div>
 
-        {/* arrows like on mock */}
-        <button
-          type="button"
-          aria-label="Предыдущая"
-          className="absolute left-2 top-1/2 z-10 grid h-[26px] w-[26px] -translate-y-1/2 place-items-center rounded-full bg-white/90"
-        >
-          <span className="text-[13px] leading-none text-[#B5B5B5]">←</span>
-        </button>
+        {slides.length > 1 && (
+          <>
+            <button
+              type="button"
+              aria-label="Предыдущая"
+              onClick={goPrev}
+              className="absolute left-2 top-1/2 z-10 grid h-[28px] w-[28px] -translate-y-1/2 place-items-center rounded-full bg-white/90 shadow-sm transition hover:bg-white"
+            >
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                aria-hidden="true"
+              >
+                <path
+                  d="M15 6l-6 6 6 6"
+                  stroke="#B5B5B5"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </button>
 
-        <button
-          type="button"
-          aria-label="Следующая"
-          className="absolute right-2 top-1/2 z-10 grid h-[26px] w-[26px] -translate-y-1/2 place-items-center rounded-full bg-white/90"
-        >
-          <span className="text-[13px] leading-none text-[#B5B5B5]">→</span>
-        </button>
+            <button
+              type="button"
+              aria-label="Следующая"
+              onClick={goNext}
+              className="absolute right-2 top-1/2 z-10 grid h-[28px] w-[28px] -translate-y-1/2 place-items-center rounded-full bg-white/90 shadow-sm transition hover:bg-white"
+            >
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                aria-hidden="true"
+              >
+                <path
+                  d="M9 6l6 6-6 6"
+                  stroke="#B5B5B5"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </button>
+
+            <div className="absolute bottom-3 left-1/2 z-10 flex -translate-x-1/2 items-center gap-1.5">
+              {slides.map((_, index) => {
+                const active = index === currentSlide;
+                return (
+                  <button
+                    key={index}
+                    type="button"
+                    aria-label={`Перейти к слайду ${index + 1}`}
+                    onClick={() => setCurrentSlide(index)}
+                    className={clsx(
+                      "rounded-full transition",
+                      active ? "h-[7px] w-[18px]" : "h-[7px] w-[7px]",
+                    )}
+                    style={{
+                      background: active
+                        ? UI.tokens.dotActive
+                        : UI.tokens.dotInactive,
+                    }}
+                  />
+                );
+              })}
+            </div>
+          </>
+        )}
       </div>
 
-      {/* text */}
-      <h3 className="mt-2 text-[16px] font-semibold leading-[1.1] tracking-[0.04em] text-[#1f1f1f]">
+      <h3 className="mt-4 text-[16px] font-semibold uppercase leading-[1.1] tracking-[0.04em] text-[#1f1f1f]">
         {item.title}
       </h3>
 
-      <p className="mt-1.5 text-[10px] leading-[1.35] text-black/65">
+      <p className="mt-2 text-[13px] leading-[1.25] text-black/65">
         {item.description}
       </p>
 
-      <div className="mt-2 space-y-1 text-[10px] leading-[1.3] text-black/70">
+      <div className="mt-3 space-y-1.5 text-[13px] leading-[1.3] text-black/70">
         <div>
           <span className="font-semibold text-[#1f1f1f]">Для кого:</span>{" "}
           {item.forWho}
@@ -285,13 +361,13 @@ function MobileConceptCard({ item }: { item: PopularConcept }) {
         </div>
       </div>
 
-      <div className="mt-2 text-[10px] text-black/45">
+      <div className="mt-3 text-[12px] text-black/45">
         Доступно {available}/{total} слотов
       </div>
 
       <SegmentBarMobile total={total} filled={available} />
 
-      <div className="mt-3">
+      <div className="mt-4 grid grid-cols-2 gap-3">
         {soldOut ? (
           <Button
             variant="secondaryLight"
@@ -299,7 +375,7 @@ function MobileConceptCard({ item }: { item: PopularConcept }) {
             maxWidth={false}
             disabled
             onClick={() => {}}
-            className="h-[34px] w-full rounded-full border-transparent bg-black/10 text-[11px] text-black/35 hover:bg-black/10"
+            className="h-[42px] rounded-full border-transparent bg-black/10 text-[12px] text-black/35 hover:bg-black/10"
           >
             {UI.buttons.soldOut}
           </Button>
@@ -309,11 +385,21 @@ function MobileConceptCard({ item }: { item: PopularConcept }) {
             variant="primary"
             size="lg"
             maxWidth={false}
-            className="h-[34px] w-full rounded-full bg-[#2F2F2F] text-[11px] hover:bg-[#1f1f1f]"
+            className="h-[42px] rounded-full bg-[#2F2F2F] text-[12px] hover:bg-[#1f1f1f]"
           >
             {UI.buttons.book}
           </Button>
         )}
+
+        <Button
+          href={item.detailsHref}
+          variant="secondaryLight"
+          size="lg"
+          maxWidth={false}
+          className="h-[42px] rounded-full border border-black/20 bg-white text-[12px] hover:bg-black/[0.03]"
+        >
+          {UI.buttons.details}
+        </Button>
       </div>
     </article>
   );
@@ -324,13 +410,26 @@ function DesktopConceptCard({ item }: { item: PopularConcept }) {
   const available = clamp(item.availableSlots, 0, total);
   const soldOut = available === 0;
 
+  const slides = item.images?.length
+    ? item.images
+    : [{ src: "", alt: item.title }];
+  const [currentSlide, setCurrentSlide] = useState(0);
+
+  const goPrev = () => {
+    setCurrentSlide((prev) => (prev === 0 ? slides.length - 1 : prev - 1));
+  };
+
+  const goNext = () => {
+    setCurrentSlide((prev) => (prev === slides.length - 1 ? 0 : prev + 1));
+  };
+
   return (
     <article className="w-full">
       <div className="relative overflow-hidden rounded-[28px] sm:rounded-[32px]">
         <div className="relative aspect-[16/9] w-full">
           <Image
-            src={item.image.src}
-            alt={item.image.alt}
+            src={slides[currentSlide].src}
+            alt={slides[currentSlide].alt}
             fill
             className="object-cover"
             sizes="(max-width: 1024px) 100vw, 720px"
@@ -338,14 +437,93 @@ function DesktopConceptCard({ item }: { item: PopularConcept }) {
           />
         </div>
 
-        <div className="absolute left-4 top-4">
+        <div className="absolute left-4 top-4 z-10">
           <span className="inline-flex items-center rounded-full bg-white/90 px-3 py-1 text-[12px] text-[#1f1f1f] shadow-sm">
             {item.drop}
           </span>
         </div>
+
+        <div className="absolute right-4 top-4 z-10">
+          <span className="inline-flex items-center rounded-full bg-white/30 px-3 py-1 text-[12px] font-medium text-white backdrop-blur-sm">
+            {item.style}
+          </span>
+        </div>
+
+        {slides.length > 1 && (
+          <>
+            <button
+              type="button"
+              aria-label="Предыдущая"
+              onClick={goPrev}
+              className="absolute left-4 top-1/2 z-10 grid h-[38px] w-[38px] -translate-y-1/2 place-items-center rounded-full bg-white/90 shadow-sm transition hover:bg-white"
+            >
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                aria-hidden="true"
+              >
+                <path
+                  d="M15 6l-6 6 6 6"
+                  stroke="#B5B5B5"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </button>
+
+            <button
+              type="button"
+              aria-label="Следующая"
+              onClick={goNext}
+              className="absolute right-4 top-1/2 z-10 grid h-[38px] w-[38px] -translate-y-1/2 place-items-center rounded-full bg-white/90 shadow-sm transition hover:bg-white"
+            >
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                aria-hidden="true"
+              >
+                <path
+                  d="M9 6l6 6-6 6"
+                  stroke="#B5B5B5"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </button>
+
+            <div className="absolute bottom-4 left-1/2 z-10 flex -translate-x-1/2 items-center gap-2">
+              {slides.map((_, index) => {
+                const active = index === currentSlide;
+                return (
+                  <button
+                    key={index}
+                    type="button"
+                    aria-label={`Перейти к слайду ${index + 1}`}
+                    onClick={() => setCurrentSlide(index)}
+                    className={clsx(
+                      "rounded-full transition",
+                      active ? "h-[8px] w-[22px]" : "h-[8px] w-[8px]",
+                    )}
+                    style={{
+                      background: active
+                        ? UI.tokens.dotActive
+                        : UI.tokens.dotInactive,
+                    }}
+                  />
+                );
+              })}
+            </div>
+          </>
+        )}
       </div>
 
-      <h3 className="mt-6 text-[22px] font-semibold tracking-[0.06em] text-[#1f1f1f]">
+      <h3 className="mt-6 text-[22px] font-semibold uppercase tracking-[0.06em] text-[#1f1f1f]">
         {item.title}
       </h3>
 

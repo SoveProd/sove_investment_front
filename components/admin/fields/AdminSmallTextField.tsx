@@ -7,6 +7,7 @@ type AdminSmallTextFieldProps = {
   value: string;
   placeholder?: string;
   onChange: (value: string) => void;
+  onBlur?: () => void; // 👈 ДОБАВИЛИ
   type?: "text" | "number";
 };
 
@@ -15,6 +16,7 @@ export function AdminSmallTextField({
   value,
   placeholder,
   onChange,
+  onBlur, // 👈 ДОБАВИЛИ
   type = "text",
 }: AdminSmallTextFieldProps) {
   return (
@@ -30,6 +32,7 @@ export function AdminSmallTextField({
           type={type}
           value={value}
           onChange={(event) => onChange(event.target.value)}
+          onBlur={onBlur} 
           placeholder={placeholder}
           className="h-[60px] w-full rounded-[10px] border border-[#D9D9D9] bg-white px-4 pr-10 text-[14px] text-[#383838] outline-none transition placeholder:text-[#D3D3D3] focus:border-[#B45B3C]"
         />

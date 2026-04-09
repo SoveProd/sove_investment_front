@@ -17,6 +17,13 @@ export const CONCEPTS: ConceptHeroData[] = [
 
     ctaLabel: "Забронировать слот",
     ctaHref: "/packages/select",
+
+    gallery: [
+      { src: "/images/hero.jpg", alt: "Modern loft interior" },
+      { src: "/images/statsimg1.jpg", alt: "Modern loft interior" },
+      { src: "/images/statsimg2.jpg", alt: "Modern loft interior" },
+      { src: "/images/statsimg3.jpg", alt: "Modern loft interior" },
+    ],
   },
   {
     slug: "japandi-soft",

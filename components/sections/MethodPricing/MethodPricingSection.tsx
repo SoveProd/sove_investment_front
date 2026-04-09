@@ -6,56 +6,42 @@ import {
 
 type Props = {
   title?: string;
+  subtitle?: string;
   plans: MethodPricingPlan[];
   className?: string;
 };
 
 export function MethodPricingSection({
   title = "Тарифы",
+  subtitle = '"SOVE" — это полный сервис управления real estate инвестициями.',
   plans,
   className = "",
 }: Props) {
   return (
     <section
-      className={[
-        "w-full bg-white",
-        "py-[64px] sm:py-[72px] lg:py-[90px]",
-        className,
-      ].join(" ")}
+      className={["w-full bg-white", "py-[32px] lg:py-[90px]", className].join(
+        " ",
+      )}
     >
       <Container>
-        {/* dark rounded panel */}
         <div
           className={[
-            "w-full",
-            "rounded-[22px] sm:rounded-[26px] lg:rounded-[30px]",
-            "bg-[#3A3A3A]",
-            "px-4 py-6 sm:px-6 sm:py-8 lg:px-10 lg:py-10",
+            "w-full bg-[#3A3A3A]",
+            "rounded-[30px]",
+            "px-4 py-8 lg:px-10 lg:py-10",
           ].join(" ")}
         >
-          <h2
-            className={[
-              "text-center font-medium text-white/90",
-              "text-[22px] sm:text-[26px] lg:text-[32px]",
-              "leading-tight",
-            ].join(" ")}
-          >
+          <h2 className="text-center text-[24px] font-medium text-white">
             {title}
           </h2>
 
-          <div
-            className={[
-              "mt-6 sm:mt-8 lg:mt-10",
-              "grid grid-cols-1 gap-5 sm:gap-6 lg:gap-8",
-              "md:grid-cols-2 lg:grid-cols-3",
-              // чтобы карточки красиво выглядели на широких экранах
-              "items-stretch",
-            ].join(" ")}
-          >
+          <p className="mx-auto mt-2 max-w-[260px] text-center text-[12px] text-white/75">
+            {subtitle}
+          </p>
+
+          <div className="mt-8 flex flex-col items-center gap-5 lg:grid lg:grid-cols-3 lg:gap-8">
             {plans.map((plan) => (
-              <div key={plan.id} className="h-full">
-                <MethodPricingCard plan={plan} />
-              </div>
+              <MethodPricingCard key={plan.id} plan={plan} />
             ))}
           </div>
         </div>

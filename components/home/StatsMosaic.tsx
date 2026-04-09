@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Container } from "../layout/Container";
+import type { CmsMetricsBlock, CmsMetricsContent } from "@/lib/cms/types";
 
 type NotchSide = "br" | "bl";
 
@@ -117,22 +118,58 @@ function ImageTile({ src, alt = "" }: ImageTileProps) {
   );
 }
 
-function LightInfoCard() {
+function LightInfoCard({ value, label }: { value: string; label: string }) {
   return (
     <div className="h-full w-full rounded-[24px] sm:rounded-[28px] lg:rounded-[48px] bg-surface border border-border px-4 sm:px-5 md:px-6 py-4 sm:py-5 md:py-6">
       <div className="flex h-full flex-col items-center justify-center text-center">
         <div className="font-medium text-text leading-none text-[24px] sm:text-[30px] md:text-[36px]">
-          6 мес.
+          {value}
         </div>
         <div className="mt-2 text-[11px] sm:text-[12px] md:text-[14px] leading-[1.15] text-text-secondary whitespace-pre-line">
-          {"От ремонта\nдо выхода на рынок"}
+          {label}
         </div>
       </div>
     </div>
   );
 }
 
-export function StatsMosaic() {
+type MetricsItem = {
+  label: string;
+  value: string;
+};
+
+type Props = {
+  block?: CmsMetricsBlock;
+};
+
+const fallbackItems: MetricsItem[] = [
+  {
+    value: "1–5",
+    label: "Показов до сделки \nили аренды",
+  },
+  {
+    value: "200K",
+    label: "Средняя цена аренды \nквартиры SOVE",
+  },
+  {
+    value: "6 мес.",
+    label: "От ремонта до выхода на рынок",
+  },
+  {
+    value: "35%",
+    label: "Средний ROI \nреализованных кейсов",
+  },
+];
+
+export function StatsMosaic({ block }: Props) {
+  const content = block?.content as CmsMetricsContent | null;
+  const items = content?.items?.length ? content.items : fallbackItems;
+
+  const first = items[0] || fallbackItems[0];
+  const second = items[1] || fallbackItems[1];
+  const third = items[2] || fallbackItems[2];
+  const fourth = items[3] || fallbackItems[3];
+
   return (
     <section className="w-full bg-bg py-[56px] sm:py-[70px] lg:py-[110px] min-[1536px]:py-[150px]">
       <Container>
@@ -140,8 +177,8 @@ export function StatsMosaic() {
         <div className="hidden lg:grid grid-cols-12 gap-6">
           <div className="col-span-3 h-[280px] min-[1280px]:h-[300px] min-[1440px]:h-[340px] min-[1536px]:h-[389px]">
             <StatNotchedCard
-              value="1–5"
-              label={"Показов до сделки \nили аренды"}
+              value={first.value}
+              label={first.label}
               notchSide="br"
               variant="dark"
             />
@@ -153,30 +190,21 @@ export function StatsMosaic() {
 
           <div className="col-span-3 h-[280px] min-[1280px]:h-[300px] min-[1440px]:h-[340px] min-[1536px]:h-[389px]">
             <StatNotchedCard
-              value="200K"
-              label={"Средняя цена аренды \nквартиры SOVE"}
+              value={second.value}
+              label={second.label}
               notchSide="bl"
               variant="dark"
             />
           </div>
 
           <div className="col-span-3 h-[280px] min-[1280px]:h-[300px] min-[1440px]:h-[340px] min-[1536px]:h-[389px]">
-            <div className="h-full w-full rounded-[48px] bg-surface border border-border px-6 min-[1440px]:px-10 min-[1536px]:px-12 py-7 min-[1440px]:py-10 min-[1536px]:py-12">
-              <div className="flex h-full flex-col justify-center">
-                <div className="font-medium text-text text-[30px] lg:text-[44px] min-[1440px]:text-[52px] min-[1536px]:text-[62px]">
-                  6 мес.
-                </div>
-                <div className="mt-2 min-[1440px]:mt-3 text-[14px] lg:text-[15px] min-[1536px]:text-[18px] text-text-secondary">
-                  От ремонта до выхода на рынок
-                </div>
-              </div>
-            </div>
+            <LightInfoCard value={third.value} label={third.label} />
           </div>
 
           <div className="col-span-3 h-[280px] min-[1280px]:h-[300px] min-[1440px]:h-[340px] min-[1536px]:h-[389px]">
             <StatNotchedCard
-              value="35%"
-              label={"Средний ROI \nреализованных кейсов"}
+              value={fourth.value}
+              label={fourth.label}
               notchSide="br"
               variant="dark"
             />
@@ -191,8 +219,8 @@ export function StatsMosaic() {
         <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:hidden">
           <div className="h-[150px] sm:h-[180px] md:h-[210px]">
             <StatNotchedCard
-              value="1–5"
-              label={"Показов до сделки\nили аренды"}
+              value={first.value}
+              label={first.label}
               notchSide="br"
               variant="dark"
               withArrow
@@ -201,8 +229,8 @@ export function StatsMosaic() {
 
           <div className="h-[150px] sm:h-[180px] md:h-[210px]">
             <StatNotchedCard
-              value="200K"
-              label={"Средняя цена аренды\nквартиры SOVE"}
+              value={second.value}
+              label={second.label}
               notchSide="br"
               variant="dark"
               withArrow
@@ -214,13 +242,13 @@ export function StatsMosaic() {
           </div>
 
           <div className="h-[150px] sm:h-[180px] md:h-[210px]">
-            <LightInfoCard />
+            <LightInfoCard value={third.value} label={third.label} />
           </div>
 
           <div className="h-[150px] sm:h-[180px] md:h-[210px]">
             <StatNotchedCard
-              value="35%"
-              label={"Средний ROI\nреализованных кейсов"}
+              value={fourth.value}
+              label={fourth.label}
               notchSide="br"
               variant="dark"
               withArrow

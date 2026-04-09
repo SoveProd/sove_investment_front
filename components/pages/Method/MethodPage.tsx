@@ -9,6 +9,8 @@ import { METHOD_PRICING_PLANS } from "@/components/sections/MethodPricing/data";
 import { TestimonialsSection } from "@/components/home/TestimonialsSection/TestimonialsSection";
 import { PackagesFaqSection } from "@/components/sections/PackagesFaq/PackagesFaqSection";
 import { SectionReveal } from "@/components/ui/SectionReveal";
+import { SELF_TRY_PLANS } from "@/components/sections/SelfTrySection/data";
+import { SelfTrySection } from "@/components/sections/SelfTrySection/SelfTrySection";
 
 export function MethodPage() {
   return (
@@ -65,11 +67,7 @@ export function MethodPage() {
       </SectionReveal>
 
       <SectionReveal delay={0.17} className="mt-6">
-        <MethodPricingSection
-          className="pt-6"
-          title="Тарифы"
-          plans={METHOD_PRICING_PLANS}
-        />
+<SelfTrySection plans={SELF_TRY_PLANS} />
       </SectionReveal>
 
       <SectionReveal delay={0.19} className="mt-6">

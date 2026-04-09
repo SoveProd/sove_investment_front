@@ -1,18 +1,21 @@
 export type ConceptHeroData = {
   slug: string;
   title: string;
-  badge: string; 
+  badge: string;
+  styleLabel?: string;
   forWho: string;
   budgetPerM2: string;
-  shortRightText: string;
-
   totalSlots: number;
   availableSlots: number;
-
-  image: { src: string; alt: string };
-
-  gallery?: { src: string; alt: string }[];
-
+  shortRightText: string;
   ctaLabel: string;
   ctaHref: string;
+  image: {
+    src: string;
+    alt: string;
+  };
+  gallery?: {
+    src: string;
+    alt: string;
+  }[];
 };

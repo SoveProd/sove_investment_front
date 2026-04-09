@@ -7,6 +7,7 @@ type Props = {
   value: string;
   placeholder?: string;
   onChange: (value: string) => void;
+  onBlur?: () => void;
 };
 
 export function AdminTextareaField({
@@ -14,6 +15,7 @@ export function AdminTextareaField({
   value,
   placeholder,
   onChange,
+  onBlur,
 }: Props) {
   return (
     <div className="space-y-2">
@@ -23,6 +25,7 @@ export function AdminTextareaField({
         <textarea
           value={value}
           onChange={(e) => onChange(e.target.value)}
+          onBlur={onBlur}
           placeholder={placeholder}
           className="h-[129px] w-full resize-none rounded-[10px] border border-[#D9D9D9] bg-white px-4 py-3 pr-10 text-[14px] outline-none transition placeholder:text-[#CFCFCF] focus:border-[#B45B3C]"
         />

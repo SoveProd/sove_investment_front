@@ -3,8 +3,8 @@ import clsx from "clsx";
 import { Container } from "@/components/layout/Container";
 
 export type MethodStatItem = {
-  value: string; 
-  label: string; 
+  value: string;
+  label: string;
 };
 
 type Props = {
@@ -16,47 +16,56 @@ type Props = {
 export function MethodStatsSection({ className = "", stats, image }: Props) {
   return (
     <section
-      className={clsx("w-full bg-white pb-[90px] max-lg:pb-[70px]", className)}
+      className={clsx("w-full bg-white pb-[56px] lg:pb-[90px]", className)}
     >
       <Container>
-        {/* Stats row */}
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {/* Stats */}
+        <div className="grid grid-cols-2 gap-[8px] lg:grid-cols-4 lg:gap-4">
           {stats.map((s) => (
-           <div
-  key={`${s.value}-${s.label}`}
-  className="
-    flex w-full flex-col items-center justify-center
-    rounded-[32px]
-    bg-[#383838]
-    border border-[#F8F8F8]
-    h-[269px]
-    px-8
-    text-center
-    max-lg:h-[200px]
-  "
->
-  <div className="text-[56px] font-medium leading-none text-white max-lg:text-[40px]">
-    {s.value}
-  </div>
+            <div
+              key={`${s.value}-${s.label}`}
+              className={clsx(
+                "flex flex-col items-center justify-center text-center",
+                "bg-[#383838] border border-[#F8F8F8]",
+                "rounded-[18px]",
 
-  <div className="mt-4 text-[24px] font-normal leading-snug text-white/80 max-lg:text-[16px]">
-    {s.label}
-  </div>
+                // MOBILE exact size
+                "h-[156px] w-full",
 
+                // DESKTOP
+                "lg:h-[269px] lg:rounded-[32px] lg:px-8",
+              )}
+            >
+              <div
+                className={clsx(
+                  "text-[32px] font-medium leading-none text-white",
+                  "lg:text-[56px]",
+                )}
+              >
+                {s.value}
+              </div>
+
+              <div
+                className={clsx(
+                  "mt-2 text-[12px] leading-[1.2] text-white/80 px-3",
+                  "lg:mt-4 lg:text-[24px]",
+                )}
+              >
+                {s.label}
+              </div>
             </div>
           ))}
         </div>
 
-        {/* Big image */}
-        <div className="mt-6 overflow-hidden rounded-[26px] bg-black/5">
-          <div className="relative aspect-[16/6] w-full max-lg:aspect-[16/8]">
+        {/* Image */}
+        <div className="mt-6 overflow-hidden rounded-[20px] lg:rounded-[26px]">
+          <div className="relative aspect-[343/190] w-full lg:aspect-[16/6]">
             <Image
               src={image.src}
               alt={image.alt}
               fill
               className="object-cover"
               sizes="100vw"
-              priority={false}
             />
           </div>
         </div>

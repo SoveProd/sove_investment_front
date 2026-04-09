@@ -7,23 +7,32 @@ import { RealEstate } from "@/components/home/RealEstate/RealEstate";
 import { CasesCtaSection } from "@/components/home/CasesCtaSection/CasesCtaSection";
 import { DesignMosaicSection } from "@/components/home/DesignMosaicSection/DesignMosaicsection";
 import HowItWorksSection from "@/components/home/HowItWorks/HowItWorksSection";
-import WhyInvestAccordionSection from "@/components/home/WhyIvest/WhyInvestAccordionSection";
 import { ThreeHoverZones } from "@/components/home/FeatureZone/FeatureZone";
 import { TestimonialsSection } from "@/components/home/TestimonialsSection/TestimonialsSection";
 import { CtaBanner } from "@/components/home/CtaBanner/CtaBanner";
 
 import { SectionReveal } from "@/components/ui/SectionReveal";
 import Image from "next/image";
+import {
+  getHomepageHeroBlock,
+  getHomepageMetricsBlock,
+  getPublishedHomepage,
+} from "@/lib/cms/homepage";
 
-export default function Home() {
+export default async function Home() {
+  const homepage = await getPublishedHomepage();
+
+  const heroBlock = getHomepageHeroBlock(homepage);
+  const metricsBlock = getHomepageMetricsBlock(homepage);
+
   return (
     <>
       <SectionReveal>
-        <Hero />
+        <Hero block={heroBlock} />
       </SectionReveal>
 
       <SectionReveal>
-        <StatsMosaic />
+        <StatsMosaic block={metricsBlock} />
       </SectionReveal>
 
       <SectionReveal>
@@ -53,6 +62,7 @@ export default function Home() {
       <SectionReveal>
         <HowItWorksSection />
       </SectionReveal>
+
       <SectionReveal>
         <div className="bg-white">
           <div className="flex justify-center pt-10 pb-6">

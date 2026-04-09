@@ -26,16 +26,48 @@ export function MaterialsSection({
     [active],
   );
 
+  return (
+    <section className={clsx("w-full bg-white py-10 lg:py-16", className)}>
+      {/* MOBILE */}
+      <div className="lg:hidden">
+        <MaterialsSectionMobile
+          active={active}
+          setActive={setActive}
+          tab={tab}
+        />
+      </div>
+
+      {/* DESKTOP */}
+      <div className="hidden lg:block">
+        <MaterialsSectionDesktop
+          title={title}
+          active={active}
+          setActive={setActive}
+          tab={tab}
+        />
+      </div>
+    </section>
+  );
+}
+
+function MaterialsSectionMobile({
+  active,
+  setActive,
+  tab,
+}: {
+  active: MaterialsTabKey;
+  setActive: (value: MaterialsTabKey) => void;
+  tab: (typeof MATERIALS_TABS)[number];
+}) {
   const [viewportRef, embla] = useEmblaCarousel({
     loop: false,
     align: "start",
-    skipSnaps: false,
   });
 
   const [canPrev, setCanPrev] = useState(false);
   const [canNext, setCanNext] = useState(false);
 
-  const syncArrows = useCallback(() => {
+  const syncState = useCallback(() => {
     if (!embla) return;
     setCanPrev(embla.canScrollPrev());
     setCanNext(embla.canScrollNext());
@@ -44,149 +76,188 @@ export function MaterialsSection({
   useEffect(() => {
     if (!embla) return;
 
-    // безопасно обновляем после маунта
-    const id = requestAnimationFrame(syncArrows);
-    embla.on("select", syncArrows);
-    embla.on("reInit", syncArrows);
+    syncState();
+    embla.on("select", syncState);
 
     return () => {
-      cancelAnimationFrame(id);
-      embla.off("select", syncArrows);
-      embla.off("reInit", syncArrows);
+      embla.off("select", syncState);
     };
-  }, [embla, syncArrows]);
+  }, [embla, syncState]);
 
-  // при смене таба — сбрасываем карусель в начало
   useEffect(() => {
     if (!embla) return;
-    const id = requestAnimationFrame(() => {
-      embla.scrollTo(0, true);
-      syncArrows();
-    });
-    return () => cancelAnimationFrame(id);
-  }, [active, embla, syncArrows]);
 
-  const prev = useCallback(() => embla?.scrollPrev(), [embla]);
-  const next = useCallback(() => embla?.scrollNext(), [embla]);
+    requestAnimationFrame(() => {
+      embla.scrollTo(0, true);
+      syncState();
+    });
+  }, [active, embla, syncState]);
+
+  const prev = () => embla?.scrollPrev();
+  const next = () => embla?.scrollNext();
 
   return (
-    <section className={clsx("w-full bg-white py-16", className)}>
-      <Container>
-        <h2 className="text-center text-[44px] font-medium leading-none max-lg:text-[30px]">
-          {title}
+    <Container>
+      <div className="mx-auto w-full max-w-[343px]">
+        {/* SELECT */}
+        <div className="relative">
+          <select
+            value={active}
+            onChange={(e) => setActive(e.target.value as MaterialsTabKey)}
+            className="h-[40px] w-full appearance-none rounded-full border border-black/30 bg-white px-4 pr-10 text-[14px] text-[#4A4A4A] outline-none"
+          >
+            {MATERIALS_TABS.map((t) => (
+              <option key={t.key} value={t.key}>
+                {t.label}
+              </option>
+            ))}
+          </select>
+
+          <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-black/60">
+            <svg width="14" height="14" viewBox="0 0 24 24">
+              <path
+                d="M7 10l5 5 5-5"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+              />
+            </svg>
+          </span>
+        </div>
+
+        {/* TITLE */}
+        <h2 className="mt-5 text-center text-[24px] font-medium text-[#3A3A3A]">
+          {tab.label}
         </h2>
 
-        {/* Tabs */}
-        {/* Tabs (full width like on screenshot) */}
-        <div className="mt-8 w-full overflow-x-auto">
-          <div
-            className={clsx(
-              "mx-auto flex w-full items-start justify-between gap-[22px]",
-              // чтобы на узких экранах не ломалось — будет скролл
-              "min-w-[1743px]", // 331*5 + 22*4 = 1743
-            )}
-          >
-            {MATERIALS_TABS.map((t) => {
-              const isActive = t.key === active;
-
-              return (
-                <button
-                  key={t.key}
-                  type="button"
-                  onClick={() => setActive(t.key)}
-                  className="group flex flex-col items-center"
-                >
-                  <span
-                    className={clsx(
-                      "inline-flex items-center justify-center",
-                      "h-[79px] w-[331px] rounded-full border",
-                      "text-[16px] font-medium transition",
-                      isActive
-                        ? "bg-[#3A3A3A] text-white border-transparent"
-                        : "bg-white text-black/70 border-black/10 hover:border-black/20",
-                    )}
-                  >
-                    {t.label}
-                  </span>
-
-                  {/* dot exactly under tab */}
-                  <span
-                    className={clsx(
-                      "mt-4 h-[4px] w-[4px] rounded-full transition",
-                      isActive ? "bg-black/60" : "bg-transparent",
-                    )}
-                  />
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Dot indicator line (как на макете маленькая точка под табом) */}
-        <div className="mt-3 flex items-center justify-center gap-4">
-          {MATERIALS_TABS.map((t) => (
-            <span
-              key={`${t.key}-dot`}
-              className={clsx(
-                "h-[4px] w-[4px] rounded-full",
-                t.key === active ? "bg-black/60" : "bg-transparent",
-              )}
-            />
-          ))}
-        </div>
-
-        {/* Description */}
-        <p className="mx-auto mt-6 max-w-5xl text-center text-[13px] leading-relaxed text-black/55">
+        {/* DESCRIPTION */}
+        <p className="mx-auto mt-5 max-w-[310px] text-center text-[12px] leading-[1.2] text-black/60">
           {tab.description}
         </p>
-{/* Carousel */}
-<div className="relative mt-10">
-  <div ref={viewportRef} className="overflow-hidden">
-    <div className="flex gap-4">
-      {tab.cards.map((card) => (
-        <div
-          key={card.id}
-          className="min-w-0 flex-[0_0_auto]"
-        >
-          {/* card image block */}
-          <div className="overflow-hidden rounded-[26px]">
-            <div className="relative h-[491px] w-[419px] max-lg:w-[320px] max-lg:h-[380px] max-md:w-[280px] max-md:h-[340px]">
-              <Image
-                src={card.imageSrc}
-                alt={card.title}
-                fill
-                className="object-cover"
-                sizes="419px"
-              />
+
+        {/* CAROUSEL */}
+        <div className="relative mt-7">
+          <div ref={viewportRef} className="overflow-hidden">
+            <div className="flex gap-[10px]">
+              {tab.cards.map((card) => (
+                <div key={card.id} className="flex-[0_0_145px]">
+                  <div className="relative overflow-hidden rounded-[18px]">
+                    <div className="relative h-[176px] w-[145px]">
+                      <Image
+                        src={card.imageSrc}
+                        alt={card.title}
+                        fill
+                        className="object-cover"
+                        sizes="145px"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="mt-2 text-center text-[12px] text-black/70">
+                    {card.title}
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
 
-          {/* caption */}
-          <div className="mt-4 text-center text-[14px] text-black/75">
-            {card.title}
+          {/* ARROWS */}
+          <CircleNav side="left" onClick={prev} disabled={!canPrev} />
+
+          <CircleNav side="right" onClick={next} disabled={!canNext} />
+        </div>
+      </div>
+    </Container>
+  );
+}
+
+function MaterialsSectionDesktop({
+  title,
+  active,
+  setActive,
+  tab,
+}: {
+  title: string;
+  active: MaterialsTabKey;
+  setActive: (value: MaterialsTabKey) => void;
+  tab: (typeof MATERIALS_TABS)[number];
+}) {
+  const [viewportRef, embla] = useEmblaCarousel({
+    loop: false,
+    align: "start",
+  });
+
+  const prev = () => embla?.scrollPrev();
+  const next = () => embla?.scrollNext();
+
+  return (
+    <Container>
+      <h2 className="text-center text-[44px] font-medium">{title}</h2>
+
+      <div className="mt-8 flex gap-[22px] justify-between min-w-[1743px] overflow-x-auto">
+        {MATERIALS_TABS.map((t) => {
+          const isActive = t.key === active;
+
+          return (
+            <button
+              key={t.key}
+              onClick={() => setActive(t.key)}
+              className="flex flex-col items-center"
+            >
+              <span
+                className={clsx(
+                  "h-[79px] w-[331px] rounded-full border text-[16px] flex items-center justify-center",
+                  isActive
+                    ? "bg-[#3A3A3A] text-white border-transparent"
+                    : "bg-white text-black/70 border-black/10",
+                )}
+              >
+                {t.label}
+              </span>
+
+              <span
+                className={clsx(
+                  "mt-4 h-[4px] w-[4px] rounded-full",
+                  isActive ? "bg-black/60" : "bg-transparent",
+                )}
+              />
+            </button>
+          );
+        })}
+      </div>
+
+      <p className="mx-auto mt-6 max-w-5xl text-center text-[13px] text-black/55">
+        {tab.description}
+      </p>
+
+      <div className="relative mt-10">
+        <div ref={viewportRef} className="overflow-hidden">
+          <div className="flex gap-4">
+            {tab.cards.map((card) => (
+              <div key={card.id}>
+                <div className="overflow-hidden rounded-[26px]">
+                  <div className="relative h-[491px] w-[419px]">
+                    <Image
+                      src={card.imageSrc}
+                      alt={card.title}
+                      fill
+                      className="object-cover"
+                    />
+                  </div>
+                </div>
+
+                <div className="mt-4 text-center text-[14px] text-black/75">
+                  {card.title}
+                </div>
+              </div>
+            ))}
           </div>
         </div>
-      ))}
-    </div>
-  </div>
 
-  {/* Arrows */}
-  <CircleNav
-    side="left"
-    onClick={prev}
-    disabled={!canPrev}
-    ariaLabel="Prev"
-  />
-  <CircleNav
-    side="right"
-    onClick={next}
-    disabled={!canNext}
-    ariaLabel="Next"
-  />
-
-        </div>
-      </Container>
-    </section>
+        <CircleNav side="left" onClick={prev} />
+        <CircleNav side="right" onClick={next} />
+      </div>
+    </Container>
   );
 }
 
@@ -194,35 +265,29 @@ function CircleNav({
   side,
   onClick,
   disabled,
-  ariaLabel,
 }: {
   side: "left" | "right";
   onClick: () => void;
   disabled?: boolean;
-  ariaLabel: string;
 }) {
   return (
     <button
-      type="button"
-      aria-label={ariaLabel}
       onClick={onClick}
       disabled={disabled}
       className={clsx(
         "absolute top-1/2 -translate-y-1/2",
         side === "left" ? "left-2" : "right-2",
-        "h-11 w-11 rounded-full bg-white text-black",
-        "shadow-[0_12px_40px_rgba(0,0,0,0.18)]",
-        "grid place-items-center transition",
-        "hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed",
+        "h-[34px] w-[34px] rounded-full bg-white",
+        "shadow-[0_8px_20px_rgba(0,0,0,0.15)]",
+        "grid place-items-center",
       )}
     >
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+      <svg width="14" height="14" viewBox="0 0 24 24">
         <path
           d={side === "left" ? "M15 18l-6-6 6-6" : "M9 6l6 6-6 6"}
           stroke="currentColor"
-          strokeWidth="2.2"
+          strokeWidth="2"
           strokeLinecap="round"
-          strokeLinejoin="round"
         />
       </svg>
     </button>
