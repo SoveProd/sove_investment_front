@@ -3,13 +3,13 @@ import {
   CmsBlock,
   CmsHeroBlock,
   CmsMetricsBlock,
+  CmsButton,
 } from "./types";
 
-const API_BASE =
-  process.env.NEXT_PUBLIC_API_URL || "https://sovegroup.sytes.net/api/v1";
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || "https://sove.app/api/v1";
 
 // ==============================
-// 📡 Получение homepage
+// Получение homepage
 // ==============================
 export async function getPublishedHomepage(): Promise<CmsStaticPage | null> {
   try {
@@ -19,7 +19,9 @@ export async function getPublishedHomepage(): Promise<CmsStaticPage | null> {
         Accept: "application/json",
         "x-client-type": "web",
       },
-      next: { revalidate: 60 },
+      ...(process.env.NODE_ENV === "development"
+        ? { cache: "no-store" as const }
+        : { next: { revalidate: 60 } }),
     });
 
     if (!response.ok) {
@@ -64,7 +66,12 @@ export function getHomepageMetricsBlock(
   return findBlockByType<CmsMetricsBlock>(page.blocks, "metrics:main");
 }
 
-
+export function getHomepageDoItWithSoveBlock(
+  page: CmsStaticPage | null,
+): (CmsBlock & { button: CmsButton | CmsButton[] | null }) | undefined {
+  if (!page) return undefined;
+  return findBlockByType<CmsBlock>(page.blocks, "do_it_with_sove:main");
+}
 
 export function getVisibleBlocks(
   blocks: CmsBlock[],
@@ -77,4 +84,17 @@ export function getVisibleBlocks(
       const bPos = b.display?.[client]?.position ?? Number.MAX_SAFE_INTEGER;
       return aPos - bPos;
     });
+}
+
+export function getHomepageManagePropertyBlock(homepage: CmsStaticPage) {
+  return homepage.blocks.find(
+    (b) => b.block_type === "manage_your_property:main",
+  );
+}
+
+
+export function getHomepageDesignMosaicBlock(homepage: CmsStaticPage) {
+  return homepage.blocks.find(
+    (block) => block.block_type === "end_to_end_investment:main",
+  ) as CmsBlock | undefined;
 }

@@ -20,6 +20,10 @@ export type CmsButton = {
 export type CmsMedia = {
   id: number;
   file_url: string;
+  url?: string | null;
+  thumbnail_url?: string | null;
+  medium_url?: string | null;
+  large_url?: string | null;
   file_name?: string | null;
   file_type?: string | null;
   file_size?: number | null;
@@ -65,6 +69,8 @@ export type CmsStaticPage = {
 // --- Hero ---
 export type CmsHeroBlock = CmsBlock & {
   block_type: "ceiling:main";
+  primary_button_label: string;
+  secondary_button_label: string;
 };
 
 // --- Metrics ---
@@ -81,3 +87,4 @@ export type CmsMetricsBlock = CmsBlock & {
   block_type: "metrics:main";
   content: CmsMetricsContent | null;
 };
+

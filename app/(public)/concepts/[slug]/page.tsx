@@ -1,4 +1,4 @@
-import { ConceptDetailPage } from "@/components/pages/Concept/ConceptDetailPage";
+import { ConceptDetailPage } from "@/src/components/pages/Concept/ConceptDetailPage";
 
 type PageProps = {
   params: Promise<{ slug: string }>;

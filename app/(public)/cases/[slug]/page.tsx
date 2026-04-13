@@ -1,4 +1,4 @@
-import { CaseDetailsPage } from "@/components/pages/Cases/CasesDetailsPage";
+import { CaseDetailsPage } from "@/src/components/pages/Cases/CasesDetailsPage";
 
 type Props = { params: { slug: string } };
 

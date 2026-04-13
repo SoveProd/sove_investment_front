@@ -1,5 +1,5 @@
 // app/journal/[slug]/page.tsx
-import { JournalArticlePage } from "@/components/pages/Journal/JournalArticlePage";
+import { JournalArticlePage } from "@/src/components/pages/Journal/JournalArticlePage";
 
 type PageProps = {
   params: Promise<{ slug: string }>;

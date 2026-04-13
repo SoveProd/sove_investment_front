@@ -1,6 +1,5 @@
-import { CasesPage } from "@/components/pages/Cases/CasesPage";
-
+import { CasesPage } from "@/src/components/pages/Cases/CasesPage";
 
 export default function Page() {
-  return <CasesPage/>;
+  return <CasesPage />;
 }

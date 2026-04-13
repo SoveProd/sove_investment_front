@@ -1,6 +1,11 @@
 import type { ReactNode } from "react";
-import { AdminLayoutShell } from "@/components/admin/layout/AdminLayoutShell";
+import { AdminLayoutShell } from "@/src/components/admin/layout/AdminLayoutShell";
+import { AdminAuthGate } from "@/src/components/auth/AdminAuthGate";
 
 export default function AdminLayout({ children }: { children: ReactNode }) {
-  return <AdminLayoutShell>{children}</AdminLayoutShell>;
+  return (
+    <AdminAuthGate>
+      <AdminLayoutShell>{children}</AdminLayoutShell>
+    </AdminAuthGate>
+  );
 }

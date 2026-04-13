@@ -1,29 +1,91 @@
-import { FindYourPathSection } from "@/components/home/FindYourPath";
-import { Hero } from "@/components/home/Hero";
-import PopularConcepts from "@/components/home/PopularConcepts/PopularConcepts";
-import { StatsMosaic } from "@/components/home/StatsMosaic";
-import TryItSection from "@/components/home/TryIt/TryItSection";
-import { RealEstate } from "@/components/home/RealEstate/RealEstate";
-import { CasesCtaSection } from "@/components/home/CasesCtaSection/CasesCtaSection";
-import { DesignMosaicSection } from "@/components/home/DesignMosaicSection/DesignMosaicsection";
-import HowItWorksSection from "@/components/home/HowItWorks/HowItWorksSection";
-import { ThreeHoverZones } from "@/components/home/FeatureZone/FeatureZone";
-import { TestimonialsSection } from "@/components/home/TestimonialsSection/TestimonialsSection";
-import { CtaBanner } from "@/components/home/CtaBanner/CtaBanner";
+import { FindYourPathSection } from "@/src/components/home/FindYourPath";
+import { Hero } from "@/src/components/home/Hero";
+import PopularConcepts from "@/src/components/home/PopularConcepts/PopularConcepts";
+import { StatsMosaic } from "@/src/components/home/StatsMosaic";
+import TryItSection from "@/src/components/home/TryIt/TryItSection";
+import { RealEstate } from "@/src/components/home/RealEstate/RealEstate";
+import { CasesCtaSection } from "@/src/components/home/CasesCtaSection/CasesCtaSection";
+import { DesignMosaicSection } from "@/src/components/home/DesignMosaicSection/DesignMosaicsection";
+import HowItWorksSection from "@/src/components/home/HowItWorks/HowItWorksSection";
+import { ThreeHoverZones } from "@/src/components/home/FeatureZone/FeatureZone";
+import { TestimonialsSection } from "@/src/components/home/TestimonialsSection/TestimonialsSection";
+import { CtaBanner } from "@/src/components/home/CtaBanner/CtaBanner";
 
-import { SectionReveal } from "@/components/ui/SectionReveal";
+import { SectionReveal } from "@/src/components/ui/SectionReveal";
 import Image from "next/image";
 import {
   getHomepageHeroBlock,
+  getHomepageManagePropertyBlock,
   getHomepageMetricsBlock,
+  getHomepageDoItWithSoveBlock,
   getPublishedHomepage,
+  getHomepageDesignMosaicBlock,
 } from "@/lib/cms/homepage";
+import type { CmsBlock, CmsStaticPage } from "@/lib/cms/types";
+
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || "https://sove.app/api/v1";
+
+type CaseStudyEntity = {
+  id: number;
+  project_id?: number | null;
+  title: string;
+  title_seo?: string | null;
+  description_seo?: string | null;
+  hero_media_id?: number | null;
+  timeline?: string | null;
+  roi_coeff?: number | null;
+  budget?: number | null;
+  city?: string | null;
+  apartment_name?: string | null;
+  square?: number | null;
+  is_published?: boolean;
+  published_at?: string | null;
+};
+
+function findBlockByType(
+  homepage: CmsStaticPage | null | undefined,
+  blockType: string,
+): CmsBlock | undefined {
+  return homepage?.blocks?.find((block) => block.block_type === blockType);
+}
+
+async function getPublishedCaseStudies(): Promise<CaseStudyEntity[]> {
+  try {
+    const response = await fetch(`${API_BASE}/case-studies/published`, {
+      next: { revalidate: 60 },
+      headers: {
+        Accept: "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      return [];
+    }
+
+    return (await response.json()) as CaseStudyEntity[];
+  } catch (error) {
+    console.error("Failed to load published case studies", error);
+    return [];
+  }
+}
 
 export default async function Home() {
-  const homepage = await getPublishedHomepage();
+  const homepage = (await getPublishedHomepage()) as CmsStaticPage;
+  const caseStudies = await getPublishedCaseStudies();
 
   const heroBlock = getHomepageHeroBlock(homepage);
   const metricsBlock = getHomepageMetricsBlock(homepage);
+  const doItWithSoveBlock = getHomepageDoItWithSoveBlock(homepage);
+  const managePropertyBlock = getHomepageManagePropertyBlock(homepage);
+  const designMosaicBlock = getHomepageDesignMosaicBlock(homepage);
+  const doItYourselfBlock = findBlockByType(homepage, "diy:main");
+
+  const casesCtaBlock = findBlockByType(homepage, "capitalized_text:main");
+  const popularConceptsBlock = findBlockByType(
+    homepage,
+    "featured_concepts:main",
+  );
+  const readyProjectsBlock = findBlockByType(homepage, "featured_cases:main");
 
   return (
     <>
@@ -36,27 +98,32 @@ export default async function Home() {
       </SectionReveal>
 
       <SectionReveal>
-        <FindYourPathSection />
+        <FindYourPathSection block={doItWithSoveBlock} />
       </SectionReveal>
 
       <SectionReveal>
-        <CasesCtaSection buttonLabel="Посмотри наши кейсы" href="/cases" />
+        <CasesCtaSection block={casesCtaBlock} href="/cases" />
       </SectionReveal>
 
       <SectionReveal>
-        <TryItSection />
+        <TryItSection block={doItYourselfBlock as CmsBlock} />
       </SectionReveal>
 
       <SectionReveal>
-        <PopularConcepts />
+        <PopularConcepts
+          popularBlock={popularConceptsBlock}
+          readyBlock={readyProjectsBlock}
+          popularItems={caseStudies}
+          readyItems={caseStudies}
+        />
       </SectionReveal>
 
       <SectionReveal>
-        <RealEstate />
+        <RealEstate block={managePropertyBlock as CmsBlock} />
       </SectionReveal>
 
       <SectionReveal>
-        <DesignMosaicSection />
+        <DesignMosaicSection block={designMosaicBlock as CmsBlock} />
       </SectionReveal>
 
       <SectionReveal>

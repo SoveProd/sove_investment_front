@@ -2,9 +2,10 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
 
-import { Header } from "@/components/layout/Header/Header";
-import { Footer } from "@/components/layout/Footer/Footer";
+import { Header } from "@/src/components/layout/Header/Header";
+import { Footer } from "@/src/components/layout/Footer/Footer";
 import { TransitionProvider } from "./TransitionProvider";
+import { StoreProvider } from "@/src/store/StoreProvider";
 
 const montserrat = localFont({
   src: [
@@ -44,17 +45,19 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="ru" className="overflow-x-hidden">
+    <html lang="ru" className="overflow-x-hidden" suppressHydrationWarning>
       <body
         className={`${montserrat.variable} font-main antialiased bg-white text-black overflow-x-hidden`}
       >
-        <Header />
+        <StoreProvider>
+          <Header />
 
-        <main className="min-h-screen">
-          <TransitionProvider>{children}</TransitionProvider>
-        </main>
+          <main className="min-h-screen">
+            <TransitionProvider>{children}</TransitionProvider>
+          </main>
 
-        <Footer />
+          <Footer />
+        </StoreProvider>
       </body>
     </html>
   );
