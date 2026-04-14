@@ -59,15 +59,18 @@ export function AdminMediaField({
   return (
     <div className="space-y-2">
       {label ? (
-        <label className="block text-[14px] leading-[1.2] text-[#8D8D8D]">
+        <label
+          htmlFor={inputId}
+          className="block text-[14px] leading-[1.2] text-[#8D8D8D]"
+        >
           {label}
         </label>
       ) : null}
 
       <div
         className={clsx(
-          "flex items-center justify-between rounded-[10px] border border-[#D9D9D9] bg-white",
-          compact ? "h-[60px] px-3" : "h-[60px] px-3",
+          "flex items-center justify-between rounded-[10px] border border-[#D9D9D9] bg-white px-3",
+          compact ? "h-[60px]" : "h-[60px]",
         )}
       >
         <div className="flex min-w-0 items-center gap-3 overflow-hidden">
@@ -79,7 +82,7 @@ export function AdminMediaField({
           >
             {hasPreview ? (
               <Image
-                src={preview}
+                src={preview as string}
                 alt=""
                 fill
                 unoptimized
@@ -119,7 +122,8 @@ export function AdminMediaField({
           <button
             type="button"
             onClick={onRemove}
-            className="flex h-6 w-6 items-center justify-center rounded-full bg-[#B45B3C] text-white transition hover:opacity-90"
+            disabled={!onRemove}
+            className="flex h-6 w-6 items-center justify-center rounded-full bg-[#B45B3C] text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
             aria-label="Удалить файл"
           >
             <Ellipsis size={14} />

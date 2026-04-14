@@ -39,6 +39,7 @@ import type {
 import { hydrateHomepageBlocks } from "./hydrateHomepageBlocks";
 import { createHomepageBlurHandlers } from "./createHomepageBlurHandlers";
 import { uploadMedia } from "./uploadMedia";
+import type { CmsBlock, CmsMedia } from "@/lib/cms/types";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "https://sove.app/api/v1";
 
@@ -169,6 +170,85 @@ function buildRepeatableFeaturePatches(block: RepeatableFeatureBlockData) {
   ];
 }
 
+function buildManagePropertyPatches(block: MediaTextCardsBlockData) {
+  const mediaIds = block.items
+    .map((item) => item.mediaId)
+    .filter((value): value is number => typeof value === "number");
+
+  const positionedMedia = block.items
+    .filter(
+      (item): item is typeof item & { mediaId: number } =>
+        typeof item.mediaId === "number",
+    )
+    .map((item, index) => ({
+      id: item.mediaId,
+      position: index,
+    }));
+
+  return [
+    {
+      title: block.title,
+      text: block.description,
+      content: {
+        items: block.items.map((item) => ({
+          title: item.title,
+          subtitle: item.subtitle,
+        })),
+      },
+      media_ids: mediaIds,
+    },
+    {
+      title: block.title,
+      text: block.description,
+      content: {
+        items: block.items.map((item) => ({
+          title: item.title,
+          subtitle: item.subtitle,
+        })),
+      },
+      media: positionedMedia,
+    },
+  ];
+}
+
+function buildDesignMosaicPatches(block: DesignMosaicBlockData) {
+  const mediaIds = block.items
+    .map((item) => item.mediaId)
+    .filter((value): value is number => typeof value === "number");
+
+  const positionedMedia = block.items
+    .filter(
+      (item): item is typeof item & { mediaId: number } =>
+        typeof item.mediaId === "number",
+    )
+    .map((item, index) => ({
+      id: item.mediaId,
+      position: index,
+    }));
+
+  const basePatch = {
+    title: block.title,
+    content: {
+      items: block.items.map((item) => ({
+        title: item.title,
+        subtitle: item.description,
+        text: item.description,
+      })),
+    },
+  };
+
+  return [
+    {
+      ...basePatch,
+      media_ids: mediaIds,
+    },
+    {
+      ...basePatch,
+      media: positionedMedia,
+    },
+  ];
+}
+
 function mergeFeaturedItems(
   currentValue: FeaturedSelectionBlockData,
   shortList: CaseStudyShort[],
@@ -208,6 +288,110 @@ async function loadCaseStudiesShort(token: string): Promise<CaseStudyShort[]> {
     id: item.id,
     title: item.title,
   }));
+}
+
+function hydrateManagePropertyBlock(
+  block?: CmsBlock | null,
+): MediaTextCardsBlockData {
+  if (!block) {
+    return initialManagePropertyBlock;
+  }
+
+  const contentItems =
+    block.content &&
+    typeof block.content === "object" &&
+    "items" in block.content &&
+    Array.isArray((block.content as { items?: unknown[] }).items)
+      ? (
+          block.content as {
+            items: Array<{ title?: string; subtitle?: string }>;
+          }
+        ).items
+      : [];
+
+  const media = Array.isArray(block.media) ? (block.media as CmsMedia[]) : [];
+
+  const maxLength = Math.max(contentItems.length, media.length, 0);
+
+  if (maxLength === 0) {
+    return {
+      ...initialManagePropertyBlock,
+      title: block.title || initialManagePropertyBlock.title,
+      description: block.text || initialManagePropertyBlock.description,
+      items: initialManagePropertyBlock.items,
+    };
+  }
+
+  return {
+    title: block.title || "",
+    description: block.text || "",
+    items: Array.from({ length: maxLength }).map((_, index) => {
+      const contentItem = contentItems[index];
+      const mediaItem = media[index];
+
+      return {
+        id: index + 1,
+        title: contentItem?.title || "",
+        subtitle: contentItem?.subtitle || "",
+        fileName: mediaItem?.file_name || "Фото.jpeg",
+        preview:
+          mediaItem?.url ||
+          mediaItem?.large_url ||
+          mediaItem?.thumbnail_url ||
+          undefined,
+        mediaId: mediaItem?.id,
+      };
+    }),
+  };
+}
+
+function hydrateDesignMosaicBlock(block?: CmsBlock | null): DesignMosaicBlockData {
+  if (!block) {
+    return initialDesignMosaicBlock;
+  }
+
+  const contentItems =
+    block.content &&
+    typeof block.content === "object" &&
+    "items" in block.content &&
+    Array.isArray((block.content as { items?: unknown[] }).items)
+      ? (
+          block.content as {
+            items: Array<{ title?: string | null; text?: string | null }>;
+          }
+        ).items
+      : [];
+
+  const media = [...(Array.isArray(block.media) ? (block.media as CmsMedia[]) : [])].sort(
+    (a, b) => {
+      const aPos = a.position ?? Number.MAX_SAFE_INTEGER;
+      const bPos = b.position ?? Number.MAX_SAFE_INTEGER;
+      return aPos - bPos;
+    },
+  );
+
+  const maxLength = Math.max(contentItems.length, media.length, 4);
+
+  return {
+    title: block.title || "",
+    items: Array.from({ length: maxLength }).map((_, index) => {
+      const contentItem = contentItems[index];
+      const mediaItem = media[index];
+
+      return {
+        id: index + 1,
+        title: contentItem?.title || "",
+        description: contentItem?.text || "",
+        fileName: mediaItem?.file_name || "Фото.jpeg",
+        preview:
+          mediaItem?.url ||
+          mediaItem?.large_url ||
+          mediaItem?.thumbnail_url ||
+          undefined,
+        mediaId: mediaItem?.id,
+      };
+    }),
+  };
 }
 
 export default function ContentToolsHomePage() {
@@ -253,6 +437,12 @@ export default function ContentToolsHomePage() {
   const [readyProjectsCmsBlockId, setReadyProjectsCmsBlockId] = useState<
     number | null
   >(null);
+  const [managePropertyCmsBlockId, setManagePropertyCmsBlockId] = useState<
+    number | null
+  >(null);
+  const [designMosaicCmsBlockId, setDesignMosaicCmsBlockId] = useState<
+    number | null
+  >(null);
 
   const [isLoading, setIsLoading] = useState(true);
   const [isSavingHero, setIsSavingHero] = useState(false);
@@ -262,6 +452,8 @@ export default function ContentToolsHomePage() {
   const [isSavingCapitalizedText, setIsSavingCapitalizedText] = useState(false);
   const [isSavingPopularConcepts, setIsSavingPopularConcepts] = useState(false);
   const [isSavingReadyProjects, setIsSavingReadyProjects] = useState(false);
+  const [isSavingManageProperty, setIsSavingManageProperty] = useState(false);
+  const [isSavingDesignMosaic, setIsSavingDesignMosaic] = useState(false);
   const [isPublishing, setIsPublishing] = useState(false);
   const [publishMessage, setPublishMessage] = useState<string | null>(null);
 
@@ -310,6 +502,26 @@ export default function ContentToolsHomePage() {
           setPopularConceptsBlock,
           setReadyProjectsBlock,
         });
+
+        const managePropertySourceBlock = homepageDraft.blocks.find(
+          (block) => block.block_type === "manage_your_property:main",
+        );
+
+        if (managePropertySourceBlock) {
+          setManagePropertyCmsBlockId(managePropertySourceBlock.id);
+          setManagePropertyBlock(
+            hydrateManagePropertyBlock(managePropertySourceBlock),
+          );
+        }
+
+        const designMosaicSourceBlock = homepageDraft.blocks.find(
+          (block) => block.block_type === "end_to_end_investment:main",
+        );
+
+        if (designMosaicSourceBlock) {
+          setDesignMosaicCmsBlockId(designMosaicSourceBlock.id);
+          setDesignMosaicBlock(hydrateDesignMosaicBlock(designMosaicSourceBlock));
+        }
 
         setPopularConceptsBlock((prev) =>
           mergeFeaturedItems(prev, caseStudiesShort),
@@ -409,14 +621,30 @@ export default function ContentToolsHomePage() {
     });
   }
 
-  async function saveDoItYourselfBlock(
-    nextValue: RepeatableFeatureBlockData,
-  ) {
+  async function saveDoItYourselfBlock(nextValue: RepeatableFeatureBlockData) {
     await patchBlockWithFallback({
       apiBase: API_BASE,
       blockId: doItYourselfCmsBlockId,
       token,
       patches: buildRepeatableFeaturePatches(nextValue),
+    });
+  }
+
+  async function saveManagePropertyBlock(nextValue: MediaTextCardsBlockData) {
+    await patchBlockWithFallback({
+      apiBase: API_BASE,
+      blockId: managePropertyCmsBlockId,
+      token,
+      patches: buildManagePropertyPatches(nextValue),
+    });
+  }
+
+  async function saveDesignMosaicBlock(nextValue: DesignMosaicBlockData) {
+    await patchBlockWithFallback({
+      apiBase: API_BASE,
+      blockId: designMosaicCmsBlockId,
+      token,
+      patches: buildDesignMosaicPatches(nextValue),
     });
   }
 
@@ -733,6 +961,202 @@ export default function ContentToolsHomePage() {
     }
   }
 
+  async function handleManagePropertyBlur() {
+    if (!token || !managePropertyCmsBlockId) return;
+
+    try {
+      setIsSavingManageProperty(true);
+      setError(null);
+      await saveManagePropertyBlock(managePropertyBlock);
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Failed to save manage property block",
+      );
+    } finally {
+      setIsSavingManageProperty(false);
+    }
+  }
+
+  async function handleDesignMosaicBlur() {
+    if (!token || !designMosaicCmsBlockId) return;
+
+    try {
+      setIsSavingDesignMosaic(true);
+      setError(null);
+      await saveDesignMosaicBlock(designMosaicBlock);
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "Failed to save design mosaic block",
+      );
+    } finally {
+      setIsSavingDesignMosaic(false);
+    }
+  }
+
+  async function handleManagePropertyMediaUpload(id: number, file: File) {
+    if (!token || !managePropertyCmsBlockId) return;
+
+    try {
+      setIsSavingManageProperty(true);
+      setError(null);
+
+      const uploadedMedia = await uploadMedia({
+        apiBase: API_BASE,
+        token,
+        file,
+        ownerType: "page_block",
+        ownerId: managePropertyCmsBlockId,
+      });
+
+      const nextManagePropertyBlock: MediaTextCardsBlockData = {
+        ...managePropertyBlock,
+        items: managePropertyBlock.items.map((item) =>
+          item.id === id
+            ? {
+                ...item,
+                mediaId: uploadedMedia.id,
+                fileName: uploadedMedia.file_name || file.name,
+                preview:
+                  uploadedMedia.file_url ||
+                  uploadedMedia.url ||
+                  uploadedMedia.large_url ||
+                  uploadedMedia.thumbnail_url ||
+                  undefined,
+              }
+            : item,
+        ),
+      };
+
+      setManagePropertyBlock(nextManagePropertyBlock);
+      await saveManagePropertyBlock(nextManagePropertyBlock);
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Failed to upload manage property media",
+      );
+    } finally {
+      setIsSavingManageProperty(false);
+    }
+  }
+
+  async function handleManagePropertyMediaRemove(id: number) {
+    if (!token || !managePropertyCmsBlockId) return;
+
+    try {
+      setIsSavingManageProperty(true);
+      setError(null);
+
+      const nextManagePropertyBlock: MediaTextCardsBlockData = {
+        ...managePropertyBlock,
+        items: managePropertyBlock.items.map((item) =>
+          item.id === id
+            ? {
+                ...item,
+                mediaId: undefined,
+                fileName: "",
+                preview: undefined,
+              }
+            : item,
+        ),
+      };
+
+      setManagePropertyBlock(nextManagePropertyBlock);
+      await saveManagePropertyBlock(nextManagePropertyBlock);
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Failed to remove manage property media",
+      );
+    } finally {
+      setIsSavingManageProperty(false);
+    }
+  }
+
+  async function handleDesignMosaicMediaUpload(id: number, file: File) {
+    if (!token || !designMosaicCmsBlockId) return;
+
+    try {
+      setIsSavingDesignMosaic(true);
+      setError(null);
+
+      const uploadedMedia = await uploadMedia({
+        apiBase: API_BASE,
+        token,
+        file,
+        ownerType: "page_block",
+        ownerId: designMosaicCmsBlockId,
+      });
+
+      const nextDesignMosaicBlock: DesignMosaicBlockData = {
+        ...designMosaicBlock,
+        items: designMosaicBlock.items.map((item) =>
+          item.id === id
+            ? {
+                ...item,
+                mediaId: uploadedMedia.id,
+                fileName: uploadedMedia.file_name || file.name,
+                preview:
+                  uploadedMedia.file_url ||
+                  uploadedMedia.url ||
+                  uploadedMedia.large_url ||
+                  uploadedMedia.thumbnail_url ||
+                  undefined,
+              }
+            : item,
+        ),
+      };
+
+      setDesignMosaicBlock(nextDesignMosaicBlock);
+      await saveDesignMosaicBlock(nextDesignMosaicBlock);
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Failed to upload design mosaic media",
+      );
+    } finally {
+      setIsSavingDesignMosaic(false);
+    }
+  }
+
+  async function handleDesignMosaicMediaRemove(id: number) {
+    if (!token || !designMosaicCmsBlockId) return;
+
+    try {
+      setIsSavingDesignMosaic(true);
+      setError(null);
+
+      const nextDesignMosaicBlock: DesignMosaicBlockData = {
+        ...designMosaicBlock,
+        items: designMosaicBlock.items.map((item) =>
+          item.id === id
+            ? {
+                ...item,
+                mediaId: undefined,
+                fileName: "",
+                preview: undefined,
+              }
+            : item,
+        ),
+      };
+
+      setDesignMosaicBlock(nextDesignMosaicBlock);
+      await saveDesignMosaicBlock(nextDesignMosaicBlock);
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Failed to remove design mosaic media",
+      );
+    } finally {
+      setIsSavingDesignMosaic(false);
+    }
+  }
+
   async function handlePublishHomepage() {
     if (!token || !homepageId) return;
 
@@ -885,11 +1309,23 @@ export default function ContentToolsHomePage() {
       <ManagePropertyBlockEditor
         value={managePropertyBlock}
         onChange={setManagePropertyBlock}
+        onTitleBlur={handleManagePropertyBlur}
+        onDescriptionBlur={handleManagePropertyBlur}
+        onItemTitleBlur={handleManagePropertyBlur}
+        onItemSubtitleBlur={handleManagePropertyBlur}
+        onMediaUpload={handleManagePropertyMediaUpload}
+        onMediaRemove={handleManagePropertyMediaRemove}
+        isSaving={isSavingManageProperty}
       />
 
       <DesignMosaicBlockEditor
         value={designMosaicBlock}
         onChange={setDesignMosaicBlock}
+        onTitleBlur={handleDesignMosaicBlur}
+        onItemBlur={handleDesignMosaicBlur}
+        onMediaUpload={handleDesignMosaicMediaUpload}
+        onMediaRemove={handleDesignMosaicMediaRemove}
+        isSaving={isSavingDesignMosaic}
       />
 
       <WeTakeCareBlockEditor

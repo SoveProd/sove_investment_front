@@ -9,6 +9,10 @@ type UploadMediaParams = {
 export type UploadedMedia = {
   id: number;
   file_url: string;
+  url?: string | null;
+  thumbnail_url?: string | null;
+  medium_url?: string | null;
+  large_url?: string | null;
   file_name?: string | null;
 };
 

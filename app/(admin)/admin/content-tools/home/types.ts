@@ -68,6 +68,7 @@ export type FeaturedSelectionBlockData = {
 
 export type MediaTextCardItem = {
   id: number;
+  mediaId?: number;
   fileName: string;
   preview?: string;
   title: string;
@@ -84,6 +85,7 @@ export type DesignMosaicItem = {
   id: number;
   title: string;
   description: string;
+  mediaId?: number;
   fileName: string;
   preview?: string;
 };

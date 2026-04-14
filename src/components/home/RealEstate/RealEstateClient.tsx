@@ -15,6 +15,7 @@ type CarouselItem = {
   imageSrc: string;
   imageAlt: string;
   caption: string;
+  description?: string;
 };
 
 type RealEstateClientProps = {
@@ -285,6 +286,11 @@ export default function RealEstateClient({
                   <p className="text-[20px] font-medium uppercase tracking-wide text-white/90 sm:text-[22px]">
                     {it.caption}
                   </p>
+                  {it.description ? (
+                    <p className="mt-1 text-[13px] leading-5 text-white/80 sm:text-[14px]">
+                      {it.description}
+                    </p>
+                  ) : null}
                 </div>
               </div>
             ))}

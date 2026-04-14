@@ -119,11 +119,11 @@ export default async function Home() {
       </SectionReveal>
 
       <SectionReveal>
-        <RealEstate block={managePropertyBlock as CmsBlock} />
+        <RealEstate managePropertyBlock={managePropertyBlock} />
       </SectionReveal>
 
       <SectionReveal>
-        <DesignMosaicSection block={designMosaicBlock as CmsBlock} />
+        <DesignMosaicSection designMosaicBlock={designMosaicBlock} />
       </SectionReveal>
 
       <SectionReveal>

@@ -3,7 +3,6 @@ import {
   CmsBlock,
   CmsHeroBlock,
   CmsMetricsBlock,
-  CmsButton,
 } from "./types";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "https://sove.app/api/v1";
@@ -37,10 +36,8 @@ export async function getPublishedHomepage(): Promise<CmsStaticPage | null> {
 }
 
 // ==============================
-// 🔍 Helpers
+// Helpers
 // ==============================
-
-// найти блок по типу
 export function findBlockByType<T extends CmsBlock>(
   blocks: CmsBlock[],
   blockType: string,
@@ -50,7 +47,6 @@ export function findBlockByType<T extends CmsBlock>(
     | undefined;
 }
 
-// получить hero
 export function getHomepageHeroBlock(
   page: CmsStaticPage | null,
 ): CmsHeroBlock | undefined {
@@ -58,7 +54,6 @@ export function getHomepageHeroBlock(
   return findBlockByType<CmsHeroBlock>(page.blocks, "ceiling:main");
 }
 
-// получить metrics
 export function getHomepageMetricsBlock(
   page: CmsStaticPage | null,
 ): CmsMetricsBlock | undefined {
@@ -68,7 +63,7 @@ export function getHomepageMetricsBlock(
 
 export function getHomepageDoItWithSoveBlock(
   page: CmsStaticPage | null,
-): (CmsBlock & { button: CmsButton | CmsButton[] | null }) | undefined {
+): CmsBlock | undefined {
   if (!page) return undefined;
   return findBlockByType<CmsBlock>(page.blocks, "do_it_with_sove:main");
 }
@@ -86,15 +81,22 @@ export function getVisibleBlocks(
     });
 }
 
-export function getHomepageManagePropertyBlock(homepage: CmsStaticPage) {
+export function getHomepageManagePropertyBlock(
+  homepage: CmsStaticPage | null,
+): CmsBlock | undefined {
+  if (!homepage) return undefined;
+
   return homepage.blocks.find(
-    (b) => b.block_type === "manage_your_property:main",
+    (block) => block.block_type === "manage_your_property:main",
   );
 }
 
+export function getHomepageDesignMosaicBlock(
+  homepage: CmsStaticPage | null,
+): CmsBlock | undefined {
+  if (!homepage) return undefined;
 
-export function getHomepageDesignMosaicBlock(homepage: CmsStaticPage) {
   return homepage.blocks.find(
     (block) => block.block_type === "end_to_end_investment:main",
-  ) as CmsBlock | undefined;
+  );
 }

@@ -12,6 +12,9 @@ type Props = {
   value: DesignMosaicBlockData;
   onChange: (value: DesignMosaicBlockData) => void;
   onTitleBlur?: () => void;
+  onItemBlur?: () => void;
+  onMediaUpload?: (id: number, file: File) => void | Promise<void>;
+  onMediaRemove?: (id: number) => void | Promise<void>;
   isSaving?: boolean;
 };
 
@@ -19,6 +22,9 @@ export function DesignMosaicBlockEditor({
   value,
   onChange,
   onTitleBlur,
+  onItemBlur,
+  onMediaUpload,
+  onMediaRemove,
   isSaving = false,
 }: Props) {
   const handleTitleChange = (fieldValue: string) => {
@@ -41,13 +47,39 @@ export function DesignMosaicBlockEditor({
     });
   };
 
-  const handleRemoveItemFile = (id: number) => {
+  const handleItemFileChange = async (id: number, file: File) => {
     onChange({
       ...value,
       items: value.items.map((item) =>
-        item.id === id ? { ...item, fileName: "", preview: undefined } : item,
+        item.id === id
+          ? {
+              ...item,
+              fileName: file.name,
+              preview: URL.createObjectURL(file),
+            }
+          : item,
       ),
     });
+
+    await onMediaUpload?.(id, file);
+  };
+
+  const handleRemoveItemFile = async (id: number) => {
+    onChange({
+      ...value,
+      items: value.items.map((item) =>
+        item.id === id
+          ? {
+              ...item,
+              fileName: "",
+              preview: undefined,
+              mediaId: undefined,
+            }
+          : item,
+      ),
+    });
+
+    await onMediaRemove?.(id);
   };
 
   const handleAddItem = () => {
@@ -60,6 +92,7 @@ export function DesignMosaicBlockEditor({
       id: nextId,
       title: "",
       description: "",
+      mediaId: undefined,
       fileName: "Фото.jpeg",
       preview: undefined,
     };
@@ -93,6 +126,7 @@ export function DesignMosaicBlockEditor({
                 onChange={(fieldValue) =>
                   handleItemChange(item.id, "title", fieldValue)
                 }
+                onBlur={onItemBlur}
               />
 
               <AdminTextareaField
@@ -102,12 +136,14 @@ export function DesignMosaicBlockEditor({
                 onChange={(fieldValue) =>
                   handleItemChange(item.id, "description", fieldValue)
                 }
+                onBlur={onItemBlur}
               />
 
               <AdminMediaField
                 label="Фото"
                 fileName={item.fileName}
                 preview={item.preview}
+                onUpload={(file) => handleItemFileChange(item.id, file)}
                 onRemove={() => handleRemoveItemFile(item.id)}
                 compact
               />

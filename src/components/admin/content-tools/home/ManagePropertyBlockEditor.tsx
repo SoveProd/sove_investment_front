@@ -14,6 +14,10 @@ type Props = {
   onChange: (value: MediaTextCardsBlockData) => void;
   onTitleBlur?: () => void;
   onDescriptionBlur?: () => void;
+  onItemTitleBlur?: () => void;
+  onItemSubtitleBlur?: () => void;
+  onMediaUpload?: (id: number, file: File) => void | Promise<void>;
+  onMediaRemove?: (id: number) => void | Promise<void>;
   isSaving?: boolean;
 };
 
@@ -22,6 +26,10 @@ export function ManagePropertyBlockEditor({
   onChange,
   onTitleBlur,
   onDescriptionBlur,
+  onItemTitleBlur,
+  onItemSubtitleBlur,
+  onMediaUpload,
+  onMediaRemove,
   isSaving = false,
 }: Props) {
   const handleTopFieldChange = (
@@ -47,13 +55,39 @@ export function ManagePropertyBlockEditor({
     });
   };
 
-  const handleRemoveItemFile = (id: number) => {
+  const handleItemFileChange = async (id: number, file: File) => {
     onChange({
       ...value,
       items: value.items.map((item) =>
-        item.id === id ? { ...item, fileName: "", preview: undefined } : item,
+        item.id === id
+          ? {
+              ...item,
+              fileName: file.name,
+              preview: URL.createObjectURL(file),
+            }
+          : item,
       ),
     });
+
+    await onMediaUpload?.(id, file);
+  };
+
+  const handleRemoveItemFile = async (id: number) => {
+    onChange({
+      ...value,
+      items: value.items.map((item) =>
+        item.id === id
+          ? {
+              ...item,
+              fileName: "",
+              preview: undefined,
+              mediaId: undefined,
+            }
+          : item,
+      ),
+    });
+
+    await onMediaRemove?.(id);
   };
 
   const handleAddItem = () => {
@@ -68,6 +102,7 @@ export function ManagePropertyBlockEditor({
       preview: undefined,
       title: "",
       subtitle: "",
+      mediaId: undefined,
     };
 
     onChange({
@@ -91,7 +126,7 @@ export function ManagePropertyBlockEditor({
           <AdminTextareaField
             label="Описание краткое"
             value={value.description}
-            placeholder='"SOVE — это полный сервис управления real estate инвестициями. Мы берём на себя:"'
+            placeholder="SOVE — это полный сервис управления real estate инвестициями. Мы берём на себя:"
             onChange={(fieldValue) =>
               handleTopFieldChange("description", fieldValue)
             }
@@ -107,6 +142,7 @@ export function ManagePropertyBlockEditor({
                   label="Фото"
                   fileName={item.fileName}
                   preview={item.preview}
+                  onUpload={(file) => handleItemFileChange(item.id, file)}
                   onRemove={() => handleRemoveItemFile(item.id)}
                   compact
                 />
@@ -118,6 +154,7 @@ export function ManagePropertyBlockEditor({
                   onChange={(fieldValue) =>
                     handleItemFieldChange(item.id, "title", fieldValue)
                   }
+                  onBlur={onItemTitleBlur}
                 />
 
                 <AdminSmallTextField
@@ -127,6 +164,7 @@ export function ManagePropertyBlockEditor({
                   onChange={(fieldValue) =>
                     handleItemFieldChange(item.id, "subtitle", fieldValue)
                   }
+                  onBlur={onItemSubtitleBlur}
                 />
               </div>
             ))}

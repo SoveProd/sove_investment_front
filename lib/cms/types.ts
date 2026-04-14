@@ -1,3 +1,5 @@
+// cms/types.ts
+
 // --- Display (позиции блоков) ---
 export type CmsClientDisplay = {
   position: number | null;
@@ -27,7 +29,7 @@ export type CmsMedia = {
   file_name?: string | null;
   file_type?: string | null;
   file_size?: number | null;
-  position?: number;
+  position?: number | null;
   caption?: string | null;
   description?: string | null;
 };
@@ -50,6 +52,9 @@ export type CmsBlock = {
 
   media: CmsMedia[];
   referenced_objects: unknown[] | null;
+
+  primary_button_label?: string | null;
+  secondary_button_label?: string | null;
 };
 
 // --- Страница CMS ---
@@ -65,22 +70,21 @@ export type CmsStaticPage = {
   blocks: CmsBlock[];
 };
 
-
 // --- Hero ---
 export type CmsHeroBlock = CmsBlock & {
   block_type: "ceiling:main";
-  primary_button_label: string;
-  secondary_button_label: string;
+  primary_button_label?: string | null;
+  secondary_button_label?: string | null;
 };
 
 // --- Metrics ---
 export type CmsMetricItem = {
-  label: string;
-  value: string;
+  label?: string | null;
+  value?: string | null;
 };
 
 export type CmsMetricsContent = {
-  items: CmsMetricItem[];
+  items?: CmsMetricItem[];
 };
 
 export type CmsMetricsBlock = CmsBlock & {
@@ -88,3 +92,48 @@ export type CmsMetricsBlock = CmsBlock & {
   content: CmsMetricsContent | null;
 };
 
+// --- Repeatable feature content ---
+export type CmsRepeatableFeatureItem = {
+  text?: string | null;
+};
+
+export type CmsRepeatableFeatureContent = {
+  items?: CmsRepeatableFeatureItem[];
+};
+
+// --- Featured selection content ---
+export type CmsFeaturedContent = {
+  ids?: number[];
+};
+
+// --- Media text cards content ---
+export type CmsMediaTextCardItem = {
+  title?: string | null;
+  subtitle?: string | null;
+};
+
+export type CmsMediaTextCardsContent = {
+  items?: CmsMediaTextCardItem[];
+};
+
+// --- Media list content ---
+export type CmsMediaListItem = {
+  title?: string | null;
+  subtitle?: string | null;
+  text?: string | null;
+};
+
+export type CmsMediaListContent = {
+  items?: CmsMediaListItem[];
+};
+
+// --- Design mosaic content ---
+export type CmsDesignMosaicItem = {
+  title?: string | null;
+  subtitle?: string | null;
+  text?: string | null;
+};
+
+export type CmsDesignMosaicContent = {
+  items?: CmsDesignMosaicItem[];
+};

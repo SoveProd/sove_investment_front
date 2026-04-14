@@ -1,6 +1,8 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Container } from "@/src/components/layout/Container";
+import type { CmsBlock, CmsDesignMosaicContent, CmsMedia } from "@/lib/cms/types";
+import { getCmsMediaUrl } from "@/lib/cms/mediaUrl";
 
 type TextCard = {
   type: "text";
@@ -66,18 +68,69 @@ const items: MosaicItem[] = [
   { type: "image", id: "i4", imageSrc: "/images/statsimg2.jpg", imageAlt: "" },
 ];
 
-export function DesignMosaicSection() {
+type Props = {
+  designMosaicBlock?: CmsBlock;
+};
+
+function buildItemsFromCms(block?: CmsBlock | null): MosaicItem[] {
+  if (!block) return items;
+
+  const content =
+    block.content && typeof block.content === "object"
+      ? (block.content as CmsDesignMosaicContent)
+      : null;
+
+  const contentItems = Array.isArray(content?.items) ? content.items : [];
+  const media = [...(block.media || [])].sort((a: CmsMedia, b: CmsMedia) => {
+    const aPos = a.position ?? Number.MAX_SAFE_INTEGER;
+    const bPos = b.position ?? Number.MAX_SAFE_INTEGER;
+    return aPos - bPos;
+  });
+
+  const maxLength = Math.max(contentItems.length, media.length, 4);
+
+  const mosaic: MosaicItem[] = [];
+
+  for (let i = 0; i < maxLength; i += 1) {
+    const c = contentItems[i];
+    const m = media[i];
+
+    mosaic.push({
+      type: "text",
+      id: `t${i + 1}`,
+      indexLabel: `[${i + 1}]`,
+      title: c?.title || "",
+      description: c?.text || c?.subtitle || "",
+      href: "#",
+    });
+
+    mosaic.push({
+      type: "image",
+      id: `i${i + 1}`,
+      imageSrc: getCmsMediaUrl(m) || "/images/hero.jpg",
+      imageAlt: m?.file_name || "",
+    });
+  }
+
+  return mosaic;
+}
+
+export function DesignMosaicSection({ designMosaicBlock }: Props) {
+  const mosaicItems = buildItemsFromCms(designMosaicBlock);
+  const heading =
+    (designMosaicBlock?.title && designMosaicBlock.title.trim()) ||
+    "Инвестируйте в дизайн\nнедвижимости под ключ";
+
   return (
     <section className="w-full bg-bg py-[56px] sm:py-[80px] lg:py-[150px]">
       <Container>
-        <h2 className="text-center text-[28px] font-medium leading-[1.08] tracking-[-0.02em] text-dark sm:text-[34px] lg:text-[55px]">
-          Инвестируйте в дизайн
-          <br className="sm:hidden" /> недвижимости под ключ
+        <h2 className="whitespace-pre-line text-center text-[28px] font-medium leading-[1.08] tracking-[-0.02em] text-dark sm:text-[34px] lg:text-[55px]">
+          {heading}
         </h2>
 
         {/* MOBILE */}
         <div className="mt-8 grid grid-cols-1 gap-4 sm:hidden">
-          {items.map((item) => {
+          {mosaicItems.map((item) => {
             if (item.type === "image") {
               return (
                 <MobileImageCard
@@ -102,14 +155,14 @@ export function DesignMosaicSection() {
 
         {/* TABLET / DESKTOP */}
         <div className="mt-12 hidden sm:grid grid-cols-2 gap-6 lg:grid-cols-4">
-          {items.map((item) => {
+          {mosaicItems.map((item) => {
             if (item.type === "image") {
               return (
                 <div
                   key={item.id}
                   className="group relative overflow-hidden rounded-[36px] lg:rounded-[48px] bg-white"
                 >
-                  <div className="relative aspect-[4/5] w-full">
+                  <div className="relative aspect-4/5 w-full">
                     <Image
                       src={item.imageSrc}
                       alt={item.imageAlt}
@@ -189,27 +242,6 @@ function MobileTextFeatureCard({
   );
 }
 
-function MobileMaskedPanel({ children }: { children: React.ReactNode }) {
-  const shapeFill = "var(--color-graphite)";
-
-  return (
-    <div className="relative h-[257px] w-full">
-      <svg
-        viewBox="0 0 343 257"
-        className="absolute inset-0 h-full w-full"
-        aria-hidden="true"
-        preserveAspectRatio="none"
-      >
-        <path
-          d="M0 24C0 10.7452 10.7452 0 24 0H319C332.255 0 343 10.7452 343 24V196C343 209.255 332.255 220 319 220H302C283.775 220 269 234.775 269 253V257H24C10.7452 257 0 246.255 0 233V24Z"
-          fill={shapeFill}
-        />
-      </svg>
-
-      <div className="relative z-[2] h-full w-full">{children}</div>
-    </div>
-  );
-}
 function TextFeatureCard({
   indexLabel,
   title,
@@ -238,7 +270,7 @@ function TextFeatureCard({
           </div>
         </MaskedPanel>
 
-        <div className="absolute bottom-4 right-4 z-[3] grid h-[52px] w-[52px] place-items-center rounded-full bg-white text-dark shadow-[0_10px_30px_rgba(0,0,0,0.12)] transition-transform duration-200 group-hover:scale-[1.03]">
+        <div className="absolute bottom-4 right-4 z-3 grid h-[52px] w-[52px] place-items-center rounded-full bg-white text-dark shadow-[0_10px_30px_rgba(0,0,0,0.12)] transition-transform duration-200 group-hover:scale-[1.03]">
           <ArrowIcon />
         </div>
       </div>
@@ -250,7 +282,7 @@ function MaskedPanel({ children }: { children: React.ReactNode }) {
   const shapeFill = "var(--color-graphite)";
 
   return (
-    <div className="relative aspect-[4/5] w-full">
+    <div className="relative aspect-4/5 w-full">
       <svg
         viewBox="0 0 419 546"
         className="absolute inset-0 h-full w-full"
@@ -263,7 +295,7 @@ function MaskedPanel({ children }: { children: React.ReactNode }) {
         />
       </svg>
 
-      <div className="relative z-[2] h-full w-full">{children}</div>
+      <div className="relative z-2 h-full w-full">{children}</div>
     </div>
   );
 }
