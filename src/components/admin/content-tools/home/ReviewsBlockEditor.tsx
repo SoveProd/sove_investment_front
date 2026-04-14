@@ -24,7 +24,7 @@ function RatingStars({
 
   return (
     <div className="space-y-2">
-      <div className="block text-[14px] leading-[1.2] text-[#8D8D8D]">Оценка</div>
+      <div className="block text-[14px] leading-[1.2] text-adminMuted">Оценка</div>
       <div className="flex items-center gap-1">
         {Array.from({ length: 5 }).map((_, index) => {
           const starValue = index + 1;
@@ -37,7 +37,7 @@ function RatingStars({
               onClick={() => onChange(starValue)}
               className={[
                 "text-[18px] leading-none transition",
-                filled ? "text-[#B45B3C]" : "text-[#D9D9D9]",
+                filled ? "text-adminAccent" : "text-adminBorder",
               ].join(" ")}
               aria-label={`Оценка ${starValue}`}
             >
@@ -114,7 +114,7 @@ export function ReviewsBlockEditor({
           {value.items.map((item) => (
             <div
               key={item.id}
-              className="rounded-[10px] border border-[#D9D9D9] bg-white p-4"
+              className="rounded-[10px] border border-adminBorder bg-surface p-4"
             >
               <div className="space-y-3">
                 <AdminSmallTextField
@@ -172,13 +172,13 @@ export function ReviewsBlockEditor({
         <button
           type="button"
           onClick={handleAddItem}
-          className="inline-flex h-[42px] items-center justify-center rounded-[6px] bg-[#B45B3C] px-6 text-[16px] font-medium text-white transition hover:opacity-90"
+          className="inline-flex h-[42px] items-center justify-center rounded-[6px] bg-adminAccent px-6 text-[16px] font-medium text-white transition hover:opacity-90"
         >
           Добавить
         </button>
 
         {isSaving ? (
-          <p className="text-[13px] text-[#8D8D8D]">Сохраняем...</p>
+          <p className="text-[13px] text-adminMuted">Сохраняем...</p>
         ) : null}
       </div>
     </AdminSectionCard>

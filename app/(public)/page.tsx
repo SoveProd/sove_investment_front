@@ -7,12 +7,12 @@ import { RealEstate } from "@/src/components/home/RealEstate/RealEstate";
 import { CasesCtaSection } from "@/src/components/home/CasesCtaSection/CasesCtaSection";
 import { DesignMosaicSection } from "@/src/components/home/DesignMosaicSection/DesignMosaicsection";
 import HowItWorksSection from "@/src/components/home/HowItWorks/HowItWorksSection";
-import { ThreeHoverZones } from "@/src/components/home/FeatureZone/FeatureZone";
 import { TestimonialsSection } from "@/src/components/home/TestimonialsSection/TestimonialsSection";
-import { CtaBanner } from "@/src/components/home/CtaBanner/CtaBanner";
+import { RequestsLiveBanner } from "@/src/components/home/RequestsLiveBanner";
+import { SoveGroupLiveSection } from "@/src/components/home/SoveGroupLiveSection";
+import { HomepageLiveRefresh } from "@/src/components/home/HomepageLiveRefresh";
 
 import { SectionReveal } from "@/src/components/ui/SectionReveal";
-import Image from "next/image";
 import {
   getHomepageHeroBlock,
   getHomepageManagePropertyBlock,
@@ -22,9 +22,10 @@ import {
   getHomepageDesignMosaicBlock,
 } from "@/lib/cms/homepage";
 import type { CmsBlock, CmsStaticPage } from "@/lib/cms/types";
-import { getCmsMediaUrl } from "@/lib/cms/mediaUrl";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "https://sove.app/api/v1";
+
+export const dynamic = "force-dynamic";
 
 type CaseStudyEntity = {
   id: number;
@@ -50,40 +51,7 @@ function findBlockByType(
   return homepage?.blocks?.find((block) => block.block_type === blockType);
 }
 
-function mapSoveGroupToThreeHoverZones(block?: CmsBlock) {
-  const contentItems =
-    block?.content &&
-    typeof block.content === "object" &&
-    "items" in block.content &&
-    Array.isArray((block.content as { items?: unknown[] }).items)
-      ? (
-          block.content as {
-            items: Array<{
-              label?: string | null;
-              value?: string | null;
-              title?: string | null;
-              subtitle?: string | null;
-            }>;
-          }
-        ).items
-      : [];
-
-  const zones = contentItems.length
-    ? contentItems.map((item) => ({
-        title: item.label || item.title || "",
-        text: item.value || item.subtitle || "",
-      }))
-    : [
-        { title: "Современный дизайн", text: "Наши дизайнеры создают концепции..." },
-        { title: "Профессиональное\nуправление", text: "Берём на себя процесс..." },
-        { title: "Гарантированная ROI", text: "Работаем на результат..." },
-      ];
-
-  const firstMedia = Array.isArray(block?.media) ? block?.media?.[0] : undefined;
-  const imageSrc = (firstMedia ? getCmsMediaUrl(firstMedia) : null) || "/images/hero.jpg";
-
-  return { zones, imageSrc };
-}
+// SoveGroup/Requests are rendered via live client wrappers
 
 async function getPublishedCaseStudies(): Promise<CaseStudyEntity[]> {
   try {
@@ -127,6 +95,7 @@ export default async function Home() {
 
   return (
     <>
+      <HomepageLiveRefresh />
       <SectionReveal>
         <Hero block={heroBlock} />
       </SectionReveal>
@@ -169,23 +138,7 @@ export default async function Home() {
       </SectionReveal>
 
       <SectionReveal>
-        <div className="bg-white">
-          <div className="flex justify-center pt-10 pb-6">
-            <Image
-              src="/logo_dark.svg"
-              alt="SOVE GROUP"
-              width={443}
-              height={42}
-              priority
-              className="opacity-90"
-            />
-          </div>
-
-          {(() => {
-            const mapped = mapSoveGroupToThreeHoverZones(soveGroupBlock);
-            return <ThreeHoverZones imageSrc={mapped.imageSrc} zones={mapped.zones} />;
-          })()}
-        </div>
+        <SoveGroupLiveSection initialBlock={soveGroupBlock} />
       </SectionReveal>
 
       <SectionReveal>
@@ -193,20 +146,7 @@ export default async function Home() {
       </SectionReveal>
 
       <SectionReveal>
-        <CtaBanner
-          title={requestsBlock?.title || undefined}
-          bgSrc={
-            requestsBlock?.media?.[0]
-              ? getCmsMediaUrl(requestsBlock.media[0]) || undefined
-              : undefined
-          }
-          primaryButtonLabel={
-            (Array.isArray(requestsBlock?.button)
-              ? requestsBlock?.button?.[0]?.name
-              : requestsBlock?.button?.name) || undefined
-          }
-          secondaryButtonLabel={requestsBlock?.subtitle || undefined}
-        />
+        <RequestsLiveBanner initialBlock={requestsBlock} />
       </SectionReveal>
     </>
   );

@@ -18,9 +18,9 @@ export async function getPublishedHomepage(): Promise<CmsStaticPage | null> {
         Accept: "application/json",
         "x-client-type": "web",
       },
-      ...(process.env.NODE_ENV === "development"
-        ? { cache: "no-store" as const }
-        : { next: { revalidate: 60 } }),
+      // Important: `router.refresh()` should see fresh CMS content immediately.
+      // If you need CDN-level caching, do it at the API layer instead.
+      cache: "no-store",
     });
 
     if (!response.ok) {

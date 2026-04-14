@@ -105,7 +105,7 @@ export function MediaListBlockEditor({
           />
         </div>
 
-        <div className="max-w-[68%] rounded-[10px] border border-[#D9D9D9] bg-white p-3 max-xl:max-w-full">
+        <div className="max-w-[68%] rounded-[10px] border border-adminBorder bg-surface p-3 max-xl:max-w-full">
           <div className="max-h-[190px] space-y-3 overflow-y-auto pr-2">
             {value.items.map((item) => (
               <AdminMediaField
@@ -122,7 +122,7 @@ export function MediaListBlockEditor({
           <button
             type="button"
             onClick={handleAddItem}
-            className="mt-4 inline-flex h-[42px] items-center justify-center rounded-[6px] bg-[#B45B3C] px-6 text-[16px] font-medium text-white transition hover:opacity-90"
+            className="mt-4 inline-flex h-[42px] items-center justify-center rounded-[6px] bg-adminAccent px-6 text-[16px] font-medium text-white transition hover:opacity-90"
           >
             {addButtonText}
           </button>

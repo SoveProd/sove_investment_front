@@ -1,5 +1,209 @@
 "use client";
 
+import { HeroBlockEditor } from "@/src/components/admin/content-tools/home/HeroBlockEditor";
+import { MetricsBlockEditor } from "@/src/components/admin/content-tools/home/MetricsBlockEditor";
+import { MakeWithSoveBlockEditor } from "@/src/components/admin/content-tools/home/MakeWithSoveBlockEditor";
+import { DoItYourselfBlockEditor } from "@/src/components/admin/content-tools/home/DoItYourselfBlockEditor";
+import { PopularConceptsBlockEditor } from "@/src/components/admin/content-tools/home/PopularConceptsBlockEditor";
+import { ReadyProjectsBlockEditor } from "@/src/components/admin/content-tools/home/ReadyProjectsBlockEditor";
+import { WeTakeCareBlockEditor } from "@/src/components/admin/content-tools/home/WeTakeCareBlockEditor";
+import { CapitalizedTextBlockEditor } from "@/src/components/admin/content-tools/home/CapitalizedTextBlockEditor";
+import { ManagePropertyBlockEditor } from "@/src/components/admin/content-tools/home/ManagePropertyBlockEditor";
+import { DesignMosaicBlockEditor } from "@/src/components/admin/content-tools/home/DesignMosaicBlockEditor";
+import { HowItWorksBlockEditor } from "@/src/components/admin/content-tools/home/HowItWorksBlockEditor";
+import { SoveGroupBlockEditor } from "@/src/components/admin/content-tools/home/SoveGroupBlockEditor";
+import { ReviewsBlockEditor } from "@/src/components/admin/content-tools/home/ReviewsBlockEditor";
+import { RequestsBlockEditor } from "@/src/components/admin/content-tools/home/RequestsBlockEditor";
+import { useContentToolsHome } from "./useContentToolsHome";
+
+export default function ContentToolsHomePage() {
+  const state = useContentToolsHome();
+
+  if (!state.token) {
+    return (
+      <section className="p-6 text-adminMuted">
+        Нет токена. Добавь его в localStorage.
+      </section>
+    );
+  }
+
+  if (state.isLoading) {
+    return <section className="p-6">Загрузка homepage...</section>;
+  }
+
+  if (state.error) {
+    return <section className="p-6 text-red-500">Ошибка: {state.error}</section>;
+  }
+
+  return (
+    <section className="space-y-10">
+        <div className="flex items-center justify-between rounded-[16px] border border-borderSoft bg-surface px-4 py-3">
+        <div>
+          <p className="text-[16px] font-medium text-graphite">
+            Публикация homepage
+          </p>
+          <p className="text-[13px] text-textSecondary">
+            Изменения из этой админки попадут на главную только после публикации.
+          </p>
+        </div>
+
+        <button
+          type="button"
+          onClick={state.handlePublishHomepage}
+          disabled={state.isPublishing}
+          className="rounded-full bg-primary px-4 py-2 text-[14px] font-medium text-white transition hover:bg-primaryHover disabled:cursor-not-allowed disabled:opacity-60"
+        >
+          {state.isPublishing ? "Публикуем..." : "Опубликовать"}
+        </button>
+      </div>
+
+      {state.publishMessage ? (
+        <p className="text-[13px] text-[#3D7A52]">{state.publishMessage}</p>
+      ) : null}
+
+      <HeroBlockEditor
+        value={state.heroBlock}
+        onChange={state.setHeroBlock}
+        onMediaUpload={state.handleHeroMediaUpload}
+        onMediaRemove={state.handleHeroMediaRemove}
+        onTitleBlur={state.blurHandlers.handleHeroTitleBlur}
+        onDescriptionBlur={state.blurHandlers.handleHeroDescriptionBlur}
+        onPrimaryButtonBlur={state.blurHandlers.handleHeroPrimaryButtonBlur}
+        onSecondaryButtonBlur={state.blurHandlers.handleHeroSecondaryButtonBlur}
+        isSaving={state.isSavingHero}
+      />
+
+      <MetricsBlockEditor
+        value={state.metricsBlock}
+        onChange={state.setMetricsBlock}
+        onMediaUpload={state.handleMetricsMediaUpload}
+        onMediaRemove={state.handleMetricsMediaRemove}
+        onFieldBlur={state.blurHandlers.handleMetricsBlur}
+        isSaving={state.isSavingMetrics}
+      />
+
+      <MakeWithSoveBlockEditor
+        value={state.makeWithSoveBlock}
+        onChange={state.setMakeWithSoveBlock}
+        onTitleBlur={state.blurHandlers.handleMakeWithSoveTitleBlur}
+        onDescriptionBlur={state.blurHandlers.handleMakeWithSoveDescriptionBlur}
+        onButtonBlur={state.blurHandlers.handleMakeWithSoveButtonBlur}
+        onItemTextBlur={state.handleMakeWithSoveItemsBlur}
+        onMediaUpload={state.handleMakeWithSoveMediaUpload}
+        onMediaRemove={state.handleMakeWithSoveMediaRemove}
+        isSaving={state.isSavingMakeWithSove}
+      />
+
+      <div className="grid gap-6 xl:grid-cols-2">
+        <CapitalizedTextBlockEditor
+          value={state.capitalizedTextBlock}
+          onChange={state.setCapitalizedTextBlock}
+          onTextBlur={state.blurHandlers.handleCapitalizedTextBlur}
+          onButtonBlur={state.blurHandlers.handleCapitalizedTextButtonBlur}
+          isSaving={state.isSavingCapitalizedText}
+        />
+
+        <DoItYourselfBlockEditor
+          value={state.doItYourselfBlock}
+          onChange={state.setDoItYourselfBlock}
+          onTitleBlur={state.blurHandlers.handleDiyTitleBlur}
+          onDescriptionBlur={state.blurHandlers.handleDiyDescriptionBlur}
+          onButtonBlur={state.blurHandlers.handleDiyButtonBlur}
+          onItemTextBlur={state.handleDiyItemsBlur}
+          onMediaUpload={state.handleDiyMediaUpload}
+          onMediaRemove={state.handleDiyMediaRemove}
+          isSaving={state.isSavingDoItYourself}
+        />
+      </div>
+
+      <div className="grid gap-6 xl:grid-cols-2">
+        <PopularConceptsBlockEditor
+          value={state.popularConceptsBlock}
+          onChange={state.setPopularConceptsBlock}
+          onTitleBlur={state.blurHandlers.handlePopularConceptsTitleBlur}
+          onSelectionChange={state.blurHandlers.handlePopularConceptsSelectionChange}
+          isSaving={state.isSavingPopularConcepts}
+        />
+
+        <ReadyProjectsBlockEditor
+          value={state.readyProjectsBlock}
+          onChange={state.setReadyProjectsBlock}
+          onTitleBlur={state.blurHandlers.handleReadyProjectsTitleBlur}
+          onSelectionChange={state.blurHandlers.handleReadyProjectsSelectionChange}
+          isSaving={state.isSavingReadyProjects}
+        />
+      </div>
+
+      <ManagePropertyBlockEditor
+        value={state.managePropertyBlock}
+        onChange={state.setManagePropertyBlock}
+        onTitleBlur={state.handleManagePropertyBlur}
+        onDescriptionBlur={state.handleManagePropertyBlur}
+        onItemTitleBlur={state.handleManagePropertyBlur}
+        onItemSubtitleBlur={state.handleManagePropertyBlur}
+        onMediaUpload={state.handleManagePropertyMediaUpload}
+        onMediaRemove={state.handleManagePropertyMediaRemove}
+        isSaving={state.isSavingManageProperty}
+      />
+
+      <DesignMosaicBlockEditor
+        value={state.designMosaicBlock}
+        onChange={state.setDesignMosaicBlock}
+        onTitleBlur={state.handleDesignMosaicBlur}
+        onItemBlur={state.handleDesignMosaicBlur}
+        onMediaUpload={state.handleDesignMosaicMediaUpload}
+        onMediaRemove={state.handleDesignMosaicMediaRemove}
+        isSaving={state.isSavingDesignMosaic}
+      />
+
+      <HowItWorksBlockEditor
+        value={state.howItWorksBlock}
+        onChange={state.setHowItWorksBlock}
+        onTitleBlur={state.handleHowItWorksBlur}
+        onSubtitleBlur={state.handleHowItWorksBlur}
+        onStepBlur={state.handleHowItWorksBlur}
+        onMediaUpload={state.handleHowItWorksMediaUpload}
+        onMediaRemove={state.handleHowItWorksMediaRemove}
+        isSaving={state.isSavingHowItWorks}
+      />
+
+      <SoveGroupBlockEditor
+        value={state.soveGroupBlock}
+        onChange={state.setSoveGroupBlock}
+        onZoneBlur={state.handleSoveGroupBlur}
+        onMediaUpload={state.handleSoveGroupMediaUpload}
+        onMediaRemove={state.handleSoveGroupMediaRemove}
+        isSaving={state.isSavingSoveGroup}
+      />
+
+      <ReviewsBlockEditor
+        value={state.reviewsBlock}
+        onChange={state.setReviewsBlock}
+        onTitleBlur={state.handleReviewsBlur}
+        onItemBlur={state.handleReviewsBlur}
+        isSaving={state.isSavingReviews}
+      />
+
+      <RequestsBlockEditor
+        value={state.requestsBlock}
+        onChange={state.setRequestsBlock}
+        onBlur={state.handleRequestsBlur}
+        onMediaUpload={state.handleRequestsMediaUpload}
+        onMediaRemove={state.handleRequestsMediaRemove}
+        isSaving={state.isSavingRequests}
+      />
+
+      <WeTakeCareBlockEditor
+        value={state.weTakeCareBlock}
+        onChange={state.setWeTakeCareBlock}
+      />
+    </section>
+  );
+}
+
+/*
+"use client";
+
 import { useEffect, useState } from "react";
 import { HeroBlockEditor } from "@/src/components/admin/content-tools/home/HeroBlockEditor";
 import { MetricsBlockEditor } from "@/src/components/admin/content-tools/home/MetricsBlockEditor";
@@ -51,7 +255,40 @@ import type {
 import { hydrateHomepageBlocks } from "./hydrateHomepageBlocks";
 import { createHomepageBlurHandlers } from "./createHomepageBlurHandlers";
 import { uploadMedia } from "./uploadMedia";
-import type { CmsBlock, CmsMedia } from "@/lib/cms/types";
+import { patchBlockWithFallback } from "./patchBlock";
+import {
+  HOW_IT_WORKS_BLOCK_TYPE,
+  hydrateHowItWorksBlock,
+  buildHowItWorksPatches,
+} from "./blocks/howItWorks";
+import {
+  SOVE_GROUP_BLOCK_TYPE,
+  hydrateSoveGroupBlock,
+  buildSoveGroupPatches,
+} from "./blocks/soveGroup";
+import {
+  REVIEWS_BLOCK_TYPE,
+  hydrateReviewsBlock,
+  buildReviewsPatches,
+} from "./blocks/reviews";
+import {
+  REQUESTS_BLOCK_TYPE,
+  hydrateRequestsBlock,
+  buildRequestsPatches,
+} from "./blocks/requests";
+import {
+  buildRepeatableFeaturePatches,
+} from "./blocks/repeatableFeature";
+import {
+  MANAGE_PROPERTY_BLOCK_TYPE,
+  buildManagePropertyPatches,
+  hydrateManagePropertyBlock,
+} from "./blocks/manageProperty";
+import {
+  DESIGN_MOSAIC_BLOCK_TYPE,
+  buildDesignMosaicPatches,
+  hydrateDesignMosaicBlock,
+} from "./blocks/designMosaic";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "https://sove.app/api/v1";
 
@@ -60,42 +297,28 @@ type CaseStudyShort = {
   title: string;
 };
 
-async function patchBlockWithFallback({
-  apiBase,
-  blockId,
+function withFallbackSaver({
   token,
-  patches,
+  setError,
 }: {
-  apiBase: string;
-  blockId: number | null;
   token: string | null;
-  patches: Record<string, unknown>[];
+  setError: (value: string | null) => void;
 }) {
-  if (!blockId || !token) {
-    throw new Error("Missing block id or token");
-  }
-
-  let lastError: Error | null = null;
-
-  for (const patch of patches) {
-    const response = await fetch(`${apiBase}/blocks/${blockId}`, {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify(patch),
+  return async (params: {
+    blockId: number | null;
+    patches: Record<string, unknown>[];
+    setSaving: (value: boolean) => void;
+    errorMessage: string;
+  }) =>
+    patchBlockWithFallback({
+      apiBase: API_BASE,
+      blockId: params.blockId,
+      token,
+      patches: params.patches,
+      setSaving: params.setSaving,
+      setError,
+      errorMessage: params.errorMessage,
     });
-
-    if (response.ok) {
-      return;
-    }
-
-    lastError = new Error(`Failed to patch block: ${response.status}`);
-  }
-
-  throw lastError ?? new Error("Failed to patch block");
 }
 
 function buildMetricsMediaPatches(metricsBlock: MetricsBlockData) {
@@ -135,256 +358,7 @@ function buildMetricsMediaPatches(metricsBlock: MetricsBlockData) {
   ];
 }
 
-function buildRepeatableFeaturePatches(block: RepeatableFeatureBlockData) {
-  const mediaIds = block.items
-    .map((item) => item.mediaId)
-    .filter((value): value is number => typeof value === "number");
 
-  const positionedMedia = block.items
-    .filter(
-      (item): item is typeof item & { mediaId: number } =>
-        typeof item.mediaId === "number",
-    )
-    .map((item, index) => ({
-      id: item.mediaId,
-      position: index,
-    }));
-
-  return [
-    {
-      title: block.title,
-      text: block.description,
-      button: {
-        name: block.buttonLabel,
-        position: 0,
-      },
-      content: {
-        items: block.items.map((item) => ({
-          text: item.text,
-        })),
-      },
-      media_ids: mediaIds,
-    },
-    {
-      title: block.title,
-      text: block.description,
-      button: {
-        name: block.buttonLabel,
-        position: 0,
-      },
-      content: {
-        items: block.items.map((item) => ({
-          text: item.text,
-        })),
-      },
-      media: positionedMedia,
-    },
-  ];
-}
-
-function buildManagePropertyPatches(block: MediaTextCardsBlockData) {
-  const mediaIds = block.items
-    .map((item) => item.mediaId)
-    .filter((value): value is number => typeof value === "number");
-
-  const positionedMedia = block.items
-    .filter(
-      (item): item is typeof item & { mediaId: number } =>
-        typeof item.mediaId === "number",
-    )
-    .map((item, index) => ({
-      id: item.mediaId,
-      position: index,
-    }));
-
-  return [
-    {
-      title: block.title,
-      text: block.description,
-      content: {
-        items: block.items.map((item) => ({
-          title: item.title,
-          subtitle: item.subtitle,
-        })),
-      },
-      media_ids: mediaIds,
-    },
-    {
-      title: block.title,
-      text: block.description,
-      content: {
-        items: block.items.map((item) => ({
-          title: item.title,
-          subtitle: item.subtitle,
-        })),
-      },
-      media: positionedMedia,
-    },
-  ];
-}
-
-function buildDesignMosaicPatches(block: DesignMosaicBlockData) {
-  const mediaIds = block.items
-    .map((item) => item.mediaId)
-    .filter((value): value is number => typeof value === "number");
-
-  const positionedMedia = block.items
-    .filter(
-      (item): item is typeof item & { mediaId: number } =>
-        typeof item.mediaId === "number",
-    )
-    .map((item, index) => ({
-      id: item.mediaId,
-      position: index,
-    }));
-
-  const basePatch = {
-    title: block.title,
-    content: {
-      items: block.items.map((item) => ({
-        title: item.title,
-        subtitle: item.description,
-        text: item.description,
-      })),
-    },
-  };
-
-  return [
-    {
-      ...basePatch,
-      media_ids: mediaIds,
-    },
-    {
-      ...basePatch,
-      media: positionedMedia,
-    },
-  ];
-}
-
-function buildHowItWorksPatches(block: HowItWorksBlockData) {
-  const mediaIds = block.steps
-    .map((item) => item.mediaId)
-    .filter((value): value is number => typeof value === "number");
-
-  const positionedMedia = block.steps
-    .filter(
-      (item): item is typeof item & { mediaId: number } =>
-        typeof item.mediaId === "number",
-    )
-    .map((item, index) => ({
-      id: item.mediaId,
-      position: index,
-    }));
-
-  const contentPatch = {
-    content: {
-      items: block.steps.map((step) => ({
-        title: step.stepLabel,
-        subtitle: step.title,
-        text: step.shortDescription,
-        button: step.buttonLabel,
-      })),
-    },
-  };
-
-  const basePatchA = {
-    title: block.title,
-    subtitle: block.subtitle,
-    ...contentPatch,
-  };
-
-  const basePatchB = {
-    title: block.title,
-    text: block.subtitle,
-    ...contentPatch,
-  };
-
-  return [
-    {
-      ...basePatchA,
-      media_ids: mediaIds,
-    },
-    {
-      ...basePatchA,
-      media: positionedMedia,
-    },
-    {
-      ...basePatchB,
-      media_ids: mediaIds,
-    },
-    {
-      ...basePatchB,
-      media: positionedMedia,
-    },
-  ];
-}
-
-function buildSoveGroupPatches(block: SoveGroupBlockData) {
-  const contentPatch = {
-    content: {
-      items: block.zones.map((zone) => ({
-        label: zone.title,
-        value: zone.subtitle,
-      })),
-    },
-  };
-
-  const mediaIds =
-    typeof block.mediaId === "number" ? ([block.mediaId] as number[]) : [];
-
-  return [
-    {
-      ...contentPatch,
-      media_ids: mediaIds,
-    },
-    {
-      ...contentPatch,
-      media: typeof block.mediaId === "number" ? [{ id: block.mediaId, position: 0 }] : [],
-    },
-  ];
-}
-
-function buildReviewsPatches(block: ReviewsBlockData) {
-  return [
-    {
-      title: block.title,
-      content: {
-        items: block.items.map((item) => ({
-          author: item.author,
-          text: item.text,
-          rating: item.rating,
-          date: item.date,
-          url: item.url || null,
-        })),
-      },
-    },
-  ];
-}
-
-function buildRequestsPatches(block: RequestsBlockData) {
-  const mediaIds =
-    typeof block.mediaId === "number" ? ([block.mediaId] as number[]) : [];
-
-  const basePatch = {
-    title: block.title,
-    subtitle: block.secondaryButtonLabel,
-    button: {
-      name: block.primaryButtonLabel,
-      position: 0,
-    },
-  };
-
-  return [
-    {
-      ...basePatch,
-      media_ids: mediaIds,
-    },
-    {
-      ...basePatch,
-      media: typeof block.mediaId === "number" ? [{ id: block.mediaId, position: 0 }] : [],
-    },
-  ];
-}
 
 function mergeFeaturedItems(
   currentValue: FeaturedSelectionBlockData,
@@ -427,278 +401,7 @@ async function loadCaseStudiesShort(token: string): Promise<CaseStudyShort[]> {
   }));
 }
 
-function hydrateManagePropertyBlock(
-  block?: CmsBlock | null,
-): MediaTextCardsBlockData {
-  if (!block) {
-    return initialManagePropertyBlock;
-  }
 
-  const contentItems =
-    block.content &&
-    typeof block.content === "object" &&
-    "items" in block.content &&
-    Array.isArray((block.content as { items?: unknown[] }).items)
-      ? (
-          block.content as {
-            items: Array<{ title?: string; subtitle?: string }>;
-          }
-        ).items
-      : [];
-
-  const media = Array.isArray(block.media) ? (block.media as CmsMedia[]) : [];
-
-  const maxLength = Math.max(contentItems.length, media.length, 0);
-
-  if (maxLength === 0) {
-    return {
-      ...initialManagePropertyBlock,
-      title: block.title || initialManagePropertyBlock.title,
-      description: block.text || initialManagePropertyBlock.description,
-      items: initialManagePropertyBlock.items,
-    };
-  }
-
-  return {
-    title: block.title || "",
-    description: block.text || "",
-    items: Array.from({ length: maxLength }).map((_, index) => {
-      const contentItem = contentItems[index];
-      const mediaItem = media[index];
-
-      return {
-        id: index + 1,
-        title: contentItem?.title || "",
-        subtitle: contentItem?.subtitle || "",
-        fileName: mediaItem?.file_name || "Фото.jpeg",
-        preview:
-          mediaItem?.url ||
-          mediaItem?.large_url ||
-          mediaItem?.thumbnail_url ||
-          undefined,
-        mediaId: mediaItem?.id,
-      };
-    }),
-  };
-}
-
-function hydrateDesignMosaicBlock(block?: CmsBlock | null): DesignMosaicBlockData {
-  if (!block) {
-    return initialDesignMosaicBlock;
-  }
-
-  const contentItems =
-    block.content &&
-    typeof block.content === "object" &&
-    "items" in block.content &&
-    Array.isArray((block.content as { items?: unknown[] }).items)
-      ? (
-          block.content as {
-            items: Array<{ title?: string | null; text?: string | null }>;
-          }
-        ).items
-      : [];
-
-  const media = [...(Array.isArray(block.media) ? (block.media as CmsMedia[]) : [])].sort(
-    (a, b) => {
-      const aPos = a.position ?? Number.MAX_SAFE_INTEGER;
-      const bPos = b.position ?? Number.MAX_SAFE_INTEGER;
-      return aPos - bPos;
-    },
-  );
-
-  const maxLength = Math.max(contentItems.length, media.length, 4);
-
-  return {
-    title: block.title || "",
-    items: Array.from({ length: maxLength }).map((_, index) => {
-      const contentItem = contentItems[index];
-      const mediaItem = media[index];
-
-      return {
-        id: index + 1,
-        title: contentItem?.title || "",
-        description: contentItem?.text || "",
-        fileName: mediaItem?.file_name || "Фото.jpeg",
-        preview:
-          mediaItem?.url ||
-          mediaItem?.large_url ||
-          mediaItem?.thumbnail_url ||
-          undefined,
-        mediaId: mediaItem?.id,
-      };
-    }),
-  };
-}
-
-function hydrateHowItWorksBlock(block?: CmsBlock | null): HowItWorksBlockData {
-  if (!block) {
-    return initialHowItWorksBlock;
-  }
-
-  const contentItems =
-    block.content &&
-    typeof block.content === "object" &&
-    "items" in block.content &&
-    Array.isArray((block.content as { items?: unknown[] }).items)
-      ? (
-          block.content as {
-            items: Array<{
-              title?: string | null;
-              subtitle?: string | null;
-              text?: string | null;
-              button?: string | null;
-            }>;
-          }
-        ).items
-      : [];
-
-  const media = [...(Array.isArray(block.media) ? (block.media as CmsMedia[]) : [])].sort(
-    (a, b) => {
-      const aPos = a.position ?? Number.MAX_SAFE_INTEGER;
-      const bPos = b.position ?? Number.MAX_SAFE_INTEGER;
-      return aPos - bPos;
-    },
-  );
-
-  const maxLength = Math.max(contentItems.length, media.length, 4);
-
-  return {
-    title: block.title || "",
-    subtitle: block.subtitle || block.text || "",
-    steps: Array.from({ length: maxLength }).map((_, index) => {
-      const contentItem = contentItems[index];
-      const mediaItem = media[index];
-
-      return {
-        id: index + 1,
-        stepLabel: contentItem?.title || "",
-        title: contentItem?.subtitle || "",
-        shortDescription: contentItem?.text || "",
-        buttonLabel: contentItem?.button || "",
-        fileName: mediaItem?.file_name || "Фото.jpeg",
-        preview:
-          mediaItem?.url ||
-          mediaItem?.large_url ||
-          mediaItem?.thumbnail_url ||
-          undefined,
-        mediaId: mediaItem?.id,
-      };
-    }),
-  };
-}
-
-function hydrateSoveGroupBlock(block?: CmsBlock | null): SoveGroupBlockData {
-  if (!block) {
-    return initialSoveGroupBlock;
-  }
-
-  const contentItems =
-    block.content &&
-    typeof block.content === "object" &&
-    "items" in block.content &&
-    Array.isArray((block.content as { items?: unknown[] }).items)
-      ? (
-          block.content as {
-            items: Array<{
-              label?: string | null;
-              value?: string | null;
-              title?: string | null;
-              subtitle?: string | null;
-            }>;
-          }
-        ).items
-      : [];
-
-  const media = Array.isArray(block.media) ? (block.media as CmsMedia[]) : [];
-  const firstMedia = media[0];
-
-  const zones = Array.from({ length: Math.max(contentItems.length, 3) }).map(
-    (_, index) => {
-      const item = contentItems[index];
-      return {
-        id: index + 1,
-        title: item?.label || item?.title || "",
-        subtitle: item?.value || item?.subtitle || "",
-      };
-    },
-  );
-
-  return {
-    zones,
-    mediaId: firstMedia?.id,
-    fileName: firstMedia?.file_name || "Фото.jpeg",
-    preview:
-      firstMedia?.url ||
-      firstMedia?.large_url ||
-      firstMedia?.thumbnail_url ||
-      undefined,
-  };
-}
-
-function hydrateReviewsBlock(block?: CmsBlock | null): ReviewsBlockData {
-  if (!block) {
-    return initialReviewsBlock;
-  }
-
-  const contentItems =
-    block.content &&
-    typeof block.content === "object" &&
-    "items" in block.content &&
-    Array.isArray((block.content as { items?: unknown[] }).items)
-      ? (
-          block.content as {
-            items: Array<{
-              author?: string | null;
-              text?: string | null;
-              rating?: number | null;
-              date?: string | null;
-              url?: string | null;
-            }>;
-          }
-        ).items
-      : [];
-
-  const maxLength = Math.max(contentItems.length, 3);
-
-  return {
-    title: block.title || "",
-    items: Array.from({ length: maxLength }).map((_, index) => {
-      const item = contentItems[index];
-      return {
-        id: index + 1,
-        author: item?.author || "",
-        text: item?.text || "",
-        rating: typeof item?.rating === "number" ? item.rating : 5,
-        date: item?.date || "",
-        url: item?.url || "",
-      };
-    }),
-  };
-}
-
-function hydrateRequestsBlock(block?: CmsBlock | null): RequestsBlockData {
-  if (!block) {
-    return initialRequestsBlock;
-  }
-
-  const button = Array.isArray(block.button) ? block.button[0] : block.button;
-  const media = Array.isArray(block.media) ? (block.media as CmsMedia[]) : [];
-  const firstMedia = media[0];
-
-  return {
-    title: block.title || "",
-    primaryButtonLabel: button?.name || "",
-    secondaryButtonLabel: block.subtitle || "",
-    mediaId: firstMedia?.id,
-    fileName: firstMedia?.file_name || "Фото.jpeg",
-    preview:
-      firstMedia?.url ||
-      firstMedia?.large_url ||
-      firstMedia?.thumbnail_url ||
-      undefined,
-  };
-}
 
 export default function ContentToolsHomePage() {
   const [homepageId, setHomepageId] = useState<number | null>(1);
@@ -785,6 +488,7 @@ export default function ContentToolsHomePage() {
 
   const [error, setError] = useState<string | null>(null);
   const [token, setToken] = useState<string | null>(null);
+  const saveWithFallback = withFallbackSaver({ token, setError });
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -830,7 +534,7 @@ export default function ContentToolsHomePage() {
         });
 
         const managePropertySourceBlock = homepageDraft.blocks.find(
-          (block) => block.block_type === "manage_your_property:main",
+          (block) => block.block_type === MANAGE_PROPERTY_BLOCK_TYPE,
         );
 
         if (managePropertySourceBlock) {
@@ -841,7 +545,7 @@ export default function ContentToolsHomePage() {
         }
 
         const designMosaicSourceBlock = homepageDraft.blocks.find(
-          (block) => block.block_type === "end_to_end_investment:main",
+          (block) => block.block_type === DESIGN_MOSAIC_BLOCK_TYPE,
         );
 
         if (designMosaicSourceBlock) {
@@ -850,7 +554,7 @@ export default function ContentToolsHomePage() {
         }
 
         const howItWorksSourceBlock = homepageDraft.blocks.find(
-          (block) => block.block_type === "how_it_works:main",
+          (block) => block.block_type === HOW_IT_WORKS_BLOCK_TYPE,
         );
 
         if (howItWorksSourceBlock) {
@@ -859,7 +563,7 @@ export default function ContentToolsHomePage() {
         }
 
         const soveGroupSourceBlock = homepageDraft.blocks.find(
-          (block) => block.block_type === "sove_group:main",
+          (block) => block.block_type === SOVE_GROUP_BLOCK_TYPE,
         );
 
         if (soveGroupSourceBlock) {
@@ -868,7 +572,7 @@ export default function ContentToolsHomePage() {
         }
 
         const reviewsSourceBlock = homepageDraft.blocks.find(
-          (block) => block.block_type === "reviews:main",
+          (block) => block.block_type === REVIEWS_BLOCK_TYPE,
         );
 
         if (reviewsSourceBlock) {
@@ -877,7 +581,7 @@ export default function ContentToolsHomePage() {
         }
 
         const requestsSourceBlock = homepageDraft.blocks.find(
-          (block) => block.block_type === "requests:main",
+          (block) => block.block_type === REQUESTS_BLOCK_TYPE,
         );
 
         if (requestsSourceBlock) {
@@ -951,10 +655,8 @@ export default function ContentToolsHomePage() {
   async function saveHeroMedia(nextMediaIds: number[]) {
     const firstMediaId = nextMediaIds[0];
 
-    await patchBlockWithFallback({
-      apiBase: API_BASE,
+    await saveWithFallback({
       blockId: heroCmsBlockId,
-      token,
       patches: [
         { media_ids: nextMediaIds },
         { media_id: firstMediaId ?? null },
@@ -962,87 +664,89 @@ export default function ContentToolsHomePage() {
           media: firstMediaId ? [{ id: firstMediaId, position: 0 }] : [],
         },
       ],
+      setSaving: setIsSavingHero,
+      errorMessage: "Failed to save hero media",
     });
   }
 
   async function saveMetricsBlock(nextValue: MetricsBlockData) {
-    await patchBlockWithFallback({
-      apiBase: API_BASE,
+    await saveWithFallback({
       blockId: metricsCmsBlockId,
-      token,
       patches: buildMetricsMediaPatches(nextValue),
+      setSaving: setIsSavingMetrics,
+      errorMessage: "Failed to save metrics block",
     });
   }
 
   async function saveMakeWithSoveBlock(nextValue: RepeatableFeatureBlockData) {
-    await patchBlockWithFallback({
-      apiBase: API_BASE,
+    await saveWithFallback({
       blockId: makeWithSoveCmsBlockId,
-      token,
       patches: buildRepeatableFeaturePatches(nextValue),
+      setSaving: setIsSavingMakeWithSove,
+      errorMessage: "Failed to save do_it_with_sove block",
     });
   }
 
   async function saveDoItYourselfBlock(nextValue: RepeatableFeatureBlockData) {
-    await patchBlockWithFallback({
-      apiBase: API_BASE,
+    await saveWithFallback({
       blockId: doItYourselfCmsBlockId,
-      token,
       patches: buildRepeatableFeaturePatches(nextValue),
+      setSaving: setIsSavingDoItYourself,
+      errorMessage: "Failed to save diy block",
     });
   }
 
   async function saveManagePropertyBlock(nextValue: MediaTextCardsBlockData) {
-    await patchBlockWithFallback({
-      apiBase: API_BASE,
+    await saveWithFallback({
       blockId: managePropertyCmsBlockId,
-      token,
       patches: buildManagePropertyPatches(nextValue),
+      setSaving: setIsSavingManageProperty,
+      errorMessage: "Failed to save manage property block",
     });
   }
 
   async function saveDesignMosaicBlock(nextValue: DesignMosaicBlockData) {
-    await patchBlockWithFallback({
-      apiBase: API_BASE,
+    await saveWithFallback({
       blockId: designMosaicCmsBlockId,
-      token,
       patches: buildDesignMosaicPatches(nextValue),
+      setSaving: setIsSavingDesignMosaic,
+      errorMessage: "Failed to save design mosaic block",
     });
   }
 
   async function saveHowItWorksBlock(nextValue: HowItWorksBlockData) {
-    await patchBlockWithFallback({
-      apiBase: API_BASE,
+    await saveWithFallback({
       blockId: howItWorksCmsBlockId,
-      token,
       patches: buildHowItWorksPatches(nextValue),
+      setSaving: setIsSavingHowItWorks,
+      errorMessage: "Failed to save how it works block",
     });
   }
 
   async function saveSoveGroupBlock(nextValue: SoveGroupBlockData) {
-    await patchBlockWithFallback({
-      apiBase: API_BASE,
+    await saveWithFallback({
       blockId: soveGroupCmsBlockId,
-      token,
       patches: buildSoveGroupPatches(nextValue),
+      setSaving: setIsSavingSoveGroup,
+      errorMessage: "Failed to save sove group block",
     });
   }
 
   async function saveReviewsBlock(nextValue: ReviewsBlockData) {
-    await patchBlockWithFallback({
-      apiBase: API_BASE,
+    await saveWithFallback({
       blockId: reviewsCmsBlockId,
-      token,
       patches: buildReviewsPatches(nextValue),
+      setSaving: setIsSavingReviews,
+      errorMessage: "Failed to save reviews block",
     });
   }
 
   async function saveRequestsBlock(nextValue: RequestsBlockData) {
-    await patchBlockWithFallback({
-      apiBase: API_BASE,
+    await saveWithFallback({
       blockId: requestsCmsBlockId,
-      token,
       patches: buildRequestsPatches(nextValue),
+      setSaving: setIsSavingRequests,
+      errorMessage: "Failed to save requests block",
     });
   }
 
@@ -1859,7 +1563,7 @@ export default function ContentToolsHomePage() {
 
   if (!token) {
     return (
-      <section className="p-6 text-[#8D8D8D]">
+      <section className="p-6 text-adminMuted">
         Нет токена. Добавь его в localStorage.
       </section>
     );
@@ -1875,12 +1579,12 @@ export default function ContentToolsHomePage() {
 
   return (
     <section className="space-y-10">
-      <div className="flex items-center justify-between rounded-[16px] border border-[#D9D9D9] bg-white px-4 py-3">
+      <div className="flex items-center justify-between rounded-[16px] border border-adminBorder bg-surface px-4 py-3">
         <div>
-          <p className="text-[16px] font-medium text-[#383838]">
+          <p className="text-[16px] font-medium text-graphite">
             Публикация homepage
           </p>
-          <p className="text-[13px] text-[#8D8D8D]">
+          <p className="text-[13px] text-adminMuted">
             Изменения из этой админки попадут на главную только после
             публикации.
           </p>
@@ -1890,7 +1594,7 @@ export default function ContentToolsHomePage() {
           type="button"
           onClick={handlePublishHomepage}
           disabled={isPublishing}
-          className="rounded-full bg-[#B45B3C] px-4 py-2 text-[14px] font-medium text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
+          className="rounded-full bg-adminAccent px-4 py-2 text-[14px] font-medium text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
         >
           {isPublishing ? "Публикуем..." : "Опубликовать"}
         </button>
@@ -2039,3 +1743,4 @@ export default function ContentToolsHomePage() {
     </section>
   );
 }
+*/

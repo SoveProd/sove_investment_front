@@ -21,15 +21,7 @@ export function MethodPage() {
       </SectionReveal>
 
       <SectionReveal delay={0.05} className="mt-6">
-        <CasesCtaSection
-          beforeAccent1="МЫ РАБОТАЕМ"
-          accent1="ТОЛЬКО С ПРОВЕРЕННЫМИ"
-          betweenAccents="ОБЪЕКТАМИ И ОПЫТНЫМИ КОМАНДАМИ."
-          accent2="ТВОЙ КАПИТАЛ"
-          afterAccent2="ВСЕГДА ПОД КОНТРОЛЕМ."
-          buttonLabel="Подробнее"
-          href="/cases"
-        />
+        <CasesCtaSection href="/cases" />
       </SectionReveal>
 
       <SectionReveal delay={0.07} className="mt-6">

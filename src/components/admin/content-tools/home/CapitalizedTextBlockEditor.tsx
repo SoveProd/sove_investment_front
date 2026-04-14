@@ -50,7 +50,7 @@ export function CapitalizedTextBlockEditor({
       </div>
 
       {isSaving ? (
-        <p className="mt-3 text-[13px] text-[#8D8D8D]">Сохраняем...</p>
+        <p className="mt-3 text-[13px] text-adminMuted">Сохраняем...</p>
       ) : null}
     </AdminSectionCard>
   );

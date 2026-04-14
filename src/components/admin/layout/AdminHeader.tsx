@@ -35,8 +35,8 @@ export function AdminHeader() {
   const title = getPageTitle(pathname);
 
   return (
-    <header className="border-b border-[#F0F0F0] px-8 py-6 max-lg:px-5">
-      <p className="text-[20px] font-normal text-[#383838]">{title}</p>
+    <header className="border-b border-border px-8 py-6 max-lg:px-5">
+      <p className="text-[20px] font-normal text-graphite">{title}</p>
     </header>
   );
 }

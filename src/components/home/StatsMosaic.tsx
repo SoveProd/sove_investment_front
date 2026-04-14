@@ -181,6 +181,16 @@ export function StatsMosaic({ block }: Props) {
   const third = items[2] || fallbackItems[2];
   const fourth = items[3] || fallbackItems[3];
 
+  const safe = (item: { label?: string | null; value?: string | null }) => ({
+    label: item.label ?? "",
+    value: item.value ?? "",
+  });
+
+  const firstSafe = safe(first);
+  const secondSafe = safe(second);
+  const thirdSafe = safe(third);
+  const fourthSafe = safe(fourth);
+
   return (
     <section className="w-full bg-bg py-[56px] sm:py-[70px] lg:py-[110px] min-[1536px]:py-[150px]">
       <Container>
@@ -188,8 +198,8 @@ export function StatsMosaic({ block }: Props) {
         <div className="hidden lg:grid grid-cols-12 gap-6">
           <div className="col-span-3 h-[280px] min-[1280px]:h-[300px] min-[1440px]:h-[340px] min-[1536px]:h-[389px]">
             <StatNotchedCard
-              value={first.value}
-              label={first.label}
+              value={firstSafe.value}
+              label={firstSafe.label}
               notchSide="br"
               variant="dark"
             />
@@ -201,21 +211,21 @@ export function StatsMosaic({ block }: Props) {
 
           <div className="col-span-3 h-[280px] min-[1280px]:h-[300px] min-[1440px]:h-[340px] min-[1536px]:h-[389px]">
             <StatNotchedCard
-              value={second.value}
-              label={second.label}
+              value={secondSafe.value}
+              label={secondSafe.label}
               notchSide="bl"
               variant="dark"
             />
           </div>
 
           <div className="col-span-3 h-[280px] min-[1280px]:h-[300px] min-[1440px]:h-[340px] min-[1536px]:h-[389px]">
-            <LightInfoCard value={third.value} label={third.label} />
+            <LightInfoCard value={thirdSafe.value} label={thirdSafe.label} />
           </div>
 
           <div className="col-span-3 h-[280px] min-[1280px]:h-[300px] min-[1440px]:h-[340px] min-[1536px]:h-[389px]">
             <StatNotchedCard
-              value={fourth.value}
-              label={fourth.label}
+              value={fourthSafe.value}
+              label={fourthSafe.label}
               notchSide="br"
               variant="dark"
             />
@@ -230,8 +240,8 @@ export function StatsMosaic({ block }: Props) {
         <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:hidden">
           <div className="h-[150px] sm:h-[180px] md:h-[210px]">
             <StatNotchedCard
-              value={first.value}
-              label={first.label}
+              value={firstSafe.value}
+              label={firstSafe.label}
               notchSide="br"
               variant="dark"
               withArrow
@@ -240,8 +250,8 @@ export function StatsMosaic({ block }: Props) {
 
           <div className="h-[150px] sm:h-[180px] md:h-[210px]">
             <StatNotchedCard
-              value={second.value}
-              label={second.label}
+              value={secondSafe.value}
+              label={secondSafe.label}
               notchSide="br"
               variant="dark"
               withArrow
@@ -253,13 +263,13 @@ export function StatsMosaic({ block }: Props) {
           </div>
 
           <div className="h-[150px] sm:h-[180px] md:h-[210px]">
-            <LightInfoCard value={third.value} label={third.label} />
+            <LightInfoCard value={thirdSafe.value} label={thirdSafe.label} />
           </div>
 
           <div className="h-[150px] sm:h-[180px] md:h-[210px]">
             <StatNotchedCard
-              value={fourth.value}
-              label={fourth.label}
+              value={fourthSafe.value}
+              label={fourthSafe.label}
               notchSide="br"
               variant="dark"
               withArrow

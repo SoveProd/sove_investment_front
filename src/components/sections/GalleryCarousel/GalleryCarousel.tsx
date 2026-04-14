@@ -74,7 +74,7 @@ function GalleryCarouselMobile({ images }: { images: GalleryImage[] }) {
   useEffect(() => {
     if (!embla) return;
 
-    updateStateFromEmbla();
+    requestAnimationFrame(() => updateStateFromEmbla());
     embla.on("select", updateStateFromEmbla);
     embla.on("reInit", updateStateFromEmbla);
 
@@ -182,7 +182,7 @@ function GalleryCarouselDesktop({
   useEffect(() => {
     if (!embla) return;
 
-    updateStateFromEmbla();
+    requestAnimationFrame(() => updateStateFromEmbla());
     embla.on("select", updateStateFromEmbla);
     embla.on("reInit", updateStateFromEmbla);
 

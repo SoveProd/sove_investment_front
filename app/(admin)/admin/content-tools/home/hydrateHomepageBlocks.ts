@@ -12,13 +12,13 @@ import type {
   CmsStaticPage,
 } from "@/lib/cms/types";
 import {
-  mapHeroBlockToAdmin,
-  mapMetricsBlockToAdmin,
   mapDoItWithSoveBlockToAdmin,
   mapDiyBlockToAdmin,
   mapCapitalizedTextBlockToAdmin,
   mapFeaturedBlockToAdmin,
 } from "@/lib/cms/homepageAdapters";
+import { hydrateHeroBlock, HERO_BLOCK_TYPE } from "./blocks/hero";
+import { hydrateMetricsBlock, METRICS_BLOCK_TYPE } from "./blocks/metrics";
 
 function findBlockByType<T extends CmsBlock>(
   blocks: CmsBlock[],
@@ -78,12 +78,12 @@ export function hydrateHomepageBlocks({
 }: Params) {
   const heroCmsBlock = findBlockByType<CmsHeroBlock>(
     homepageDraft.blocks,
-    "ceiling:main",
+    HERO_BLOCK_TYPE,
   );
 
   const metricsCmsBlock = findBlockByType<CmsMetricsBlock>(
     homepageDraft.blocks,
-    "metrics:main",
+    METRICS_BLOCK_TYPE,
   );
 
   const makeWithSoveCmsBlock = findBlockByType<CmsBlock>(
@@ -115,7 +115,7 @@ export function hydrateHomepageBlocks({
     setHeroCmsBlockId(heroCmsBlock.id);
 
     setHeroBlock((prev) => {
-      const mapped = mapHeroBlockToAdmin(heroCmsBlock);
+      const mapped = hydrateHeroBlock(heroCmsBlock);
 
       return {
         ...prev,
@@ -136,7 +136,7 @@ export function hydrateHomepageBlocks({
     setMetricsCmsBlockId(metricsCmsBlock.id);
 
     setMetricsBlock((prev) => {
-      const mapped = mapMetricsBlockToAdmin(metricsCmsBlock);
+      const mapped = hydrateMetricsBlock(metricsCmsBlock);
 
       return {
         items: prev.items.map((item, index) => {

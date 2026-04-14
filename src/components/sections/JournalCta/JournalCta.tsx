@@ -56,15 +56,15 @@ function MiniCtaButton({ href, label }: { href: string; label: string }) {
       className={[
         "inline-flex items-center gap-3",
         "h-[56px] rounded-full",
-        "bg-[#A05035] px-7",
+        "bg-primary px-7",
         "text-[16px] font-medium text-white",
-        "transition hover:opacity-95",
+        "transition hover:bg-primaryHover",
       ].join(" ")}
       aria-label={label}
     >
       <span className="whitespace-nowrap">{label}</span>
 
-      <span className="grid h-[34px] w-[34px] place-items-center rounded-full bg-white text-[#A05035]">
+      <span className="grid h-[34px] w-[34px] place-items-center rounded-full bg-surface text-primary">
         <svg
           width="14"
           height="14"

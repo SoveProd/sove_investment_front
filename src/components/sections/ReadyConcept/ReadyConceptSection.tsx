@@ -152,7 +152,6 @@ export function ReadyConceptSection({
               <ArrowButton
                 href={primaryCtaHref}
                 label={primaryCtaLabel}
-                mobile
                 className="w-[151px] shrink-0"
               />
 

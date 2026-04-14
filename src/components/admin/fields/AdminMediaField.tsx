@@ -61,7 +61,7 @@ export function AdminMediaField({
       {label ? (
         <label
           htmlFor={inputId}
-          className="block text-[14px] leading-[1.2] text-[#8D8D8D]"
+          className="block text-[14px] leading-[1.2] text-textSecondary"
         >
           {label}
         </label>
@@ -69,14 +69,14 @@ export function AdminMediaField({
 
       <div
         className={clsx(
-          "flex items-center justify-between rounded-[10px] border border-[#D9D9D9] bg-white px-3",
+          "flex items-center justify-between rounded-[10px] border border-borderSoft bg-surface px-3",
           compact ? "h-[60px]" : "h-[60px]",
         )}
       >
         <div className="flex min-w-0 items-center gap-3 overflow-hidden">
           <div
             className={clsx(
-              "relative shrink-0 overflow-hidden rounded-[4px] bg-[#E7E7E7]",
+              "relative shrink-0 overflow-hidden rounded-[4px] bg-border",
               compact ? "h-8 w-8" : "h-9 w-9",
             )}
           >
@@ -90,12 +90,12 @@ export function AdminMediaField({
               />
             ) : (
               <div className="flex h-full w-full items-center justify-center">
-                <Upload size={14} className="text-[#8D8D8D]" />
+                <Upload size={14} className="text-textSecondary" />
               </div>
             )}
           </div>
 
-          <span className="truncate whitespace-nowrap text-[14px] text-[#383838]">
+          <span className="truncate whitespace-nowrap text-[14px] text-graphite">
             {fileName || "Файл не выбран"}
           </span>
         </div>
@@ -113,7 +113,7 @@ export function AdminMediaField({
           <button
             type="button"
             onClick={handleUploadClick}
-            className="text-[#B45B3C] transition hover:opacity-80"
+            className="text-primary transition hover:text-primaryHover"
             aria-label="Загрузить файл"
           >
             <Upload size={16} />
@@ -123,7 +123,7 @@ export function AdminMediaField({
             type="button"
             onClick={onRemove}
             disabled={!onRemove}
-            className="flex h-6 w-6 items-center justify-center rounded-full bg-[#B45B3C] text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
+            className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-white transition hover:bg-primaryHover disabled:cursor-not-allowed disabled:opacity-50"
             aria-label="Удалить файл"
           >
             <Ellipsis size={14} />

@@ -48,7 +48,7 @@ export default function LoginPage() {
           sizes="100vw"
         />
         <div className="absolute inset-0 bg-black/45" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-black/35" />
+        <div className="absolute inset-0 bg-linear-to-t from-black/60 via-black/20 to-black/35" />
       </div>
 
       <div className="relative z-10 flex min-h-screen items-center justify-center px-4 py-10">
@@ -72,7 +72,7 @@ export default function LoginPage() {
                 onChange={(e) => setLogin(e.target.value)}
                 placeholder="Иван"
                 autoComplete="username"
-                className="h-[74px] w-full rounded-[10px] border border-[#D9D9D9] bg-white px-5 text-[18px] text-[#2F2F2F] outline-none transition focus:border-[#B45B3C]"
+                className="h-[74px] w-full rounded-[10px] border border-adminBorder bg-surface px-5 text-[18px] text-[#2F2F2F] outline-none transition focus:border-adminAccent"
               />
             </div>
 
@@ -87,7 +87,7 @@ export default function LoginPage() {
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Пароль"
                 autoComplete="current-password"
-                className="h-[74px] w-full rounded-[10px] border border-[#D9D9D9] bg-white px-5 text-[18px] text-[#2F2F2F] outline-none transition focus:border-[#B45B3C]"
+                className="h-[74px] w-full rounded-[10px] border border-adminBorder bg-surface px-5 text-[18px] text-[#2F2F2F] outline-none transition focus:border-adminAccent"
               />
             </div>
           </div>
@@ -99,7 +99,7 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={status === "loading"}
-            className="mt-7 h-[74px] w-full rounded-full bg-[#B45B3C] text-[18px] font-semibold uppercase tracking-[0.02em] text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
+            className="mt-7 h-[74px] w-full rounded-full bg-adminAccent text-[18px] font-semibold uppercase tracking-[0.02em] text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
           >
             {status === "loading" ? "Вход..." : "Войти"}
           </button>

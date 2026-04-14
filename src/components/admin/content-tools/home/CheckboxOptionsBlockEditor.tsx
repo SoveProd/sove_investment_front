@@ -63,8 +63,8 @@ export function CheckboxOptionsBlockEditor({
           onBlur={onTitleBlur}
         />
 
-        <div className="rounded-[16px] border border-[#D9D9D9] bg-white p-4 md:p-5">
-          <p className="mb-4 text-[14px] leading-[1.2] text-[#8D8D8D]">
+        <div className="rounded-[16px] border border-borderSoft bg-surface p-4 md:p-5">
+          <p className="mb-4 text-[14px] leading-[1.2] text-textSecondary">
             Выбери элементы, которые должны отображаться в этом блоке
           </p>
 
@@ -80,21 +80,21 @@ export function CheckboxOptionsBlockEditor({
                     onClick={() => handleToggle(item.id)}
                     className={`flex min-h-[64px] w-full items-center gap-3 rounded-[12px] border px-4 py-3 text-left transition ${
                       item.checked
-                        ? "border-[#B45B3C] bg-[#FFF7F3]"
-                        : "border-[#E7E7E7] bg-white hover:border-[#D6B0A0]"
+                        ? "border-primary bg-adminSurfaceWarm"
+                        : "border-borderSoft bg-surface hover:border-primary/40"
                     }`}
                   >
                     <span
                       className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-[4px] border ${
                         item.checked
-                          ? "border-[#B45B3C] bg-[#B45B3C] text-white"
-                          : "border-[#AFAFAF] bg-white"
+                          ? "border-primary bg-primary text-white"
+                          : "border-adminCheckboxBorder bg-surface"
                       }`}
                     >
                       {item.checked ? "✓" : ""}
                     </span>
 
-                    <span className="text-[14px] font-medium leading-[1.3] text-[#383838]">
+                    <span className="text-[14px] font-medium leading-[1.3] text-graphite">
                       {itemLabel}
                     </span>
                   </button>
@@ -102,14 +102,14 @@ export function CheckboxOptionsBlockEditor({
               })}
             </div>
           ) : (
-            <div className="rounded-[12px] border border-dashed border-[#D9D9D9] px-4 py-6 text-[13px] text-[#8D8D8D]">
+            <div className="rounded-[12px] border border-dashed border-borderSoft px-4 py-6 text-[13px] text-textSecondary">
               Пока нет доступных элементов для выбора
             </div>
           )}
         </div>
 
         {isSaving ? (
-          <p className="text-[13px] text-[#8D8D8D]">Сохраняем...</p>
+          <p className="text-[13px] text-textSecondary">Сохраняем...</p>
         ) : null}
       </div>
     </AdminSectionCard>

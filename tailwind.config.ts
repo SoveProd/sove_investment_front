@@ -1,7 +1,11 @@
 import type { Config } from "tailwindcss";
 
 const config: Config = {
-  content: ["./app/**/*.{js,ts,jsx,tsx}", "./components/**/*.{js,ts,jsx,tsx}"],
+  content: [
+    "./app/**/*.{js,ts,jsx,tsx}",
+    "./components/**/*.{js,ts,jsx,tsx}",
+    "./src/**/*.{js,ts,jsx,tsx}",
+  ],
   theme: {
     extend: {
       fontFamily: {
@@ -24,6 +28,17 @@ const config: Config = {
 
         graphite: "var(--color-graphite)",
         
+        adminAccent: "var(--color-admin-accent)",
+        adminMuted: "var(--color-admin-muted)",
+        adminBorder: "var(--color-admin-border)",
+        adminSoft: "var(--color-admin-soft)",
+        adminSurfaceWarm: "var(--color-admin-surface-warm)",
+        adminActiveBg: "var(--color-admin-active-bg)",
+        adminHoverBg: "var(--color-admin-hover-bg)",
+        adminHoverBorder: "var(--color-admin-hover-border)",
+        adminCheckboxBorder: "var(--color-admin-checkbox-border)",
+        adminPlaceholder: "var(--color-admin-placeholder)",
+
         slotFill: "var(--color-slot-fill)",
         slotStroke: "var(--color-slot-stroke)",
       },

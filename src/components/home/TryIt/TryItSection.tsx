@@ -186,7 +186,7 @@ export default function TryItSection({ block }: Props) {
           </div>
 
           <div className="mt-6">
-            <ArrowButton label={buttonLabel} href="#" mobile />
+            <ArrowButton label={buttonLabel} href="#" />
           </div>
         </div>
       </div>

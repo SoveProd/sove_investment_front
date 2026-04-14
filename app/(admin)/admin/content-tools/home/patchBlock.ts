@@ -42,3 +42,57 @@ export async function patchBlock({
     setSaving(false);
   }
 }
+
+type PatchBlockWithFallbackParams = {
+  apiBase: string;
+  blockId: number | null;
+  token: string | null;
+  patches: Record<string, unknown>[];
+  setSaving: (value: boolean) => void;
+  setError: (value: string | null) => void;
+  errorMessage?: string;
+};
+
+export async function patchBlockWithFallback({
+  apiBase,
+  blockId,
+  token,
+  patches,
+  setSaving,
+  setError,
+  errorMessage = "Failed to patch block",
+}: PatchBlockWithFallbackParams) {
+  if (!blockId || !token) return false;
+
+  let lastError: Error | null = null;
+
+  try {
+    setSaving(true);
+    setError(null);
+
+    for (const patch of patches) {
+      const response = await fetch(`${apiBase}/blocks/${blockId}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(patch),
+      });
+
+      if (response.ok) {
+        return true;
+      }
+
+      lastError = new Error(`${errorMessage}: ${response.status}`);
+    }
+
+    throw lastError ?? new Error(errorMessage);
+  } catch (err) {
+    setError(err instanceof Error ? err.message : errorMessage);
+    return false;
+  } finally {
+    setSaving(false);
+  }
+}

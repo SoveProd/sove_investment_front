@@ -103,7 +103,7 @@ export function SoveGroupBlockEditor({
         </div>
 
         {isSaving ? (
-          <p className="text-[13px] text-[#8D8D8D]">Сохраняем...</p>
+          <p className="text-[13px] text-adminMuted">Сохраняем...</p>
         ) : null}
       </div>
     </AdminSectionCard>

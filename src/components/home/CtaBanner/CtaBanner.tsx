@@ -1,3 +1,5 @@
+"use client";
+
 import Image from "next/image";
 import { Container } from "@/src/components/layout/Container";
 import { Button } from "@/src/components/ui/Button";

@@ -1,6 +1,5 @@
 import { patchBlock } from "@/app/(admin)/admin/content-tools/home/patchBlock";
 import {
-  mapMetricsAdminToPatch,
   mapFeaturedAdminToPatch,
 } from "@/lib/cms/homepageAdapters";
 import type {
@@ -10,6 +9,8 @@ import type {
   TextButtonBlockData,
   FeaturedSelectionBlockData,
 } from "@/app/(admin)/admin/content-tools/home/types";
+import { buildMetricsPatch } from "./blocks/metrics";
+import { buildHeroPatch } from "./blocks/hero";
 
 type Params = {
   apiBase: string;
@@ -95,12 +96,7 @@ export function createHomepageBlurHandlers({
         apiBase,
         blockId: heroCmsBlockId,
         token,
-        patch: {
-          button: [
-            { name: heroBlock.primaryButtonLabel, position: 0 },
-            { name: heroBlock.secondaryButtonLabel, position: 1 },
-          ],
-        },
+        patch: buildHeroPatch(heroBlock),
         setSaving: setIsSavingHero,
         setError,
         errorMessage: "Failed to save hero buttons",
@@ -111,12 +107,7 @@ export function createHomepageBlurHandlers({
         apiBase,
         blockId: heroCmsBlockId,
         token,
-        patch: {
-          button: [
-            { name: heroBlock.primaryButtonLabel, position: 0 },
-            { name: heroBlock.secondaryButtonLabel, position: 1 },
-          ],
-        },
+        patch: buildHeroPatch(heroBlock),
         setSaving: setIsSavingHero,
         setError,
         errorMessage: "Failed to save hero buttons",
@@ -127,7 +118,7 @@ export function createHomepageBlurHandlers({
         apiBase,
         blockId: metricsCmsBlockId,
         token,
-        patch: mapMetricsAdminToPatch(metricsBlock),
+        patch: buildMetricsPatch(metricsBlock),
         setSaving: setIsSavingMetrics,
         setError,
         errorMessage: "Failed to save metrics block",

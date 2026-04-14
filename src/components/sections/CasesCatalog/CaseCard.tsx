@@ -52,7 +52,7 @@ export function CaseCard({ item, mobile = false }: Props) {
         <div className="mt-5">
           <Button
             href={item.href}
-            variant="outlinePill"
+            variant="secondaryLight"
             size="md"
             maxWidth
             className="h-[58px] rounded-full text-[14px] font-medium"
@@ -106,7 +106,7 @@ export function CaseCard({ item, mobile = false }: Props) {
       </div>
 
       <div className="mt-5">
-        <Button href={item.href} variant="outlinePill" size="md" maxWidth>
+        <Button href={item.href} variant="secondaryLight" size="md" maxWidth>
           Подробнее
         </Button>
       </div>

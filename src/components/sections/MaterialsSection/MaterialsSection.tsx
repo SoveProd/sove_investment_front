@@ -76,7 +76,7 @@ function MaterialsSectionMobile({
   useEffect(() => {
     if (!embla) return;
 
-    syncState();
+    requestAnimationFrame(() => syncState());
     embla.on("select", syncState);
 
     return () => {

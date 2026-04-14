@@ -21,8 +21,20 @@
   /* Graphite */
   --color-graphite: #383838;
 
---color-slot-fill: #EDEDED;
---color-slot-stroke: #D8D8D8;
+  /* Admin tokens (legacy hardcoded palette) */
+  --color-admin-accent: #B45B3C;
+  --color-admin-muted: #8D8D8D;
+  --color-admin-border: #D9D9D9;
+  --color-admin-soft: #E7E7E7;
+  --color-admin-surface-warm: #FFF7F3;
+  --color-admin-active-bg: #FFEEE9;
+  --color-admin-hover-bg: #F8F5F3;
+  --color-admin-hover-border: #D6B0A0;
+  --color-admin-checkbox-border: #AFAFAF;
+  --color-admin-placeholder: #D3D3D3;
+
+  --color-slot-fill: #EDEDED;
+  --color-slot-stroke: #D8D8D8;
 
 
 }
@@ -44,8 +56,19 @@
 
   --color-graphite: var(--color-graphite);
   
---color-slot-fill: var(--color-slot-fill);
---color-slot-stroke: var(--color-slot-stroke);
+  --color-admin-accent: var(--color-admin-accent);
+  --color-admin-muted: var(--color-admin-muted);
+  --color-admin-border: var(--color-admin-border);
+  --color-admin-soft: var(--color-admin-soft);
+  --color-admin-surface-warm: var(--color-admin-surface-warm);
+  --color-admin-active-bg: var(--color-admin-active-bg);
+  --color-admin-hover-bg: var(--color-admin-hover-bg);
+  --color-admin-hover-border: var(--color-admin-hover-border);
+  --color-admin-checkbox-border: var(--color-admin-checkbox-border);
+  --color-admin-placeholder: var(--color-admin-placeholder);
+
+  --color-slot-fill: var(--color-slot-fill);
+  --color-slot-stroke: var(--color-slot-stroke);
 
 
 }

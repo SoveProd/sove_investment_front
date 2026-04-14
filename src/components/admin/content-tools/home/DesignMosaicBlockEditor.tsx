@@ -154,14 +154,14 @@ export function DesignMosaicBlockEditor({
         <button
           type="button"
           onClick={handleAddItem}
-          className="inline-flex h-[42px] items-center justify-center rounded-[6px] bg-[#B45B3C] px-6 text-[16px] font-medium text-white transition hover:opacity-90"
+          className="inline-flex h-[42px] items-center justify-center rounded-[6px] bg-adminAccent px-6 text-[16px] font-medium text-white transition hover:opacity-90"
         >
           Добавить
         </button>
       </div>
 
       {isSaving ? (
-        <p className="mt-3 text-[13px] text-[#8D8D8D]">Сохраняем...</p>
+        <p className="mt-3 text-[13px] text-adminMuted">Сохраняем...</p>
       ) : null}
     </AdminSectionCard>
   );

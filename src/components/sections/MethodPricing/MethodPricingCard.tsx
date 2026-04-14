@@ -9,6 +9,8 @@ export type MethodPricingPlan = {
   eyebrow: string; // "1 МЕСЯЦ"
   price: string; // "5000"
   priceSubtext?: string; // "500 руб./мес."
+  periodLabel?: string;
+  periodOptions?: PlanPeriodOption[];
   ctaLabel: string; // "Забронировать слот"
   description: string;
   onCta?: (payload: { planId: string }) => void;
@@ -26,7 +28,7 @@ export function MethodPricingCard({
       className={clsx(
         "w-full max-w-[343px]",
         "overflow-hidden rounded-[30px] bg-white",
-        "border-[4px] border-[#ECECEC]",
+        "border-4 border-[#ECECEC]",
         "shadow-[0_18px_50px_rgba(0,0,0,0.14)]",
         "lg:max-w-none lg:rounded-[33px] lg:border-[6px]",
       )}
@@ -62,7 +64,7 @@ export function MethodPricingCard({
           type="button"
           onClick={() => plan.onCta?.({ planId: plan.id })}
           className={clsx(
-            "mt-5 h-[54px] w-full rounded-full bg-[#383838] text-white transition hover:opacity-95",
+            "mt-5 h-[54px] w-full rounded-full bg-graphite text-white transition hover:opacity-95",
             "text-[14px] font-medium",
             "lg:mt-[18px] lg:h-[70px] lg:text-[22px]",
           )}

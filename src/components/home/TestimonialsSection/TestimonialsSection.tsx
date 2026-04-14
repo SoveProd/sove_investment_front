@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Container } from "@/src/components/layout/Container";
 import type { CmsBlock } from "@/lib/cms/types";
+import { usePublishedHomepageBlock } from "@/src/components/home/hooks/usePublishedHomepageBlock";
 
 type Testimonial = {
   id: string;
@@ -232,7 +233,10 @@ function TestimonialCard({
 }
 
 export function TestimonialsSection() {
-  const [block, setBlock] = useState<CmsBlock | undefined>(undefined);
+  const block = usePublishedHomepageBlock({
+    blockType: "reviews:main",
+    refreshIntervalMs: 4000,
+  });
   const mobileTrackRef = useRef<HTMLDivElement | null>(null);
   const desktopTrackRef = useRef<HTMLDivElement | null>(null);
 
@@ -354,37 +358,6 @@ export function TestimonialsSection() {
   }, []);
 
   const isDesktopSlider = perView >= 2;
-
-  useEffect(() => {
-    let cancelled = false;
-
-    async function loadReviews() {
-      try {
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL || "https://sove.app/api/v1"}/static-pages/homepage`,
-          {
-            headers: {
-              Accept: "application/json",
-              "x-client-type": "web",
-            },
-          },
-        );
-
-        if (!response.ok) return;
-        const homepage = (await response.json()) as { blocks?: CmsBlock[] };
-        const reviews = homepage.blocks?.find((b) => b.block_type === "reviews:main");
-        if (!cancelled) setBlock(reviews);
-      } catch {
-        // ignore
-      }
-    }
-
-    loadReviews();
-
-    return () => {
-      cancelled = true;
-    };
-  }, []);
 
   return (
     <section className="w-full bg-bg py-[70px] lg:py-[120px]">

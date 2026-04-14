@@ -26,7 +26,7 @@ export function MethodStatsSection({ className = "", stats, image }: Props) {
               key={`${s.value}-${s.label}`}
               className={clsx(
                 "flex flex-col items-center justify-center text-center",
-                "bg-[#383838] border border-[#F8F8F8]",
+                "bg-graphite border border-surfaceAlt",
                 "rounded-[18px]",
 
                 // MOBILE exact size
@@ -59,7 +59,7 @@ export function MethodStatsSection({ className = "", stats, image }: Props) {
 
         {/* Image */}
         <div className="mt-6 overflow-hidden rounded-[20px] lg:rounded-[26px]">
-          <div className="relative aspect-[343/190] w-full lg:aspect-[16/6]">
+          <div className="relative aspect-343/190 w-full lg:aspect-16/6">
             <Image
               src={image.src}
               alt={image.alt}

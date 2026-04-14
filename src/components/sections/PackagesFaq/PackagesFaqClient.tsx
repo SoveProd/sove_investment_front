@@ -20,20 +20,13 @@ function cn(...classes: Array<string | false | null | undefined>) {
 }
 
 export function PackagesFaqClient({ items, defaultOpenId = null }: Props) {
-  const firstId = items[0]?.id ?? null;
   const [openId, setOpenId] = useState<string | null>(defaultOpenId ?? null);
 
-  // если items поменялись и текущего openId больше нет — закрываем
-  useEffect(() => {
-    if (!openId) return;
-    const exists = items.some((i) => i.id === openId);
-    if (!exists) setOpenId(null);
-  }, [items, openId]);
-
   const safeOpenId = useMemo(() => {
-    if (openId) return openId;
-    return null;
-  }, [openId]);
+    if (!openId) return null;
+    const exists = items.some((i) => i.id === openId);
+    return exists ? openId : null;
+  }, [items, openId]);
 
   return (
     <div className="w-full">
@@ -51,7 +44,7 @@ export function PackagesFaqClient({ items, defaultOpenId = null }: Props) {
       </div>
 
       {/* если хочешь, чтобы первый был открыт по умолчанию — просто раскомментируй */}
-      {/* <button onClick={() => setOpenId(firstId)} className="hidden">{firstId}</button> */}
+      {/* <button onClick={() => setOpenId(items[0]?.id ?? null)} className="hidden">{items[0]?.id}</button> */}
     </div>
   );
 }

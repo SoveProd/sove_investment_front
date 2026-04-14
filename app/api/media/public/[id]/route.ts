@@ -23,7 +23,7 @@ function getSourceUrl(media: MediaMetadata) {
 
 function downloadInsecure(url: string) {
   return new Promise<{
-    body: Buffer;
+    body: ArrayBuffer;
     contentType: string | null;
     statusCode: number;
   }>((resolve, reject) => {
@@ -49,7 +49,7 @@ function downloadInsecure(url: string) {
 
         response.on("end", () => {
           resolve({
-            body: Buffer.concat(chunks),
+            body: Uint8Array.from(Buffer.concat(chunks)).buffer,
             contentType: response.headers["content-type"] || null,
             statusCode,
           });

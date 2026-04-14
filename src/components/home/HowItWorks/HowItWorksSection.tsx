@@ -6,6 +6,7 @@ import { Container } from "@/src/components/layout/Container";
 import { ArrowButton } from "@/src/components/ui/ArrowBtn";
 import type { CmsBlock, CmsMedia } from "@/lib/cms/types";
 import { getCmsMediaUrl } from "@/lib/cms/mediaUrl";
+import { usePublishedHomepageBlock } from "@/src/components/home/hooks/usePublishedHomepageBlock";
 
 type Step = {
   id: string;
@@ -111,10 +112,11 @@ function mapCmsHowItWorksToSteps(block?: CmsBlock | null): Step[] {
   });
 }
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "https://sove.app/api/v1";
-
 export default function HowItWorksSection() {
-  const [block, setBlock] = useState<CmsBlock | undefined>(undefined);
+  const block = usePublishedHomepageBlock({
+    blockType: "how_it_works:main",
+    refreshIntervalMs: 4000,
+  });
   const [active, setActive] = useState(0);
 
   const sliderRef = useRef<HTMLDivElement>(null);
@@ -123,40 +125,6 @@ export default function HowItWorksSection() {
 
   const steps = useMemo(() => mapCmsHowItWorksToSteps(block), [block]);
   const current = useMemo(() => steps[active], [active, steps]);
-
-  useEffect(() => {
-    let cancelled = false;
-
-    async function loadHowItWorks() {
-      try {
-        const response = await fetch(`${API_BASE}/static-pages/homepage`, {
-          headers: {
-            Accept: "application/json",
-            "x-client-type": "web",
-          },
-        });
-
-        if (!response.ok) return;
-
-        const homepage = (await response.json()) as { blocks?: CmsBlock[] };
-        const howItWorks = homepage.blocks?.find(
-          (b) => b.block_type === "how_it_works:main",
-        );
-
-        if (!cancelled) {
-          setBlock(howItWorks);
-        }
-      } catch {
-        // ignore
-      }
-    }
-
-    loadHowItWorks();
-
-    return () => {
-      cancelled = true;
-    };
-  }, []);
 
   const centerActiveTab = (index: number) => {
     const viewport = tabsViewportRef.current;
@@ -292,7 +260,7 @@ export default function HowItWorksSection() {
                   aria-label={`Перейти к шагу ${idx + 1}`}
                   className={[
                     "h-[6px] w-[6px] rounded-full transition-colors duration-300",
-                    isActive ? "bg-[#383838]" : "bg-borderSoft",
+                    isActive ? "bg-graphite" : "bg-borderSoft",
                   ].join(" ")}
                 />
               );
@@ -309,7 +277,7 @@ export default function HowItWorksSection() {
               return (
                 <div key={step.id} className="min-w-full snap-center">
                   <div className="rounded-[28px] bg-white px-5 py-5">
-                    <div className="text-[22px] text-[#E7E7E7]">
+                    <div className="text-[22px] text-adminSoft">
                       [{step.id}]
                     </div>
 
@@ -375,8 +343,8 @@ export default function HowItWorksSection() {
                       "flex h-[79px] w-full items-center justify-center rounded-[79px] px-6 text-center transition-all duration-300",
                       "text-[18px] font-medium leading-none xl:text-[20px]",
                       isActive
-                        ? "bg-[#383838] text-white"
-                        : "border border-border bg-white text-text hover:border-[#383838]/40",
+                        ? "bg-graphite text-white"
+                        : "border border-border bg-surface text-text hover:border-graphite/40",
                     ].join(" ")}
                   >
                     {s.tabLabel}
@@ -394,7 +362,7 @@ export default function HowItWorksSection() {
                     <span
                       className={[
                         "block h-[6px] w-[6px] rounded-full transition-all duration-300",
-                        isActive ? "bg-[#383838]" : "bg-borderSoft",
+                        isActive ? "bg-graphite" : "bg-borderSoft",
                       ].join(" ")}
                     />
                   </div>
@@ -406,7 +374,7 @@ export default function HowItWorksSection() {
           <div className="mt-10 grid grid-cols-1 gap-6 lg:grid-cols-12">
             <div className="lg:col-span-6">
               <div className="relative flex h-full flex-col rounded-[48px] border border-border bg-white p-18 max-lg:p-8 lg:h-[730px]">
-                <div className="text-[45px] font-medium text-[#E7E7E7]">
+                <div className="text-[45px] font-medium text-adminSoft">
                   [{current.id}]
                 </div>
 

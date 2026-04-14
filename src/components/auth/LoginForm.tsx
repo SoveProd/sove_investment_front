@@ -27,7 +27,7 @@ export function LoginForm() {
   }
 
   return (
-    <section className="flex min-h-screen items-center justify-center bg-[#f5f3f1] px-4">
+    <section className="flex min-h-screen items-center justify-center bg-bg px-4">
       <form
         onSubmit={handleSubmit}
         className="w-full max-w-[646px] rounded-[32px] bg-white px-10 py-12 shadow-[0_20px_80px_rgba(0,0,0,0.16)]"
@@ -48,7 +48,7 @@ export function LoginForm() {
               onChange={(e) => setLogin(e.target.value)}
               placeholder="Иван"
               autoComplete="username"
-              className="h-[74px] w-full rounded-[10px] border border-[#D9D9D9] bg-white px-5 text-[18px] text-[#2F2F2F] outline-none transition focus:border-[#B45B3C]"
+              className="h-[74px] w-full rounded-[10px] border border-adminBorder bg-surface px-5 text-[18px] text-[#2F2F2F] outline-none transition focus:border-adminAccent"
             />
           </div>
 
@@ -63,7 +63,7 @@ export function LoginForm() {
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Пароль"
               autoComplete="current-password"
-              className="h-[74px] w-full rounded-[10px] border border-[#D9D9D9] bg-white px-5 text-[18px] text-[#2F2F2F] outline-none transition focus:border-[#B45B3C]"
+              className="h-[74px] w-full rounded-[10px] border border-adminBorder bg-surface px-5 text-[18px] text-[#2F2F2F] outline-none transition focus:border-adminAccent"
             />
           </div>
         </div>
@@ -75,7 +75,7 @@ export function LoginForm() {
         <button
           type="submit"
           disabled={status === "loading"}
-          className="mt-7 h-[74px] w-full rounded-full bg-[#B45B3C] text-[18px] font-semibold uppercase tracking-[0.02em] text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
+          className="mt-7 h-[74px] w-full rounded-full bg-adminAccent text-[18px] font-semibold uppercase tracking-[0.02em] text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
         >
           {status === "loading" ? "Вход..." : "Войти"}
         </button>

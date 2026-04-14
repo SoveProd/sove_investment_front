@@ -56,7 +56,7 @@ export function MetricsBlockEditor({
       <div className="space-y-6">
         {value.items.map((item) => (
           <div key={item.id} className="space-y-2">
-            <p className="text-[14px] leading-[1.2] text-[#8D8D8D]">
+            <p className="text-[14px] leading-[1.2] text-adminMuted">
               {item.label}
             </p>
 
@@ -92,7 +92,7 @@ export function MetricsBlockEditor({
         ))}
 
         {isSaving ? (
-          <p className="text-[13px] text-[#8D8D8D]">Сохраняем...</p>
+          <p className="text-[13px] text-adminMuted">Сохраняем...</p>
         ) : null}
       </div>
     </AdminSectionCard>

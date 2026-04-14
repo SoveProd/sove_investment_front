@@ -53,7 +53,7 @@ export function RequestsBlockEditor({
 
   return (
     <AdminSectionCard title='Блок "Заявки"'>
-      <div className="rounded-[18px] bg-white p-4">
+      <div className="rounded-[18px] bg-surface p-4">
         <div className="grid gap-6 xl:grid-cols-[1fr_1fr_420px]">
           <AdminTextareaField
             label="Заголовок"
@@ -98,7 +98,7 @@ export function RequestsBlockEditor({
         </div>
 
         {isSaving ? (
-          <p className="mt-3 text-[13px] text-[#8D8D8D]">Сохраняем...</p>
+          <p className="mt-3 text-[13px] text-adminMuted">Сохраняем...</p>
         ) : null}
       </div>
     </AdminSectionCard>

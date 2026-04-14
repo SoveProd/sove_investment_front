@@ -8,9 +8,9 @@ type Props = {
 export function AdminSectionCard({ title, children }: Props) {
   return (
     <section className="space-y-5">
-      <h2 className="text-[22px] font-medium text-[#383838]">{title}</h2>
+      <h2 className="text-[22px] font-medium text-graphite">{title}</h2>
 
-      <div className="rounded-[18px]  bg-white ">
+      <div className="rounded-[18px] bg-surface">
         {children}
       </div>
     </section>

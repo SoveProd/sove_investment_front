@@ -79,7 +79,7 @@ export function AdminSidebar() {
                 href={item.href}
                 className={clsx(
                   "flex min-h-[62px] items-center justify-between rounded-[10px] px-[15px] transition-colors",
-                  isActive ? "bg-[#FFEEE9]" : "hover:bg-[#F8F5F3]",
+                  isActive ? "bg-adminActiveBg" : "hover:bg-adminHoverBg",
                 )}
               >
                 <span className="flex items-center gap-[17px]">
@@ -95,7 +95,7 @@ export function AdminSidebar() {
                     className={clsx(
                       "text-[22px] leading-[22px]",
                       isActive
-                        ? "font-semibold text-[#A05035]"
+                        ? "font-semibold text-primary"
                         : "font-normal text-[#5B5B5B]",
                     )}
                   >

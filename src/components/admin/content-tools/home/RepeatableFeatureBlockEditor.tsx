@@ -177,7 +177,7 @@ export function RepeatableFeatureBlockEditor({
           onBlur={onButtonBlur}
         />
 
-        <div className="xl:col-span-2 rounded-[10px] border border-[#D9D9D9] bg-white p-4">
+        <div className="xl:col-span-2 rounded-[10px] border border-adminBorder bg-surface p-4">
           <div className="space-y-4">
             {value.items.map((item) => (
               <div key={item.id} className="grid gap-4 md:grid-cols-2">
@@ -207,7 +207,7 @@ export function RepeatableFeatureBlockEditor({
           <button
             type="button"
             onClick={handleAddItem}
-            className="mt-4 inline-flex h-[43px] min-w-[137px] items-center justify-center rounded-[8px] bg-[#B45B3C] px-6 text-[14px] font-medium text-white transition hover:opacity-90"
+            className="mt-4 inline-flex h-[43px] min-w-[137px] items-center justify-center rounded-[8px] bg-adminAccent px-6 text-[14px] font-medium text-white transition hover:opacity-90"
           >
             {addButtonText}
           </button>
@@ -217,7 +217,7 @@ export function RepeatableFeatureBlockEditor({
       </div>
 
       {isSaving ? (
-        <p className="mt-3 text-[13px] text-[#8D8D8D]">Сохраняем...</p>
+        <p className="mt-3 text-[13px] text-adminMuted">Сохраняем...</p>
       ) : null}
     </AdminSectionCard>
   );
