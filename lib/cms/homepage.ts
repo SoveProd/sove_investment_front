@@ -100,3 +100,11 @@ export function getHomepageDesignMosaicBlock(
     (block) => block.block_type === "end_to_end_investment:main",
   );
 }
+
+export function getHomepageHowItWorksBlock(
+  homepage: CmsStaticPage | null,
+): CmsBlock | undefined {
+  if (!homepage) return undefined;
+
+  return homepage.blocks.find((block) => block.block_type === "how_it_works:main");
+}

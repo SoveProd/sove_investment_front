@@ -5,11 +5,19 @@ import { Button } from "@/src/components/ui/Button";
 type Props = {
   title?: string;
   bgSrc?: string;
+  primaryButtonLabel?: string;
+  primaryButtonHref?: string;
+  secondaryButtonLabel?: string;
+  secondaryButtonHref?: string;
 };
 
 export function CtaBanner({
   title = "НАЧНИ СВОЙ ИНВЕСТ\nРЕМОНТ С SOVE",
   bgSrc = "/images/banner.png",
+  primaryButtonLabel = "ЗАПОЛНИТЬ ЗАЯВКУ",
+  primaryButtonHref = "/contact",
+  secondaryButtonLabel = "ПРОКОНСУЛЬТИРОВАТЬСЯ",
+  secondaryButtonHref = "/consultation",
 }: Props) {
   return (
     <section className="w-full overflow-hidden bg-bg">
@@ -33,19 +41,19 @@ export function CtaBanner({
 
           <div className="mt-6 flex flex-col gap-3">
             <Button
-              href="/contact"
+              href={primaryButtonHref}
               variant="primary"
               className="w-full justify-center"
             >
-              НАЧАТЬ ИНВЕСТИРОВАТЬ
+              {primaryButtonLabel}
             </Button>
 
             <Button
-              href="/consultation"
+              href={secondaryButtonHref}
               variant="outlineDark"
               className="w-full justify-center"
             >
-              ПОСМОТРЕТЬ КОНЦЕПЦИИ
+              {secondaryButtonLabel}
             </Button>
           </div>
         </Container>
@@ -74,12 +82,12 @@ export function CtaBanner({
             </h2>
 
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
-              <Button href="/contact" variant="primary">
-                ЗАПОЛНИТЬ ЗАЯВКУ
+              <Button href={primaryButtonHref} variant="primary">
+                {primaryButtonLabel}
               </Button>
 
-              <Button href="/consultation" variant="outlineDark">
-                ПРОКОНСУЛЬТИРОВАТЬСЯ
+              <Button href={secondaryButtonHref} variant="outlineDark">
+                {secondaryButtonLabel}
               </Button>
             </div>
           </div>

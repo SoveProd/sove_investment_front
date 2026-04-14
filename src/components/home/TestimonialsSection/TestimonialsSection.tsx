@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Container } from "@/src/components/layout/Container";
+import type { CmsBlock } from "@/lib/cms/types";
 
 type Testimonial = {
   id: string;
@@ -10,6 +11,7 @@ type Testimonial = {
   date: string;
   rating: 1 | 2 | 3 | 4 | 5;
   text: string;
+  url?: string;
 };
 
 const testimonials: Testimonial[] = [
@@ -42,6 +44,46 @@ const testimonials: Testimonial[] = [
     text: "Протестировав несколько платформ, похожих на Masteos, мы решили воспользоваться этой командой. Поскольку у них самые дешевые тарифы. Первый контакт очень профессиональный, и их приложение с виртуальным туром работает хорошо.",
   },
 ];
+
+function clampRating(value: unknown): 1 | 2 | 3 | 4 | 5 {
+  const n = typeof value === "number" ? value : Number(value);
+  if (!Number.isFinite(n)) return 5;
+  const rounded = Math.round(n);
+  if (rounded <= 1) return 1;
+  if (rounded >= 5) return 5;
+  return rounded as 2 | 3 | 4;
+}
+
+function mapReviewsBlockToTestimonials(block?: CmsBlock): Testimonial[] {
+  const contentItems =
+    block?.content &&
+    typeof block.content === "object" &&
+    "items" in block.content &&
+    Array.isArray((block.content as { items?: unknown[] }).items)
+      ? (
+          block.content as {
+            items: Array<{
+              author?: string | null;
+              text?: string | null;
+              rating?: number | null;
+              date?: string | null;
+              url?: string | null;
+            }>;
+          }
+        ).items
+      : [];
+
+  if (!contentItems.length) return testimonials;
+
+  return contentItems.map((item, index) => ({
+    id: `cms-${index}`,
+    name: item.author || "",
+    date: item.date || "",
+    rating: clampRating(item.rating),
+    text: item.text || "",
+    url: item.url || undefined,
+  }));
+}
 
 function Stars({ rating }: { rating: number }) {
   return (
@@ -113,8 +155,8 @@ function TestimonialCard({
         <button
           type="button"
           className={[
-            "absolute z-[3]",
-            "top-[0px] right-[0px]",
+            "absolute z-3",
+            "top-0 right-0",
             mobile
               ? "grid h-[58px] w-[58px] place-items-center rounded-full bg-white shadow-[0_8px_24px_rgba(0,0,0,0.10)] border border-border"
               : "grid h-[70px] w-[70px] place-items-center rounded-full bg-white shadow-[0_10px_30px_rgba(0,0,0,0.10)] border border-border",
@@ -131,7 +173,7 @@ function TestimonialCard({
 
         <div
           className={[
-            "relative z-[2]",
+            "relative z-2",
             mobile ? "px-5 py-5" : "px-6 py-7 sm:px-8 sm:py-8",
           ].join(" ")}
         >
@@ -190,15 +232,18 @@ function TestimonialCard({
 }
 
 export function TestimonialsSection() {
+  const [block, setBlock] = useState<CmsBlock | undefined>(undefined);
   const mobileTrackRef = useRef<HTMLDivElement | null>(null);
   const desktopTrackRef = useRef<HTMLDivElement | null>(null);
 
   const [perView, setPerView] = useState(3);
   const [index, setIndex] = useState(0);
 
+  const items = useMemo(() => mapReviewsBlockToTestimonials(block), [block]);
+
   const maxIndex = useMemo(() => {
-    return Math.max(0, testimonials.length - perView);
-  }, [perView]);
+    return Math.max(0, items.length - perView);
+  }, [items.length, perView]);
 
   useEffect(() => {
     const calc = () => {
@@ -213,9 +258,8 @@ export function TestimonialsSection() {
     return () => window.removeEventListener("resize", calc);
   }, []);
 
-  useEffect(() => {
-    setIndex((prev) => Math.min(prev, maxIndex));
-  }, [maxIndex]);
+  const safeDesktopIndex = Math.min(index, maxIndex);
+  const safeMobileIndex = Math.min(index, Math.max(0, items.length - 1));
 
   const scrollDesktopToIndex = (next: number) => {
     const track = desktopTrackRef.current;
@@ -238,7 +282,7 @@ export function TestimonialsSection() {
     const track = mobileTrackRef.current;
     if (!track) return;
 
-    const clamped = Math.max(0, Math.min(next, testimonials.length - 1));
+    const clamped = Math.max(0, Math.min(next, items.length - 1));
     setIndex(clamped);
 
     const card = track.children[clamped] as HTMLElement | undefined;
@@ -255,17 +299,17 @@ export function TestimonialsSection() {
 
   const handlePrev = () => {
     if (window.innerWidth < 1024) {
-      scrollMobileToIndex(index - 1);
+      scrollMobileToIndex(safeMobileIndex - 1);
     } else {
-      scrollDesktopToIndex(index - 1);
+      scrollDesktopToIndex(safeDesktopIndex - 1);
     }
   };
 
   const handleNext = () => {
     if (window.innerWidth < 1024) {
-      scrollMobileToIndex(index + 1);
+      scrollMobileToIndex(safeMobileIndex + 1);
     } else {
-      scrollDesktopToIndex(index + 1);
+      scrollDesktopToIndex(safeDesktopIndex + 1);
     }
   };
 
@@ -291,7 +335,7 @@ export function TestimonialsSection() {
       }
     });
 
-    if (closestIndex !== index) {
+    if (closestIndex !== safeMobileIndex) {
       setIndex(closestIndex);
     }
   };
@@ -311,15 +355,50 @@ export function TestimonialsSection() {
 
   const isDesktopSlider = perView >= 2;
 
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadReviews() {
+      try {
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL || "https://sove.app/api/v1"}/static-pages/homepage`,
+          {
+            headers: {
+              Accept: "application/json",
+              "x-client-type": "web",
+            },
+          },
+        );
+
+        if (!response.ok) return;
+        const homepage = (await response.json()) as { blocks?: CmsBlock[] };
+        const reviews = homepage.blocks?.find((b) => b.block_type === "reviews:main");
+        if (!cancelled) setBlock(reviews);
+      } catch {
+        // ignore
+      }
+    }
+
+    loadReviews();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   return (
     <section className="w-full bg-bg py-[70px] lg:py-[120px]">
       <Container>
         {/* MOBILE */}
         <div className="lg:hidden">
           <h2 className="text-center text-[24px] font-medium leading-[1.1] tracking-[-0.02em] text-text">
-            Что о нас
-            <br />
-            думаютнаши клиенты
+            {block?.title || (
+              <>
+                Что о нас
+                <br />
+                думаютнаши клиенты
+              </>
+            )}
           </h2>
 
           <div className="mt-6 -mx-4">
@@ -328,7 +407,7 @@ export function TestimonialsSection() {
               onScroll={handleMobileScroll}
               className="flex gap-4 overflow-x-auto px-4 pb-2 scroll-smooth snap-x snap-mandatory [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
             >
-              {testimonials.map((t) => (
+              {items.map((t) => (
                 <div key={t.id} className="shrink-0 snap-center">
                   <TestimonialCard data={t} mobile />
                 </div>
@@ -340,7 +419,7 @@ export function TestimonialsSection() {
             <button
               type="button"
               onClick={handlePrev}
-              disabled={index === 0}
+              disabled={safeMobileIndex === 0}
               className="grid h-[30px] w-[78px] place-items-center rounded-full bg-graphite transition disabled:opacity-40 disabled:cursor-not-allowed"
               aria-label="Назад"
             >
@@ -350,7 +429,7 @@ export function TestimonialsSection() {
             <button
               type="button"
               onClick={handleNext}
-              disabled={index >= testimonials.length - 1}
+              disabled={safeMobileIndex >= items.length - 1}
               className="grid h-[30px] w-[78px] place-items-center rounded-full bg-[#F1F1F1] transition disabled:opacity-40 disabled:cursor-not-allowed"
               aria-label="Вперёд"
             >
@@ -363,14 +442,14 @@ export function TestimonialsSection() {
         <div className="hidden lg:block">
           <div className="flex items-center justify-between gap-6">
             <h2 className="text-[46px] font-medium tracking-[-0.02em] text-text max-lg:text-[28px]">
-              Что о нас думают наши клиенты
+              {block?.title || "Что о нас думают наши клиенты"}
             </h2>
 
             <div className="flex items-center gap-3">
               <button
                 type="button"
                 onClick={handlePrev}
-                disabled={!isDesktopSlider || index === 0}
+                disabled={!isDesktopSlider || safeDesktopIndex === 0}
                 className="grid h-[44px] w-[66px] place-items-center rounded-full border border-border bg-white transition hover:bg-surfaceAlt disabled:opacity-40 disabled:cursor-not-allowed"
                 aria-label="Назад"
               >
@@ -380,7 +459,7 @@ export function TestimonialsSection() {
               <button
                 type="button"
                 onClick={handleNext}
-                disabled={!isDesktopSlider || index >= maxIndex}
+                disabled={!isDesktopSlider || safeDesktopIndex >= maxIndex}
                 className="grid h-[44px] w-[66px] place-items-center rounded-full bg-graphite transition hover:opacity-95 disabled:opacity-40 disabled:cursor-not-allowed"
                 aria-label="Вперёд"
               >
@@ -398,7 +477,7 @@ export function TestimonialsSection() {
                 isDesktopSlider ? "snap-x snap-mandatory" : "snap-x",
               ].join(" ")}
             >
-              {testimonials.map((t) => (
+              {items.map((t) => (
                 <div key={t.id} data-card="true" className="snap-start">
                   <TestimonialCard data={t} />
                 </div>

@@ -7,6 +7,10 @@ import type {
   TextButtonBlockData,
   MediaTextCardsBlockData,
   DesignMosaicBlockData,
+  HowItWorksBlockData,
+  SoveGroupBlockData,
+  ReviewsBlockData,
+  RequestsBlockData,
 } from "@/app/(admin)/admin/content-tools/home/types";
 
 export const initialHeroBlock: HeroBlockData = {
@@ -226,4 +230,80 @@ export const initialDesignMosaicBlock: DesignMosaicBlockData = {
       preview: undefined,
     },
   ],
+};
+
+export const initialHowItWorksBlock: HowItWorksBlockData = {
+  title: "",
+  subtitle: "",
+  steps: [
+    {
+      id: 1,
+      stepLabel: "Оставить заявку",
+      title: "",
+      shortDescription: "",
+      buttonLabel: "Попробовать",
+      mediaId: undefined,
+      fileName: "Фото.jpeg",
+      preview: undefined,
+    },
+    {
+      id: 2,
+      stepLabel: "Оставить заявку",
+      title: "",
+      shortDescription: "",
+      buttonLabel: "Попробовать",
+      mediaId: undefined,
+      fileName: "Фото.jpeg",
+      preview: undefined,
+    },
+    {
+      id: 3,
+      stepLabel: "Оставить заявку",
+      title: "",
+      shortDescription: "",
+      buttonLabel: "Попробовать",
+      mediaId: undefined,
+      fileName: "Фото.jpeg",
+      preview: undefined,
+    },
+    {
+      id: 4,
+      stepLabel: "Оставить заявку",
+      title: "",
+      shortDescription: "",
+      buttonLabel: "Попробовать",
+      mediaId: undefined,
+      fileName: "Фото.jpeg",
+      preview: undefined,
+    },
+  ],
+};
+
+export const initialSoveGroupBlock: SoveGroupBlockData = {
+  zones: [
+    { id: 1, title: "", subtitle: "" },
+    { id: 2, title: "", subtitle: "" },
+    { id: 3, title: "", subtitle: "" },
+  ],
+  mediaId: undefined,
+  fileName: "Фото.jpeg",
+  preview: undefined,
+};
+
+export const initialReviewsBlock: ReviewsBlockData = {
+  title: "",
+  items: [
+    { id: 1, author: "", text: "", rating: 5, date: "", url: "" },
+    { id: 2, author: "", text: "", rating: 5, date: "", url: "" },
+    { id: 3, author: "", text: "", rating: 5, date: "", url: "" },
+  ],
+};
+
+export const initialRequestsBlock: RequestsBlockData = {
+  title: "",
+  primaryButtonLabel: "ЗАПОЛНИТЬ ЗАЯВКУ",
+  secondaryButtonLabel: "ПРОКОНСУЛЬТИРОВАТЬСЯ",
+  mediaId: undefined,
+  fileName: "Фото.jpeg",
+  preview: undefined,
 };

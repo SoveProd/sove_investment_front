@@ -4,6 +4,8 @@ import Image from "next/image";
 import { useMemo, useState, useRef, useEffect } from "react";
 import { Container } from "@/src/components/layout/Container";
 import { ArrowButton } from "@/src/components/ui/ArrowBtn";
+import type { CmsBlock, CmsMedia } from "@/lib/cms/types";
+import { getCmsMediaUrl } from "@/lib/cms/mediaUrl";
 
 type Step = {
   id: string;
@@ -16,7 +18,7 @@ type Step = {
   imageAlt?: string;
 };
 
-const steps: Step[] = [
+const fallbackSteps: Step[] = [
   {
     id: "1",
     tabLabel: "Оставь заявку",
@@ -58,14 +60,103 @@ const steps: Step[] = [
   },
 ];
 
+function normalizeMedia(block?: CmsBlock | null) {
+  const media = Array.isArray(block?.media) ? (block?.media as CmsMedia[]) : [];
+  return [...media].sort((a, b) => {
+    const aPos = a.position ?? Number.MAX_SAFE_INTEGER;
+    const bPos = b.position ?? Number.MAX_SAFE_INTEGER;
+    return aPos - bPos;
+  });
+}
+
+function mapCmsHowItWorksToSteps(block?: CmsBlock | null): Step[] {
+  const contentItems =
+    block?.content &&
+    typeof block.content === "object" &&
+    "items" in block.content &&
+    Array.isArray((block.content as { items?: unknown[] }).items)
+      ? (
+          block.content as {
+            items: Array<{
+              title?: string | null;
+              subtitle?: string | null;
+              text?: string | null;
+              button?: string | null;
+            }>;
+          }
+        ).items
+      : [];
+
+  const media = normalizeMedia(block);
+
+  const maxLength = Math.max(contentItems.length, media.length, fallbackSteps.length);
+
+  return Array.from({ length: maxLength }).map((_, index) => {
+    const fallback = fallbackSteps[index] || fallbackSteps[0];
+    const item = contentItems[index];
+    const m = media[index];
+    const imageSrc =
+      (m ? getCmsMediaUrl(m) : null) || fallback?.imageSrc || "/images/hero.jpg";
+
+    return {
+      id: String(index + 1),
+      tabLabel: item?.title || fallback?.tabLabel || `Шаг ${index + 1}`,
+      title: item?.subtitle || fallback?.title || "",
+      description: item?.text || fallback?.description || "",
+      ctaLabel: item?.button || fallback?.ctaLabel || "Попробовать",
+      ctaHref: fallback?.ctaHref || "#",
+      imageSrc,
+      imageAlt: m?.file_name || fallback?.imageAlt || "",
+    };
+  });
+}
+
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || "https://sove.app/api/v1";
+
 export default function HowItWorksSection() {
+  const [block, setBlock] = useState<CmsBlock | undefined>(undefined);
   const [active, setActive] = useState(0);
 
   const sliderRef = useRef<HTMLDivElement>(null);
   const tabsViewportRef = useRef<HTMLDivElement>(null);
   const tabsTrackRef = useRef<HTMLDivElement>(null);
 
-  const current = useMemo(() => steps[active], [active]);
+  const steps = useMemo(() => mapCmsHowItWorksToSteps(block), [block]);
+  const current = useMemo(() => steps[active], [active, steps]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadHowItWorks() {
+      try {
+        const response = await fetch(`${API_BASE}/static-pages/homepage`, {
+          headers: {
+            Accept: "application/json",
+            "x-client-type": "web",
+          },
+        });
+
+        if (!response.ok) return;
+
+        const homepage = (await response.json()) as { blocks?: CmsBlock[] };
+        const howItWorks = homepage.blocks?.find(
+          (b) => b.block_type === "how_it_works:main",
+        );
+
+        if (!cancelled) {
+          setBlock(howItWorks);
+        }
+      } catch {
+        // ignore
+      }
+    }
+
+    loadHowItWorks();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const centerActiveTab = (index: number) => {
     const viewport = tabsViewportRef.current;
@@ -151,11 +242,11 @@ export default function HowItWorksSection() {
         <div className="lg:hidden">
           <div className="text-center">
             <h2 className="text-[24px] font-medium text-text">
-              Как это работает
+              {block?.title || "Как это работает"}
             </h2>
 
             <p className="mt-2 text-[14px] text-textSecondary">
-              Четыре простых шагов к прибыли
+              {block?.subtitle || block?.text || "Четыре простых шагов к прибыли"}
             </p>
           </div>
 
@@ -242,7 +333,7 @@ export default function HowItWorksSection() {
 
                   <div className="mt-4">
                     <div className="relative rounded-[28px] overflow-hidden">
-                      <div className="relative aspect-[343/286]">
+                      <div className="relative aspect-343/286">
                         <Image
                           src={step.imageSrc}
                           alt={step.imageAlt || ""}
@@ -263,10 +354,10 @@ export default function HowItWorksSection() {
           {/* твой desktop код без изменений */}
           <div className="text-center">
             <h2 className="text-[55px] font-medium tracking-[-0.02em] text-text max-lg:text-[34px]">
-              Как это работает
+              {block?.title || "Как это работает"}
             </h2>
             <p className="mt-2 text-[18px] text-text max-lg:text-[16px]">
-              Четыре простых шагов к прибыли
+              {block?.subtitle || block?.text || "Четыре простых шагов к прибыли"}
             </p>
           </div>
 

@@ -94,3 +94,56 @@ export type DesignMosaicBlockData = {
   title: string;
   items: DesignMosaicItem[];
 };
+
+export type HowItWorksStepItem = {
+  id: number;
+  stepLabel: string;
+  title: string;
+  shortDescription: string;
+  buttonLabel: string;
+  mediaId?: number;
+  fileName: string;
+  preview?: string;
+};
+
+export type HowItWorksBlockData = {
+  title: string;
+  subtitle: string;
+  steps: HowItWorksStepItem[];
+};
+
+export type SoveGroupZoneItem = {
+  id: number;
+  title: string;
+  subtitle: string;
+};
+
+export type SoveGroupBlockData = {
+  zones: SoveGroupZoneItem[];
+  mediaId?: number;
+  fileName: string;
+  preview?: string;
+};
+
+export type ReviewItem = {
+  id: number;
+  author: string;
+  text: string;
+  rating: number;
+  date: string;
+  url: string;
+};
+
+export type ReviewsBlockData = {
+  title: string;
+  items: ReviewItem[];
+};
+
+export type RequestsBlockData = {
+  title: string;
+  primaryButtonLabel: string;
+  secondaryButtonLabel: string;
+  mediaId?: number;
+  fileName: string;
+  preview?: string;
+};

@@ -11,6 +11,10 @@ import { WeTakeCareBlockEditor } from "@/src/components/admin/content-tools/home
 import { CapitalizedTextBlockEditor } from "@/src/components/admin/content-tools/home/CapitalizedTextBlockEditor";
 import { ManagePropertyBlockEditor } from "@/src/components/admin/content-tools/home/ManagePropertyBlockEditor";
 import { DesignMosaicBlockEditor } from "@/src/components/admin/content-tools/home/DesignMosaicBlockEditor";
+import { HowItWorksBlockEditor } from "@/src/components/admin/content-tools/home/HowItWorksBlockEditor";
+import { SoveGroupBlockEditor } from "@/src/components/admin/content-tools/home/SoveGroupBlockEditor";
+import { ReviewsBlockEditor } from "@/src/components/admin/content-tools/home/ReviewsBlockEditor";
+import { RequestsBlockEditor } from "@/src/components/admin/content-tools/home/RequestsBlockEditor";
 import { loadHomepageDraft } from "@/app/(admin)/admin/content-tools/home/loadHomepageDraft";
 import {
   initialHeroBlock,
@@ -23,6 +27,10 @@ import {
   initialWeTakeCareBlock,
   initialManagePropertyBlock,
   initialDesignMosaicBlock,
+  initialHowItWorksBlock,
+  initialSoveGroupBlock,
+  initialReviewsBlock,
+  initialRequestsBlock,
 } from "@/app/(admin)/admin/content-tools/home/defaults";
 
 import type {
@@ -34,6 +42,10 @@ import type {
   TextButtonBlockData,
   MediaTextCardsBlockData,
   DesignMosaicBlockData,
+  HowItWorksBlockData,
+  SoveGroupBlockData,
+  ReviewsBlockData,
+  RequestsBlockData,
 } from "@/app/(admin)/admin/content-tools/home/types";
 
 import { hydrateHomepageBlocks } from "./hydrateHomepageBlocks";
@@ -249,6 +261,131 @@ function buildDesignMosaicPatches(block: DesignMosaicBlockData) {
   ];
 }
 
+function buildHowItWorksPatches(block: HowItWorksBlockData) {
+  const mediaIds = block.steps
+    .map((item) => item.mediaId)
+    .filter((value): value is number => typeof value === "number");
+
+  const positionedMedia = block.steps
+    .filter(
+      (item): item is typeof item & { mediaId: number } =>
+        typeof item.mediaId === "number",
+    )
+    .map((item, index) => ({
+      id: item.mediaId,
+      position: index,
+    }));
+
+  const contentPatch = {
+    content: {
+      items: block.steps.map((step) => ({
+        title: step.stepLabel,
+        subtitle: step.title,
+        text: step.shortDescription,
+        button: step.buttonLabel,
+      })),
+    },
+  };
+
+  const basePatchA = {
+    title: block.title,
+    subtitle: block.subtitle,
+    ...contentPatch,
+  };
+
+  const basePatchB = {
+    title: block.title,
+    text: block.subtitle,
+    ...contentPatch,
+  };
+
+  return [
+    {
+      ...basePatchA,
+      media_ids: mediaIds,
+    },
+    {
+      ...basePatchA,
+      media: positionedMedia,
+    },
+    {
+      ...basePatchB,
+      media_ids: mediaIds,
+    },
+    {
+      ...basePatchB,
+      media: positionedMedia,
+    },
+  ];
+}
+
+function buildSoveGroupPatches(block: SoveGroupBlockData) {
+  const contentPatch = {
+    content: {
+      items: block.zones.map((zone) => ({
+        label: zone.title,
+        value: zone.subtitle,
+      })),
+    },
+  };
+
+  const mediaIds =
+    typeof block.mediaId === "number" ? ([block.mediaId] as number[]) : [];
+
+  return [
+    {
+      ...contentPatch,
+      media_ids: mediaIds,
+    },
+    {
+      ...contentPatch,
+      media: typeof block.mediaId === "number" ? [{ id: block.mediaId, position: 0 }] : [],
+    },
+  ];
+}
+
+function buildReviewsPatches(block: ReviewsBlockData) {
+  return [
+    {
+      title: block.title,
+      content: {
+        items: block.items.map((item) => ({
+          author: item.author,
+          text: item.text,
+          rating: item.rating,
+          date: item.date,
+          url: item.url || null,
+        })),
+      },
+    },
+  ];
+}
+
+function buildRequestsPatches(block: RequestsBlockData) {
+  const mediaIds =
+    typeof block.mediaId === "number" ? ([block.mediaId] as number[]) : [];
+
+  const basePatch = {
+    title: block.title,
+    subtitle: block.secondaryButtonLabel,
+    button: {
+      name: block.primaryButtonLabel,
+      position: 0,
+    },
+  };
+
+  return [
+    {
+      ...basePatch,
+      media_ids: mediaIds,
+    },
+    {
+      ...basePatch,
+      media: typeof block.mediaId === "number" ? [{ id: block.mediaId, position: 0 }] : [],
+    },
+  ];
+}
+
 function mergeFeaturedItems(
   currentValue: FeaturedSelectionBlockData,
   shortList: CaseStudyShort[],
@@ -394,6 +531,175 @@ function hydrateDesignMosaicBlock(block?: CmsBlock | null): DesignMosaicBlockDat
   };
 }
 
+function hydrateHowItWorksBlock(block?: CmsBlock | null): HowItWorksBlockData {
+  if (!block) {
+    return initialHowItWorksBlock;
+  }
+
+  const contentItems =
+    block.content &&
+    typeof block.content === "object" &&
+    "items" in block.content &&
+    Array.isArray((block.content as { items?: unknown[] }).items)
+      ? (
+          block.content as {
+            items: Array<{
+              title?: string | null;
+              subtitle?: string | null;
+              text?: string | null;
+              button?: string | null;
+            }>;
+          }
+        ).items
+      : [];
+
+  const media = [...(Array.isArray(block.media) ? (block.media as CmsMedia[]) : [])].sort(
+    (a, b) => {
+      const aPos = a.position ?? Number.MAX_SAFE_INTEGER;
+      const bPos = b.position ?? Number.MAX_SAFE_INTEGER;
+      return aPos - bPos;
+    },
+  );
+
+  const maxLength = Math.max(contentItems.length, media.length, 4);
+
+  return {
+    title: block.title || "",
+    subtitle: block.subtitle || block.text || "",
+    steps: Array.from({ length: maxLength }).map((_, index) => {
+      const contentItem = contentItems[index];
+      const mediaItem = media[index];
+
+      return {
+        id: index + 1,
+        stepLabel: contentItem?.title || "",
+        title: contentItem?.subtitle || "",
+        shortDescription: contentItem?.text || "",
+        buttonLabel: contentItem?.button || "",
+        fileName: mediaItem?.file_name || "Фото.jpeg",
+        preview:
+          mediaItem?.url ||
+          mediaItem?.large_url ||
+          mediaItem?.thumbnail_url ||
+          undefined,
+        mediaId: mediaItem?.id,
+      };
+    }),
+  };
+}
+
+function hydrateSoveGroupBlock(block?: CmsBlock | null): SoveGroupBlockData {
+  if (!block) {
+    return initialSoveGroupBlock;
+  }
+
+  const contentItems =
+    block.content &&
+    typeof block.content === "object" &&
+    "items" in block.content &&
+    Array.isArray((block.content as { items?: unknown[] }).items)
+      ? (
+          block.content as {
+            items: Array<{
+              label?: string | null;
+              value?: string | null;
+              title?: string | null;
+              subtitle?: string | null;
+            }>;
+          }
+        ).items
+      : [];
+
+  const media = Array.isArray(block.media) ? (block.media as CmsMedia[]) : [];
+  const firstMedia = media[0];
+
+  const zones = Array.from({ length: Math.max(contentItems.length, 3) }).map(
+    (_, index) => {
+      const item = contentItems[index];
+      return {
+        id: index + 1,
+        title: item?.label || item?.title || "",
+        subtitle: item?.value || item?.subtitle || "",
+      };
+    },
+  );
+
+  return {
+    zones,
+    mediaId: firstMedia?.id,
+    fileName: firstMedia?.file_name || "Фото.jpeg",
+    preview:
+      firstMedia?.url ||
+      firstMedia?.large_url ||
+      firstMedia?.thumbnail_url ||
+      undefined,
+  };
+}
+
+function hydrateReviewsBlock(block?: CmsBlock | null): ReviewsBlockData {
+  if (!block) {
+    return initialReviewsBlock;
+  }
+
+  const contentItems =
+    block.content &&
+    typeof block.content === "object" &&
+    "items" in block.content &&
+    Array.isArray((block.content as { items?: unknown[] }).items)
+      ? (
+          block.content as {
+            items: Array<{
+              author?: string | null;
+              text?: string | null;
+              rating?: number | null;
+              date?: string | null;
+              url?: string | null;
+            }>;
+          }
+        ).items
+      : [];
+
+  const maxLength = Math.max(contentItems.length, 3);
+
+  return {
+    title: block.title || "",
+    items: Array.from({ length: maxLength }).map((_, index) => {
+      const item = contentItems[index];
+      return {
+        id: index + 1,
+        author: item?.author || "",
+        text: item?.text || "",
+        rating: typeof item?.rating === "number" ? item.rating : 5,
+        date: item?.date || "",
+        url: item?.url || "",
+      };
+    }),
+  };
+}
+
+function hydrateRequestsBlock(block?: CmsBlock | null): RequestsBlockData {
+  if (!block) {
+    return initialRequestsBlock;
+  }
+
+  const button = Array.isArray(block.button) ? block.button[0] : block.button;
+  const media = Array.isArray(block.media) ? (block.media as CmsMedia[]) : [];
+  const firstMedia = media[0];
+
+  return {
+    title: block.title || "",
+    primaryButtonLabel: button?.name || "",
+    secondaryButtonLabel: block.subtitle || "",
+    mediaId: firstMedia?.id,
+    fileName: firstMedia?.file_name || "Фото.jpeg",
+    preview:
+      firstMedia?.url ||
+      firstMedia?.large_url ||
+      firstMedia?.thumbnail_url ||
+      undefined,
+  };
+}
+
 export default function ContentToolsHomePage() {
   const [homepageId, setHomepageId] = useState<number | null>(1);
 
@@ -417,6 +723,14 @@ export default function ContentToolsHomePage() {
     useState<MediaTextCardsBlockData>(initialManagePropertyBlock);
   const [designMosaicBlock, setDesignMosaicBlock] =
     useState<DesignMosaicBlockData>(initialDesignMosaicBlock);
+  const [howItWorksBlock, setHowItWorksBlock] =
+    useState<HowItWorksBlockData>(initialHowItWorksBlock);
+  const [soveGroupBlock, setSoveGroupBlock] =
+    useState<SoveGroupBlockData>(initialSoveGroupBlock);
+  const [reviewsBlock, setReviewsBlock] =
+    useState<ReviewsBlockData>(initialReviewsBlock);
+  const [requestsBlock, setRequestsBlock] =
+    useState<RequestsBlockData>(initialRequestsBlock);
 
   const [heroCmsBlockId, setHeroCmsBlockId] = useState<number | null>(null);
   const [metricsCmsBlockId, setMetricsCmsBlockId] = useState<number | null>(
@@ -443,6 +757,14 @@ export default function ContentToolsHomePage() {
   const [designMosaicCmsBlockId, setDesignMosaicCmsBlockId] = useState<
     number | null
   >(null);
+  const [howItWorksCmsBlockId, setHowItWorksCmsBlockId] = useState<number | null>(
+    null,
+  );
+  const [soveGroupCmsBlockId, setSoveGroupCmsBlockId] = useState<number | null>(
+    null,
+  );
+  const [reviewsCmsBlockId, setReviewsCmsBlockId] = useState<number | null>(null);
+  const [requestsCmsBlockId, setRequestsCmsBlockId] = useState<number | null>(null);
 
   const [isLoading, setIsLoading] = useState(true);
   const [isSavingHero, setIsSavingHero] = useState(false);
@@ -454,6 +776,10 @@ export default function ContentToolsHomePage() {
   const [isSavingReadyProjects, setIsSavingReadyProjects] = useState(false);
   const [isSavingManageProperty, setIsSavingManageProperty] = useState(false);
   const [isSavingDesignMosaic, setIsSavingDesignMosaic] = useState(false);
+  const [isSavingHowItWorks, setIsSavingHowItWorks] = useState(false);
+  const [isSavingSoveGroup, setIsSavingSoveGroup] = useState(false);
+  const [isSavingReviews, setIsSavingReviews] = useState(false);
+  const [isSavingRequests, setIsSavingRequests] = useState(false);
   const [isPublishing, setIsPublishing] = useState(false);
   const [publishMessage, setPublishMessage] = useState<string | null>(null);
 
@@ -521,6 +847,42 @@ export default function ContentToolsHomePage() {
         if (designMosaicSourceBlock) {
           setDesignMosaicCmsBlockId(designMosaicSourceBlock.id);
           setDesignMosaicBlock(hydrateDesignMosaicBlock(designMosaicSourceBlock));
+        }
+
+        const howItWorksSourceBlock = homepageDraft.blocks.find(
+          (block) => block.block_type === "how_it_works:main",
+        );
+
+        if (howItWorksSourceBlock) {
+          setHowItWorksCmsBlockId(howItWorksSourceBlock.id);
+          setHowItWorksBlock(hydrateHowItWorksBlock(howItWorksSourceBlock));
+        }
+
+        const soveGroupSourceBlock = homepageDraft.blocks.find(
+          (block) => block.block_type === "sove_group:main",
+        );
+
+        if (soveGroupSourceBlock) {
+          setSoveGroupCmsBlockId(soveGroupSourceBlock.id);
+          setSoveGroupBlock(hydrateSoveGroupBlock(soveGroupSourceBlock));
+        }
+
+        const reviewsSourceBlock = homepageDraft.blocks.find(
+          (block) => block.block_type === "reviews:main",
+        );
+
+        if (reviewsSourceBlock) {
+          setReviewsCmsBlockId(reviewsSourceBlock.id);
+          setReviewsBlock(hydrateReviewsBlock(reviewsSourceBlock));
+        }
+
+        const requestsSourceBlock = homepageDraft.blocks.find(
+          (block) => block.block_type === "requests:main",
+        );
+
+        if (requestsSourceBlock) {
+          setRequestsCmsBlockId(requestsSourceBlock.id);
+          setRequestsBlock(hydrateRequestsBlock(requestsSourceBlock));
         }
 
         setPopularConceptsBlock((prev) =>
@@ -645,6 +1007,42 @@ export default function ContentToolsHomePage() {
       blockId: designMosaicCmsBlockId,
       token,
       patches: buildDesignMosaicPatches(nextValue),
+    });
+  }
+
+  async function saveHowItWorksBlock(nextValue: HowItWorksBlockData) {
+    await patchBlockWithFallback({
+      apiBase: API_BASE,
+      blockId: howItWorksCmsBlockId,
+      token,
+      patches: buildHowItWorksPatches(nextValue),
+    });
+  }
+
+  async function saveSoveGroupBlock(nextValue: SoveGroupBlockData) {
+    await patchBlockWithFallback({
+      apiBase: API_BASE,
+      blockId: soveGroupCmsBlockId,
+      token,
+      patches: buildSoveGroupPatches(nextValue),
+    });
+  }
+
+  async function saveReviewsBlock(nextValue: ReviewsBlockData) {
+    await patchBlockWithFallback({
+      apiBase: API_BASE,
+      blockId: reviewsCmsBlockId,
+      token,
+      patches: buildReviewsPatches(nextValue),
+    });
+  }
+
+  async function saveRequestsBlock(nextValue: RequestsBlockData) {
+    await patchBlockWithFallback({
+      apiBase: API_BASE,
+      blockId: requestsCmsBlockId,
+      token,
+      patches: buildRequestsPatches(nextValue),
     });
   }
 
@@ -995,6 +1393,131 @@ export default function ContentToolsHomePage() {
     }
   }
 
+  async function handleHowItWorksBlur() {
+    if (!token || !howItWorksCmsBlockId) return;
+
+    try {
+      setIsSavingHowItWorks(true);
+      setError(null);
+      await saveHowItWorksBlock(howItWorksBlock);
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "Failed to save how it works block",
+      );
+    } finally {
+      setIsSavingHowItWorks(false);
+    }
+  }
+
+  async function handleSoveGroupBlur() {
+    if (!token || !soveGroupCmsBlockId) return;
+
+    try {
+      setIsSavingSoveGroup(true);
+      setError(null);
+      await saveSoveGroupBlock(soveGroupBlock);
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "Failed to save sove group block",
+      );
+    } finally {
+      setIsSavingSoveGroup(false);
+    }
+  }
+
+  async function handleReviewsBlur() {
+    if (!token || !reviewsCmsBlockId) return;
+
+    try {
+      setIsSavingReviews(true);
+      setError(null);
+      await saveReviewsBlock(reviewsBlock);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to save reviews block");
+    } finally {
+      setIsSavingReviews(false);
+    }
+  }
+
+  async function handleRequestsBlur() {
+    if (!token || !requestsCmsBlockId) return;
+
+    try {
+      setIsSavingRequests(true);
+      setError(null);
+      await saveRequestsBlock(requestsBlock);
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "Failed to save requests block",
+      );
+    } finally {
+      setIsSavingRequests(false);
+    }
+  }
+
+  async function handleRequestsMediaUpload(file: File) {
+    if (!token || !requestsCmsBlockId) return;
+
+    try {
+      setIsSavingRequests(true);
+      setError(null);
+
+      const uploadedMedia = await uploadMedia({
+        apiBase: API_BASE,
+        token,
+        file,
+        ownerType: "page_block",
+        ownerId: requestsCmsBlockId,
+      });
+
+      const nextBlock: RequestsBlockData = {
+        ...requestsBlock,
+        mediaId: uploadedMedia.id,
+        fileName: uploadedMedia.file_name || file.name,
+        preview:
+          uploadedMedia.file_url ||
+          uploadedMedia.url ||
+          uploadedMedia.large_url ||
+          uploadedMedia.thumbnail_url ||
+          undefined,
+      };
+
+      setRequestsBlock(nextBlock);
+      await saveRequestsBlock(nextBlock);
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "Failed to upload requests media",
+      );
+    } finally {
+      setIsSavingRequests(false);
+    }
+  }
+
+  async function handleRequestsMediaRemove() {
+    if (!token || !requestsCmsBlockId) return;
+
+    try {
+      setIsSavingRequests(true);
+      setError(null);
+
+      const nextBlock: RequestsBlockData = {
+        ...requestsBlock,
+        mediaId: undefined,
+        fileName: "",
+        preview: undefined,
+      };
+
+      setRequestsBlock(nextBlock);
+      await saveRequestsBlock(nextBlock);
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "Failed to remove requests media",
+      );
+    } finally {
+      setIsSavingRequests(false);
+    }
+  }
+
   async function handleManagePropertyMediaUpload(id: number, file: File) {
     if (!token || !managePropertyCmsBlockId) return;
 
@@ -1154,6 +1677,150 @@ export default function ContentToolsHomePage() {
       );
     } finally {
       setIsSavingDesignMosaic(false);
+    }
+  }
+
+  async function handleHowItWorksMediaUpload(id: number, file: File) {
+    if (!token || !howItWorksCmsBlockId) return;
+
+    try {
+      setIsSavingHowItWorks(true);
+      setError(null);
+
+      const uploadedMedia = await uploadMedia({
+        apiBase: API_BASE,
+        token,
+        file,
+        ownerType: "page_block",
+        ownerId: howItWorksCmsBlockId,
+      });
+
+      const nextBlock: HowItWorksBlockData = {
+        ...howItWorksBlock,
+        steps: howItWorksBlock.steps.map((step) =>
+          step.id === id
+            ? {
+                ...step,
+                mediaId: uploadedMedia.id,
+                fileName: uploadedMedia.file_name || file.name,
+                preview:
+                  uploadedMedia.file_url ||
+                  uploadedMedia.url ||
+                  uploadedMedia.large_url ||
+                  uploadedMedia.thumbnail_url ||
+                  undefined,
+              }
+            : step,
+        ),
+      };
+
+      setHowItWorksBlock(nextBlock);
+      await saveHowItWorksBlock(nextBlock);
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Failed to upload how it works media",
+      );
+    } finally {
+      setIsSavingHowItWorks(false);
+    }
+  }
+
+  async function handleHowItWorksMediaRemove(id: number) {
+    if (!token || !howItWorksCmsBlockId) return;
+
+    try {
+      setIsSavingHowItWorks(true);
+      setError(null);
+
+      const nextBlock: HowItWorksBlockData = {
+        ...howItWorksBlock,
+        steps: howItWorksBlock.steps.map((step) =>
+          step.id === id
+            ? {
+                ...step,
+                mediaId: undefined,
+                fileName: "",
+                preview: undefined,
+              }
+            : step,
+        ),
+      };
+
+      setHowItWorksBlock(nextBlock);
+      await saveHowItWorksBlock(nextBlock);
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Failed to remove how it works media",
+      );
+    } finally {
+      setIsSavingHowItWorks(false);
+    }
+  }
+
+  async function handleSoveGroupMediaUpload(file: File) {
+    if (!token || !soveGroupCmsBlockId) return;
+
+    try {
+      setIsSavingSoveGroup(true);
+      setError(null);
+
+      const uploadedMedia = await uploadMedia({
+        apiBase: API_BASE,
+        token,
+        file,
+        ownerType: "page_block",
+        ownerId: soveGroupCmsBlockId,
+      });
+
+      const nextBlock: SoveGroupBlockData = {
+        ...soveGroupBlock,
+        mediaId: uploadedMedia.id,
+        fileName: uploadedMedia.file_name || file.name,
+        preview:
+          uploadedMedia.file_url ||
+          uploadedMedia.url ||
+          uploadedMedia.large_url ||
+          uploadedMedia.thumbnail_url ||
+          undefined,
+      };
+
+      setSoveGroupBlock(nextBlock);
+      await saveSoveGroupBlock(nextBlock);
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "Failed to upload sove group media",
+      );
+    } finally {
+      setIsSavingSoveGroup(false);
+    }
+  }
+
+  async function handleSoveGroupMediaRemove() {
+    if (!token || !soveGroupCmsBlockId) return;
+
+    try {
+      setIsSavingSoveGroup(true);
+      setError(null);
+
+      const nextBlock: SoveGroupBlockData = {
+        ...soveGroupBlock,
+        mediaId: undefined,
+        fileName: "",
+        preview: undefined,
+      };
+
+      setSoveGroupBlock(nextBlock);
+      await saveSoveGroupBlock(nextBlock);
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "Failed to remove sove group media",
+      );
+    } finally {
+      setIsSavingSoveGroup(false);
     }
   }
 
@@ -1326,6 +1993,43 @@ export default function ContentToolsHomePage() {
         onMediaUpload={handleDesignMosaicMediaUpload}
         onMediaRemove={handleDesignMosaicMediaRemove}
         isSaving={isSavingDesignMosaic}
+      />
+
+      <HowItWorksBlockEditor
+        value={howItWorksBlock}
+        onChange={setHowItWorksBlock}
+        onTitleBlur={handleHowItWorksBlur}
+        onSubtitleBlur={handleHowItWorksBlur}
+        onStepBlur={handleHowItWorksBlur}
+        onMediaUpload={handleHowItWorksMediaUpload}
+        onMediaRemove={handleHowItWorksMediaRemove}
+        isSaving={isSavingHowItWorks}
+      />
+
+      <SoveGroupBlockEditor
+        value={soveGroupBlock}
+        onChange={setSoveGroupBlock}
+        onZoneBlur={handleSoveGroupBlur}
+        onMediaUpload={handleSoveGroupMediaUpload}
+        onMediaRemove={handleSoveGroupMediaRemove}
+        isSaving={isSavingSoveGroup}
+      />
+
+      <ReviewsBlockEditor
+        value={reviewsBlock}
+        onChange={setReviewsBlock}
+        onTitleBlur={handleReviewsBlur}
+        onItemBlur={handleReviewsBlur}
+        isSaving={isSavingReviews}
+      />
+
+      <RequestsBlockEditor
+        value={requestsBlock}
+        onChange={setRequestsBlock}
+        onBlur={handleRequestsBlur}
+        onMediaUpload={handleRequestsMediaUpload}
+        onMediaRemove={handleRequestsMediaRemove}
+        isSaving={isSavingRequests}
       />
 
       <WeTakeCareBlockEditor

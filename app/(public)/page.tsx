@@ -22,6 +22,7 @@ import {
   getHomepageDesignMosaicBlock,
 } from "@/lib/cms/homepage";
 import type { CmsBlock, CmsStaticPage } from "@/lib/cms/types";
+import { getCmsMediaUrl } from "@/lib/cms/mediaUrl";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "https://sove.app/api/v1";
 
@@ -47,6 +48,41 @@ function findBlockByType(
   blockType: string,
 ): CmsBlock | undefined {
   return homepage?.blocks?.find((block) => block.block_type === blockType);
+}
+
+function mapSoveGroupToThreeHoverZones(block?: CmsBlock) {
+  const contentItems =
+    block?.content &&
+    typeof block.content === "object" &&
+    "items" in block.content &&
+    Array.isArray((block.content as { items?: unknown[] }).items)
+      ? (
+          block.content as {
+            items: Array<{
+              label?: string | null;
+              value?: string | null;
+              title?: string | null;
+              subtitle?: string | null;
+            }>;
+          }
+        ).items
+      : [];
+
+  const zones = contentItems.length
+    ? contentItems.map((item) => ({
+        title: item.label || item.title || "",
+        text: item.value || item.subtitle || "",
+      }))
+    : [
+        { title: "Современный дизайн", text: "Наши дизайнеры создают концепции..." },
+        { title: "Профессиональное\nуправление", text: "Берём на себя процесс..." },
+        { title: "Гарантированная ROI", text: "Работаем на результат..." },
+      ];
+
+  const firstMedia = Array.isArray(block?.media) ? block?.media?.[0] : undefined;
+  const imageSrc = (firstMedia ? getCmsMediaUrl(firstMedia) : null) || "/images/hero.jpg";
+
+  return { zones, imageSrc };
 }
 
 async function getPublishedCaseStudies(): Promise<CaseStudyEntity[]> {
@@ -79,6 +115,7 @@ export default async function Home() {
   const managePropertyBlock = getHomepageManagePropertyBlock(homepage);
   const designMosaicBlock = getHomepageDesignMosaicBlock(homepage);
   const doItYourselfBlock = findBlockByType(homepage, "diy:main");
+  const soveGroupBlock = findBlockByType(homepage, "sove_group:main");
 
   const casesCtaBlock = findBlockByType(homepage, "capitalized_text:main");
   const popularConceptsBlock = findBlockByType(
@@ -86,6 +123,7 @@ export default async function Home() {
     "featured_concepts:main",
   );
   const readyProjectsBlock = findBlockByType(homepage, "featured_cases:main");
+  const requestsBlock = findBlockByType(homepage, "requests:main");
 
   return (
     <>
@@ -143,23 +181,10 @@ export default async function Home() {
             />
           </div>
 
-          <ThreeHoverZones
-            imageSrc="/images/hero.jpg"
-            zones={[
-              {
-                title: "Современный дизайн",
-                text: "Наши дизайнеры создают концепции...",
-              },
-              {
-                title: "Профессиональное\nуправление",
-                text: "Берём на себя процесс...",
-              },
-              {
-                title: "Гарантированная ROI",
-                text: "Работаем на результат...",
-              },
-            ]}
-          />
+          {(() => {
+            const mapped = mapSoveGroupToThreeHoverZones(soveGroupBlock);
+            return <ThreeHoverZones imageSrc={mapped.imageSrc} zones={mapped.zones} />;
+          })()}
         </div>
       </SectionReveal>
 
@@ -168,7 +193,20 @@ export default async function Home() {
       </SectionReveal>
 
       <SectionReveal>
-        <CtaBanner />
+        <CtaBanner
+          title={requestsBlock?.title || undefined}
+          bgSrc={
+            requestsBlock?.media?.[0]
+              ? getCmsMediaUrl(requestsBlock.media[0]) || undefined
+              : undefined
+          }
+          primaryButtonLabel={
+            (Array.isArray(requestsBlock?.button)
+              ? requestsBlock?.button?.[0]?.name
+              : requestsBlock?.button?.name) || undefined
+          }
+          secondaryButtonLabel={requestsBlock?.subtitle || undefined}
+        />
       </SectionReveal>
     </>
   );
