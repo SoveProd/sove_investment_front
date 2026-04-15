@@ -69,10 +69,6 @@ function getSelectedIds(block?: CmsBlock): number[] {
 }
 
 function getCaseStudyImageSrc(item: CaseStudyEntity, fallback: string) {
-  if (item.hero_media_id) {
-    return `/api/media/public/${item.hero_media_id}`;
-  }
-
   return fallback;
 }
 

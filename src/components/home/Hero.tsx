@@ -3,7 +3,7 @@ import { Container } from "@/src/components/layout/Container";
 import { Button } from "@/src/components/ui/Button";
 import { Reveal } from "@/src/components/ui/Reveal";
 import type { CmsHeroBlock, CmsButton } from "@/lib/cms/types";
-import { getCmsMediaUrl, normalizeCmsMediaUrl } from "@/lib/cms/mediaUrl";
+import { getCmsMediaUrl, isLikelyVideoUrl, normalizeCmsMediaUrl } from "@/lib/cms/mediaUrl";
 
 type Props = {
   block?: CmsHeroBlock;
@@ -38,11 +38,17 @@ export function Hero({ block }: Props) {
   const heroMedia = block?.media?.[0] ?? null;
   const mediaSrc = getCmsMediaUrl(heroMedia) || "/images/hero.jpg";
 
-  const isVideo = isVideoMedia(
-    mediaSrc,
-    heroMedia?.file_name ?? null,
-    heroMedia?.file_type ?? null,
-  );
+  const isVideo =
+    isVideoMedia(
+      mediaSrc,
+      heroMedia?.file_name ?? null,
+      heroMedia?.file_type ?? null,
+    ) ||
+    // In prod, CMS can return preview images in url/large_url even for videos.
+    // If any raw URL looks like a video, treat the hero as video.
+    [heroMedia?.url, heroMedia?.file_url, heroMedia?.large_url, heroMedia?.medium_url]
+      .map((u) => normalizeCmsMediaUrl(u))
+      .some((u) => isLikelyVideoUrl(u));
 
   const videoPoster =
     normalizeCmsMediaUrl(heroMedia?.thumbnail_url) ||
@@ -93,7 +99,7 @@ export function Hero({ block }: Props) {
         )}
 
         <div className="absolute inset-0 bg-black/30" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/20 to-black/10" />
+        <div className="absolute inset-0 bg-linear-to-t from-black/65 via-black/20 to-black/10" />
       </div>
 
       <Container className="relative z-10 flex min-h-screen items-end pb-12 sm:pb-12 lg:pb-22">
@@ -112,7 +118,7 @@ export function Hero({ block }: Props) {
             </Reveal>
           </div>
 
-          <div className="w-full lg:w-[561px] lg:flex-shrink-0">
+          <div className="w-full lg:w-[561px] lg:shrink-0">
             <div className="flex w-full flex-col gap-3 sm:gap-4 max-w-[561px]">
               <Reveal delay={0.22}>
                 <Button
