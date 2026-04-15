@@ -40,20 +40,21 @@ export function Button(props: ButtonAsLink | ButtonAsButton) {
   } = props;
 
   const base = clsx(
-    "inline-flex items-center justify-center select-none",
+    "inline-flex items-center justify-center select-none cursor-pointer",
     "rounded-full",
     "transition-all duration-200",
+    "hover:opacity-95 active:scale-[0.99]",
     "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-transparent",
-    "font-medium leading-none",
+    "font-medium leading-none text-center",
     "disabled:pointer-events-none disabled:opacity-50",
   );
 
   const sizes: Record<ButtonSize, string> = {
     lg: clsx(
-      "h-[52px] px-5 text-[14px] uppercase",
-      "sm:h-[58px] sm:px-6 sm:text-[16px]",
-      "lg:h-[60px] lg:px-7 lg:text-[16px]",
-      "xl:h-[68px] xl:px-8 xl:text-[18px]",
+      "h-[56px] px-5 text-[15px] uppercase",
+      "sm:h-[62px] sm:px-6 sm:text-[17px]",
+      "lg:h-[68px] lg:px-7 lg:text-[19px]",
+      "xl:h-[72px] xl:px-8 xl:text-[20px]",
       "2xl:h-[77px] 2xl:px-[21px] 2xl:text-[22px]",
     ),
 
@@ -82,7 +83,7 @@ export function Button(props: ButtonAsLink | ButtonAsButton) {
   const width = fullWidth
     ? "w-full"
     : maxWidth
-      ? "w-full max-w-[481px]"
+      ? "w-full max-w-[561px]"
       : "w-auto";
 
   const styles = clsx(base, sizes[size], variants[variant], width, className);

@@ -195,7 +195,9 @@ export function hydrateHomepageBlocks({
       const mapped = mapCapitalizedTextBlockToAdmin(capitalizedTextCmsBlock);
 
       return {
-        text: mapped.text || prev.text,
+        grayTextTop: mapped.grayTextTop || prev.grayTextTop,
+        blackTextMain: mapped.blackTextMain || prev.blackTextMain,
+        grayTextBottom: mapped.grayTextBottom || prev.grayTextBottom,
         buttonLabel: mapped.buttonLabel || prev.buttonLabel,
       };
     });

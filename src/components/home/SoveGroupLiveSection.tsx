@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import type { CmsBlock } from "@/lib/cms/types";
-import { getCmsMediaUrl } from "@/lib/cms/mediaUrl";
+import { getCmsMediaUrl, isLikelyVideoUrl } from "@/lib/cms/mediaUrl";
 import { ThreeHoverZones } from "@/src/components/home/FeatureZone/FeatureZone";
 import { usePublishedHomepageBlock } from "@/src/components/home/hooks/usePublishedHomepageBlock";
 
@@ -40,7 +40,9 @@ function mapSoveGroupToThreeHoverZones(block?: CmsBlock) {
       ];
 
   const firstMedia = Array.isArray(block?.media) ? block?.media?.[0] : undefined;
-  const imageSrc = (firstMedia ? getCmsMediaUrl(firstMedia) : null) || "/images/hero.jpg";
+  const cmsSrc = firstMedia ? getCmsMediaUrl(firstMedia) : null;
+  const imageSrc =
+    (cmsSrc && !isLikelyVideoUrl(cmsSrc) ? cmsSrc : null) || "/images/hero.jpg";
 
   return { zones, imageSrc };
 }
@@ -49,7 +51,7 @@ export function SoveGroupLiveSection({ initialBlock }: Props) {
   const block = usePublishedHomepageBlock({
     blockType: "sove_group:main",
     initialBlock,
-    refreshIntervalMs: 4000,
+    refreshIntervalMs: 0,
   });
 
   const mapped = mapSoveGroupToThreeHoverZones(block);

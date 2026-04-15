@@ -50,7 +50,9 @@ export type MediaListBlockData = {
 };
 
 export type TextButtonBlockData = {
-  text: string;
+  grayTextTop: string;
+  blackTextMain: string;
+  grayTextBottom: string;
   buttonLabel: string;
 };
 

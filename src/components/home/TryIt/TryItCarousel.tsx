@@ -1,8 +1,9 @@
 "use client";
 
 import Image from "next/image";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import clsx from "clsx";
 
 type Item = {
   title: string;
@@ -16,17 +17,57 @@ type Props = {
 };
 
 const IMAGE_TRANSITION = {
-  duration: 0.75,
-  ease: [0.22, 1, 0.36, 1] as [number, number, number, number],
+  type: "spring" as const,
+  stiffness: 220,
+  damping: 28,
+  mass: 0.9,
 };
 
 const TITLE_TRANSITION = {
-  duration: 0.55,
-  ease: [0.22, 1, 0.36, 1] as [number, number, number, number],
+  type: "spring" as const,
+  stiffness: 260,
+  damping: 30,
+  mass: 0.7,
+};
+
+const imageVariants = {
+  enter: (direction: 1 | -1) => ({
+    opacity: 0,
+    x: direction * 22,
+    scale: 1.02,
+    filter: "blur(6px)",
+  }),
+  center: {
+    opacity: 1,
+    x: 0,
+    scale: 1,
+    filter: "blur(0px)",
+  },
+  exit: (direction: 1 | -1) => ({
+    opacity: 0,
+    x: direction * -22,
+    scale: 0.992,
+    filter: "blur(6px)",
+  }),
+};
+
+const titleVariants = {
+  enter: (direction: 1 | -1) => ({
+    opacity: 0,
+    y: direction * 10,
+    filter: "blur(4px)",
+  }),
+  center: { opacity: 1, y: 0, filter: "blur(0px)" },
+  exit: (direction: 1 | -1) => ({
+    opacity: 0,
+    y: direction * -10,
+    filter: "blur(4px)",
+  }),
 };
 
 export function TryItCarousel({ items, activeIndex, setActiveIndex }: Props) {
   const total = items.length;
+  const [direction, setDirection] = useState<1 | -1>(1);
 
   const nextIndex = useMemo(() => {
     return (activeIndex + 1) % total;
@@ -36,20 +77,31 @@ export function TryItCarousel({ items, activeIndex, setActiveIndex }: Props) {
   const currentNext = items[nextIndex];
 
   const goPrev = () => {
+    setDirection(-1);
     setActiveIndex((prev) => (prev - 1 + total) % total);
   };
 
   const goNext = () => {
+    setDirection(1);
     setActiveIndex((prev) => (prev + 1) % total);
   };
 
-  const arrowBtnClass = [
-    "flex h-[40px] w-[110px] sm:w-[120px] items-center justify-center rounded-full",
-    "bg-border text-borderSoft",
-    "transition-all duration-300",
-    "hover:bg-graphite hover:text-surface",
+  const arrowBtnBase = [
+    "flex h-[44px] w-full max-w-[135px] items-center justify-center rounded-full",
+    "border transition-colors duration-200",
     "active:scale-[0.98]",
+    "select-none",
   ].join(" ");
+
+  const arrowBtnPrev = clsx(
+    arrowBtnBase,
+    "border-graphite bg-graphite text-white hover:bg-graphite/90",
+  );
+
+  const arrowBtnNext = clsx(
+    arrowBtnBase,
+    "border-border bg-surface text-textMuted hover:bg-surface/80",
+  );
 
   return (
     <div className="w-full">
@@ -64,13 +116,15 @@ export function TryItCarousel({ items, activeIndex, setActiveIndex }: Props) {
             "lg:max-w-[520px] xl:max-w-[560px] 2xl:max-w-[573px]",
           ].join(" ")}
         >
-          <AnimatePresence mode="wait">
+          <AnimatePresence mode="wait" initial={false} custom={direction}>
             <motion.div
               key={current.img}
               className="absolute inset-0"
-              initial={{ opacity: 0, scale: 1.04 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.985 }}
+              variants={imageVariants}
+              initial="enter"
+              animate="center"
+              exit="exit"
+              custom={direction}
               transition={IMAGE_TRANSITION}
             >
               <Image
@@ -87,7 +141,7 @@ export function TryItCarousel({ items, activeIndex, setActiveIndex }: Props) {
           {/* Title inside big image */}
           <div className="absolute bottom-6 left-0 right-0 z-10 grid place-items-center px-4 text-center sm:bottom-7 lg:bottom-8">
             <div className="relative w-full min-h-[28px] sm:min-h-[30px] lg:min-h-[32px] 2xl:min-h-[34px]">
-              <AnimatePresence mode="wait">
+              <AnimatePresence mode="wait" initial={false} custom={direction}>
                 <motion.div
                   key={current.title}
                   className={[
@@ -96,9 +150,11 @@ export function TryItCarousel({ items, activeIndex, setActiveIndex }: Props) {
                     "leading-none",
                     "text-[16px] sm:text-[18px] lg:text-[20px] 2xl:text-[22px]",
                   ].join(" ")}
-                  initial={{ opacity: 0, y: 8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -8 }}
+                  variants={titleVariants}
+                  initial="enter"
+                  animate="center"
+                  exit="exit"
+                  custom={direction}
                   transition={TITLE_TRANSITION}
                 >
                   {current.title.toUpperCase()}
@@ -117,13 +173,15 @@ export function TryItCarousel({ items, activeIndex, setActiveIndex }: Props) {
               "h-[420px] xl:h-[520px] 2xl:h-[641px]",
             ].join(" ")}
           >
-            <AnimatePresence mode="wait">
+            <AnimatePresence mode="wait" initial={false} custom={direction}>
               <motion.div
                 key={currentNext.img}
                 className="absolute inset-0"
-                initial={{ opacity: 0, scale: 1.04 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.985 }}
+                variants={imageVariants}
+                initial="enter"
+                animate="center"
+                exit="exit"
+                custom={direction}
                 transition={IMAGE_TRANSITION}
               >
                 <Image
@@ -142,13 +200,15 @@ export function TryItCarousel({ items, activeIndex, setActiveIndex }: Props) {
             <div className="w-[236px] sm:w-[256px]">
               <div className="text-center text-[16px] font-medium leading-none tracking-[0.12em] text-text xl:text-[20px] 2xl:text-[22px]">
                 <span className="relative block w-full min-h-[28px] xl:min-h-[30px] 2xl:min-h-[34px]">
-                  <AnimatePresence mode="wait">
+                  <AnimatePresence mode="wait" initial={false} custom={direction}>
                     <motion.span
                       key={currentNext.title}
                       className="absolute inset-0 grid place-items-center"
-                      initial={{ opacity: 0, y: 8 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -8 }}
+                      variants={titleVariants}
+                      initial="enter"
+                      animate="center"
+                      exit="exit"
+                      custom={direction}
                       transition={TITLE_TRANSITION}
                     >
                       {currentNext.title.toUpperCase()}
@@ -162,7 +222,7 @@ export function TryItCarousel({ items, activeIndex, setActiveIndex }: Props) {
                   type="button"
                   onClick={goPrev}
                   aria-label="Previous slide"
-                  className={arrowBtnClass}
+                  className={arrowBtnPrev}
                 >
                   ←
                 </button>
@@ -170,7 +230,7 @@ export function TryItCarousel({ items, activeIndex, setActiveIndex }: Props) {
                   type="button"
                   onClick={goNext}
                   aria-label="Next slide"
-                  className={arrowBtnClass}
+                  className={arrowBtnNext}
                 >
                   →
                 </button>
@@ -186,7 +246,7 @@ export function TryItCarousel({ items, activeIndex, setActiveIndex }: Props) {
           type="button"
           onClick={goPrev}
           aria-label="Previous slide"
-          className={arrowBtnClass}
+          className={arrowBtnPrev}
         >
           ←
         </button>
@@ -194,7 +254,7 @@ export function TryItCarousel({ items, activeIndex, setActiveIndex }: Props) {
           type="button"
           onClick={goNext}
           aria-label="Next slide"
-          className={arrowBtnClass}
+          className={arrowBtnNext}
         >
           →
         </button>

@@ -1,6 +1,7 @@
 import { patchBlock } from "@/app/(admin)/admin/content-tools/home/patchBlock";
 import {
   mapFeaturedAdminToPatch,
+  mapCapitalizedTextAdminToPatch,
 } from "@/lib/cms/homepageAdapters";
 import type {
   HeroBlockData,
@@ -205,7 +206,7 @@ export function createHomepageBlurHandlers({
         apiBase,
         blockId: capitalizedTextCmsBlockId,
         token,
-        patch: { text: capitalizedTextBlock.text },
+        patch: mapCapitalizedTextAdminToPatch(capitalizedTextBlock),
         setSaving: setIsSavingCapitalizedText,
         setError,
         errorMessage: "Failed to save capitalized text",

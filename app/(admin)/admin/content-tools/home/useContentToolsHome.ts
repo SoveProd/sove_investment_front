@@ -124,6 +124,25 @@ async function loadCaseStudiesShort(token: string): Promise<CaseStudyShort[]> {
   return data.map((item) => ({ id: item.id, title: item.title }));
 }
 
+async function deleteMediaFile(params: {
+  apiBase: string;
+  token: string;
+  fileId: number;
+}) {
+  const response = await fetch(`${params.apiBase}/media/${params.fileId}`, {
+    method: "DELETE",
+    headers: {
+      Accept: "application/json",
+      Authorization: `Bearer ${params.token}`,
+    },
+  });
+
+  // If backend already deleted it (or doesn't allow), don't break UX.
+  if (!response.ok) {
+    throw new Error(`Failed to delete media: ${response.status}`);
+  }
+}
+
 function createFallbackSaver(
   token: string | null,
   setError: (v: string | null) => void,
@@ -659,13 +678,29 @@ export function useContentToolsHome() {
   ) {
     if (!token || !blockId) return;
 
+    const safeToken = token as string;
+    const previousMediaId =
+      block.items.find((item) => item.id === id)?.mediaId ?? null;
+
     const uploadedMedia = await uploadMedia({
       apiBase: API_BASE,
-      token,
+      token: safeToken,
       file,
       ownerType: "page_block",
       ownerId: blockId,
     });
+
+    const rawPreview =
+      uploadedMedia.url ||
+      uploadedMedia.large_url ||
+      uploadedMedia.medium_url ||
+      uploadedMedia.thumbnail_url ||
+      uploadedMedia.file_url;
+
+    const preview =
+      rawPreview && !rawPreview.startsWith("http") && !rawPreview.startsWith("/")
+        ? `/${rawPreview}`
+        : rawPreview;
 
     const nextBlock: RepeatableFeatureBlockData = {
       ...block,
@@ -675,7 +710,7 @@ export function useContentToolsHome() {
               ...item,
               mediaId: uploadedMedia.id,
               fileName: uploadedMedia.file_name || file.name,
-              preview: uploadedMedia.file_url,
+              preview: preview || undefined,
             }
           : item,
       ),
@@ -683,6 +718,19 @@ export function useContentToolsHome() {
 
     setBlock(nextBlock);
     await saveRepeatableFeatureBlock(blockId, nextBlock, setSaving, errorMessage);
+
+    // Clean up old media file after successful replace.
+    if (previousMediaId && previousMediaId !== uploadedMedia.id) {
+      try {
+        await deleteMediaFile({
+          apiBase: API_BASE,
+          token: safeToken,
+          fileId: previousMediaId,
+        });
+      } catch {
+        setError(`Не удалось удалить старый файл (id=${previousMediaId})`);
+      }
+    }
   }
 
   async function handleRepeatableMediaRemove(
@@ -695,6 +743,10 @@ export function useContentToolsHome() {
   ) {
     if (!token || !blockId) return;
 
+    const safeToken = token as string;
+    const removedMediaId =
+      block.items.find((item) => item.id === id)?.mediaId ?? null;
+
     const nextBlock: RepeatableFeatureBlockData = {
       ...block,
       items: block.items.map((item) =>
@@ -706,6 +758,19 @@ export function useContentToolsHome() {
 
     setBlock(nextBlock);
     await saveRepeatableFeatureBlock(blockId, nextBlock, setSaving, errorMessage);
+
+    // After detaching from block, delete the file itself (best-effort).
+    if (removedMediaId) {
+      try {
+        await deleteMediaFile({
+          apiBase: API_BASE,
+          token: safeToken,
+          fileId: removedMediaId,
+        });
+      } catch {
+        setError(`Не удалось удалить файл (id=${removedMediaId})`);
+      }
+    }
   }
 
   async function handleManagePropertyMediaUpload(id: number, file: File) {
@@ -1046,11 +1111,11 @@ export function useContentToolsHome() {
         id,
         "Failed to remove make-with-sove media",
       ),
-    handleMakeWithSoveItemsBlur: async () => {
+    handleMakeWithSoveItemsBlur: async (nextValue?: RepeatableFeatureBlockData) => {
       if (!token || !makeWithSoveCmsBlockId) return;
       await saveRepeatableFeatureBlock(
         makeWithSoveCmsBlockId,
-        makeWithSoveBlock,
+        nextValue || makeWithSoveBlock,
         setIsSavingMakeWithSove,
         "Failed to save make-with-sove block",
       );
@@ -1075,11 +1140,11 @@ export function useContentToolsHome() {
         id,
         "Failed to remove diy media",
       ),
-    handleDiyItemsBlur: async () => {
+    handleDiyItemsBlur: async (nextValue?: RepeatableFeatureBlockData) => {
       if (!token || !doItYourselfCmsBlockId) return;
       await saveRepeatableFeatureBlock(
         doItYourselfCmsBlockId,
-        doItYourselfBlock,
+        nextValue || doItYourselfBlock,
         setIsSavingDoItYourself,
         "Failed to save diy block",
       );

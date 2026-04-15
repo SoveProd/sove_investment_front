@@ -135,7 +135,7 @@ export function HowItWorksBlockEditor({
                   Шаг {step.id}
                 </div>
 
-                <div className="grid gap-4 xl:grid-cols-5">
+                <div className="grid items-start gap-4 xl:grid-cols-4">
                   <AdminSmallTextField
                     label="Шаг"
                     value={step.stepLabel}
@@ -166,24 +166,26 @@ export function HowItWorksBlockEditor({
                     onBlur={onStepBlur}
                   />
 
-                  <AdminSmallTextField
-                    label="Кнопка"
-                    value={step.buttonLabel}
-                    placeholder="Попробовать"
-                    onChange={(fieldValue) =>
-                      handleStepFieldChange(step.id, "buttonLabel", fieldValue)
-                    }
-                    onBlur={onStepBlur}
-                  />
+                  <div className="space-y-4">
+                    <AdminSmallTextField
+                      label="Кнопка"
+                      value={step.buttonLabel}
+                      placeholder="Попробовать"
+                      onChange={(fieldValue) =>
+                        handleStepFieldChange(step.id, "buttonLabel", fieldValue)
+                      }
+                      onBlur={onStepBlur}
+                    />
 
-                  <AdminMediaField
-                    label="Фото"
-                    fileName={step.fileName}
-                    preview={step.preview}
-                    onUpload={(file) => handleStepFileChange(step.id, file)}
-                    onRemove={() => handleRemoveStepFile(step.id)}
-                    compact
-                  />
+                    <AdminMediaField
+                      label="Фото"
+                      fileName={step.fileName}
+                      preview={step.preview}
+                      onUpload={(file) => handleStepFileChange(step.id, file)}
+                      onRemove={() => handleRemoveStepFile(step.id)}
+                      compact
+                    />
+                  </div>
                 </div>
               </div>
             ))}

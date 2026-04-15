@@ -14,7 +14,7 @@ type Options = {
 export function usePublishedHomepageBlock({
   blockType,
   initialBlock,
-  refreshIntervalMs = 4000,
+  refreshIntervalMs = 0,
 }: Options) {
   const [block, setBlock] = useState<CmsBlock | undefined>(initialBlock);
   const blockTypeRef = useRef(blockType);
@@ -26,6 +26,14 @@ export function usePublishedHomepageBlock({
 
   useEffect(() => {
     let cancelled = false;
+
+    // If we already have server-provided data and polling is disabled,
+    // avoid extra client fetches (and avoid StrictMode double-fetch noise in dev).
+    if (initialBlock && (!refreshIntervalMs || refreshIntervalMs <= 0)) {
+      return () => {
+        cancelled = true;
+      };
+    }
 
     async function loadOnce() {
       try {
@@ -69,7 +77,7 @@ export function usePublishedHomepageBlock({
       window.clearInterval(id);
       document.removeEventListener("visibilitychange", handleVisibility);
     };
-  }, [stableBlockType, refreshIntervalMs]);
+  }, [stableBlockType, refreshIntervalMs, initialBlock]);
 
   return block;
 }

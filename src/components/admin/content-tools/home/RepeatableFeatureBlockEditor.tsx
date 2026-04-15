@@ -4,6 +4,8 @@ import { AdminSectionCard } from "@/src/components/admin/ui/AdminSectionCard";
 import { AdminTextareaField } from "@/src/components/admin/fields/AdminTextareaField";
 import { AdminSmallTextField } from "@/src/components/admin/fields/AdminSmallTextField";
 import { AdminMediaField } from "@/src/components/admin/fields/AdminMediaField";
+import { Ellipsis } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import type {
   RepeatableFeatureBlockData,
   RepeatableFeatureItem,
@@ -17,7 +19,7 @@ type Props = {
   onTitleBlur?: () => void;
   onDescriptionBlur?: () => void;
   onButtonBlur?: () => void;
-  onItemTextBlur?: () => void;
+  onItemTextBlur?: (nextValue?: RepeatableFeatureBlockData) => void;
   isSaving?: boolean;
 
   onMediaUpload?: (id: number, file: File) => void | Promise<void>;
@@ -64,6 +66,22 @@ export function RepeatableFeatureBlockEditor({
   newItemFileName = "Фото.jpeg",
   newItemText = "",
 }: Props) {
+  const [openItemMenuId, setOpenItemMenuId] = useState<number | null>(null);
+  const menuRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (openItemMenuId === null) return;
+    const onDown = (e: MouseEvent) => {
+      const t = e.target as Node | null;
+      if (!t) return;
+      if (menuRef.current && !menuRef.current.contains(t)) {
+        setOpenItemMenuId(null);
+      }
+    };
+    window.addEventListener("mousedown", onDown);
+    return () => window.removeEventListener("mousedown", onDown);
+  }, [openItemMenuId]);
+
   const handleItemTextChange = (id: number, text: string) => {
     onChange({
       ...value,
@@ -92,6 +110,19 @@ export function RepeatableFeatureBlockEditor({
           : item,
       ),
     });
+  };
+
+  const handleRemoveItem = (id: number) => {
+    const nextItems = value.items.filter((item) => item.id !== id);
+    const nextValue: RepeatableFeatureBlockData = {
+      ...value,
+      items: nextItems,
+    };
+
+    onChange(nextValue);
+
+    // Persist the exact nextValue to avoid stale state races.
+    if (onItemTextBlur) onItemTextBlur(nextValue);
   };
 
   const handleItemUpload = (id: number, file: File) => {
@@ -180,7 +211,38 @@ export function RepeatableFeatureBlockEditor({
         <div className="xl:col-span-2 rounded-[10px] border border-adminBorder bg-surface p-4">
           <div className="space-y-4">
             {value.items.map((item) => (
-              <div key={item.id} className="grid gap-4 md:grid-cols-2">
+              <div
+                key={item.id}
+                className="relative grid gap-4 rounded-[12px] border border-borderSoft bg-white p-3 md:grid-cols-2"
+              >
+                <div className="absolute right-3 top-3" ref={menuRef}>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setOpenItemMenuId((prev) => (prev === item.id ? null : item.id))
+                    }
+                    className="flex h-7 w-7 items-center justify-center text-primary transition hover:text-primaryHover"
+                    aria-label="Действия сценария"
+                  >
+                    <Ellipsis size={14} />
+                  </button>
+
+                  {openItemMenuId === item.id ? (
+                    <div className="absolute right-0 top-[calc(100%+8px)] z-50 w-[200px] overflow-hidden rounded-[12px] border border-borderSoft bg-white shadow-[0_12px_30px_rgba(0,0,0,0.12)]">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setOpenItemMenuId(null);
+                          handleRemoveItem(item.id);
+                        }}
+                        className="block w-full px-3 py-2 text-left text-[13px] text-red-600 hover:bg-bg"
+                      >
+                        Удалить сценарий
+                      </button>
+                    </div>
+                  ) : null}
+                </div>
+
                 <AdminMediaField
                   label={itemMediaLabel}
                   fileName={item.fileName}

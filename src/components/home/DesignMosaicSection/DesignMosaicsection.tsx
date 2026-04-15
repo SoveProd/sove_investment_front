@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Container } from "@/src/components/layout/Container";
 import type { CmsBlock, CmsDesignMosaicContent, CmsMedia } from "@/lib/cms/types";
-import { getCmsMediaUrl } from "@/lib/cms/mediaUrl";
+import { getCmsMediaUrl, isLikelyVideoUrl } from "@/lib/cms/mediaUrl";
 
 type TextCard = {
   type: "text";
@@ -107,7 +107,10 @@ function buildItemsFromCms(block?: CmsBlock | null): MosaicItem[] {
     mosaic.push({
       type: "image",
       id: `i${i + 1}`,
-      imageSrc: getCmsMediaUrl(m) || "/images/hero.jpg",
+      imageSrc: (() => {
+        const cmsSrc = getCmsMediaUrl(m);
+        return cmsSrc && !isLikelyVideoUrl(cmsSrc) ? cmsSrc : "/images/hero.jpg";
+      })(),
       imageAlt: m?.file_name || "",
     });
   }

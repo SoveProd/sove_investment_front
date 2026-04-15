@@ -6,7 +6,7 @@ import { Container } from "@/src/components/layout/Container";
 import type { CmsBlock } from "@/lib/cms/types";
 
 type CaseStudyEntity = {
-  id: number;
+  id: number | string;
   title: string;
   hero_media_id?: number | null;
   timeline?: string | null;
@@ -79,11 +79,15 @@ function getCaseStudyImageSrc(item: CaseStudyEntity, fallback: string) {
 function mapCaseStudyToConceptCard(
   item: CaseStudyEntity,
   fallbackImage: string,
+  slots?: { total: number; available: number },
 ): ConceptCard {
   const budgetPerM2 =
     item.budget && item.square && item.square > 0
       ? Math.round(item.budget / item.square)
       : null;
+
+  const totalSlots = slots?.total ?? 10;
+  const availableSlots = slots?.available ?? 7;
 
   return {
     id: String(item.id),
@@ -93,11 +97,9 @@ function mapCaseStudyToConceptCard(
       : item.budget
         ? `Общий бюджет ~ ${item.budget.toLocaleString("ru-RU")}`
         : "Бюджет уточняется",
-    availabilityLabel: item.timeline
-      ? `Срок реализации ~ ${item.timeline}`
-      : "Детали уточняются",
-    totalSlots: 10,
-    availableSlots: 7,
+    availabilityLabel: `Доступно ${availableSlots}/${totalSlots} слотов`,
+    totalSlots,
+    availableSlots,
     image: {
       src: getCaseStudyImageSrc(item, fallbackImage),
       alt: item.title || "Case study preview",
@@ -115,14 +117,46 @@ export default function PopularConcepts({
   const readyIds = getSelectedIds(readyBlock);
 
   const mappedPopularItems = popularItems
-    .filter((item) => popularIds.includes(item.id))
+    .filter((item) => popularIds.includes(Number(item.id)))
     .slice(0, 2)
-    .map((item) => mapCaseStudyToConceptCard(item, "/images/hero.jpg"));
+    .map((item) =>
+      mapCaseStudyToConceptCard(item, "/images/hero.jpg", {
+        total: 10,
+        available: 7,
+      }),
+    );
 
   const mappedReadyItems = readyItems
-    .filter((item) => readyIds.includes(item.id))
+    .filter((item) => readyIds.includes(Number(item.id)))
     .slice(0, 2)
-    .map((item) => mapCaseStudyToConceptCard(item, "/images/pathimg.jpg"));
+    .map((item) =>
+      mapCaseStudyToConceptCard(item, "/images/pathimg.jpg", {
+        total: 10,
+        available: 3,
+      }),
+    );
+
+  // If selected IDs don't exist in the published list, fall back to real published items
+  // (better than showing hardcoded placeholders).
+  const fallbackPopularFromPublished =
+    popularItems.length > 0
+      ? popularItems.slice(0, 2).map((item) =>
+          mapCaseStudyToConceptCard(item, "/images/hero.jpg", {
+            total: 10,
+            available: 7,
+          }),
+        )
+      : [];
+
+  const fallbackReadyFromPublished =
+    readyItems.length > 0
+      ? readyItems.slice(0, 2).map((item) =>
+          mapCaseStudyToConceptCard(item, "/images/pathimg.jpg", {
+            total: 10,
+            available: 3,
+          }),
+        )
+      : [];
 
   const tabs: ConceptsTab[] = [
     {
@@ -134,14 +168,20 @@ export default function PopularConcepts({
       items:
         mappedPopularItems.length > 0
           ? mappedPopularItems
-          : fallbackPopularConcepts,
+          : fallbackPopularFromPublished.length > 0
+            ? fallbackPopularFromPublished
+            : fallbackPopularConcepts,
     },
     {
       key: "ready",
       label: readyBlock?.title || "Готовые проекты",
       description: readyBlock?.subtitle || "Реальные проекты и их результат",
       items:
-        mappedReadyItems.length > 0 ? mappedReadyItems : fallbackReadyProjects,
+        mappedReadyItems.length > 0
+          ? mappedReadyItems
+          : fallbackReadyFromPublished.length > 0
+            ? fallbackReadyFromPublished
+            : fallbackReadyProjects,
     },
   ];
 

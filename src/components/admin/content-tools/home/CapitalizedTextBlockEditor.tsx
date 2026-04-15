@@ -22,31 +22,63 @@ export function CapitalizedTextBlockEditor({
 }: Props) {
   return (
     <AdminSectionCard title='Блок "текст"'>
-      <div className="grid gap-4 xl:grid-cols-2">
-        <AdminTextareaField
-          label="Текст"
-          value={value.text}
-          onChange={(fieldValue) =>
-            onChange({
-              ...value,
-              text: fieldValue,
-            })
-          }
-          onBlur={onTextBlur}
-        />
+      <div className="w-full max-w-4xl">
+        <div className="grid gap-4 md:grid-cols-2">
+          <div className="md:col-span-2">
+            <AdminTextareaField
+              label="Текст (серый сверху)"
+              value={value.grayTextTop}
+              onChange={(fieldValue) =>
+                onChange({
+                  ...value,
+                  grayTextTop: fieldValue,
+                })
+              }
+              onBlur={onTextBlur}
+            />
+          </div>
 
-        <AdminSmallTextField
-          label="Кнопка"
-          value={value.buttonLabel}
-          placeholder="Посмотри наши кейсы"
-          onChange={(fieldValue) =>
-            onChange({
-              ...value,
-              buttonLabel: fieldValue,
-            })
-          }
-          onBlur={onButtonBlur}
-        />
+          <div className="md:col-span-2">
+            <AdminTextareaField
+              label="Текст (чёрный основной)"
+              value={value.blackTextMain}
+              onChange={(fieldValue) =>
+                onChange({
+                  ...value,
+                  blackTextMain: fieldValue,
+                })
+              }
+              onBlur={onTextBlur}
+            />
+          </div>
+
+          <div className="md:col-span-2">
+            <AdminTextareaField
+              label="Текст (серый снизу)"
+              value={value.grayTextBottom}
+              onChange={(fieldValue) =>
+                onChange({
+                  ...value,
+                  grayTextBottom: fieldValue,
+                })
+              }
+              onBlur={onTextBlur}
+            />
+          </div>
+
+          <AdminSmallTextField
+            label="Кнопка"
+            value={value.buttonLabel}
+            placeholder="Посмотри наши кейсы"
+            onChange={(fieldValue) =>
+              onChange({
+                ...value,
+                buttonLabel: fieldValue,
+              })
+            }
+            onBlur={onButtonBlur}
+          />
+        </div>
       </div>
 
       {isSaving ? (

@@ -19,18 +19,33 @@ export function AdminTextareaField({
 }: Props) {
   return (
     <div className="space-y-2">
-      <label className="text-[14px] text-adminMuted">{label}</label>
+      {/* Label */}
+      <label className="text-[14px] text-textMuted">{label}</label>
 
+      {/* Field */}
       <div className="relative">
         <textarea
           value={value}
           onChange={(e) => onChange(e.target.value)}
           onBlur={onBlur}
           placeholder={placeholder}
-          className="h-[129px] w-full resize-none rounded-[10px] border border-adminBorder bg-surface px-4 py-3 pr-10 text-[14px] outline-none transition placeholder:text-[#CFCFCF] focus:border-adminAccent"
+          className="
+            h-[129px] w-full resize-none
+            rounded-[10px]
+            border border-borderLight
+            bg-surface
+            px-4 py-3 pr-10
+            text-[14px] text-textMuted
+            outline-none transition
+
+            placeholder:text-textPlaceholder
+
+            focus:border-adminAccent
+          "
         />
 
-        <div className="absolute right-3 top-3 text-adminAccent">
+        {/* Icon */}
+        <div className="pointer-events-none absolute right-3 top-3 text-adminAccent">
           <Pencil size={16} />
         </div>
       </div>

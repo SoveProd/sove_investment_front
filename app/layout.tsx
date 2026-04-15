@@ -45,6 +45,7 @@ export default function RootLayout({
     <html lang="ru" className="overflow-x-hidden" suppressHydrationWarning>
       <body
         className={`${montserrat.variable} font-main antialiased bg-bg text-text overflow-x-hidden`}
+        suppressHydrationWarning
       >
         <StoreProvider>{children}</StoreProvider>
       </body>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useId, useRef, type ChangeEvent } from "react";
+import { useEffect, useId, useRef, useState, type ChangeEvent } from "react";
 import Image from "next/image";
 import { Ellipsis, Upload } from "lucide-react";
 import clsx from "clsx";
@@ -39,6 +39,8 @@ export function AdminMediaField({
 }: Props) {
   const inputId = useId();
   const inputRef = useRef<HTMLInputElement | null>(null);
+  const menuRef = useRef<HTMLDivElement | null>(null);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   function handleUploadClick() {
     inputRef.current?.click();
@@ -55,6 +57,19 @@ export function AdminMediaField({
   }
 
   const hasPreview = isRenderablePreview(preview);
+
+  useEffect(() => {
+    if (!isMenuOpen) return;
+    const onDown = (e: MouseEvent) => {
+      const t = e.target as Node | null;
+      if (!t) return;
+      if (menuRef.current && !menuRef.current.contains(t)) {
+        setIsMenuOpen(false);
+      }
+    };
+    window.addEventListener("mousedown", onDown);
+    return () => window.removeEventListener("mousedown", onDown);
+  }, [isMenuOpen]);
 
   return (
     <div className="space-y-2">
@@ -119,15 +134,42 @@ export function AdminMediaField({
             <Upload size={16} />
           </button>
 
-          <button
-            type="button"
-            onClick={onRemove}
-            disabled={!onRemove}
-            className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-white transition hover:bg-primaryHover disabled:cursor-not-allowed disabled:opacity-50"
-            aria-label="Удалить файл"
-          >
-            <Ellipsis size={14} />
-          </button>
+          <div className="relative" ref={menuRef}>
+            <button
+              type="button"
+              onClick={() => setIsMenuOpen((v) => !v)}
+              className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-white transition hover:bg-primaryHover"
+              aria-label="Действия с файлом"
+            >
+              <Ellipsis size={14} />
+            </button>
+
+            {isMenuOpen ? (
+              <div className="absolute right-0 top-[calc(100%+8px)] z-50 w-[180px] overflow-hidden rounded-[12px] border border-borderSoft bg-white shadow-[0_12px_30px_rgba(0,0,0,0.12)]">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsMenuOpen(false);
+                    handleUploadClick();
+                  }}
+                  className="block w-full px-3 py-2 text-left text-[13px] text-graphite hover:bg-bg"
+                >
+                  Загрузить новое
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsMenuOpen(false);
+                    onRemove?.();
+                  }}
+                  disabled={!onRemove}
+                  className="block w-full px-3 py-2 text-left text-[13px] text-red-600 hover:bg-bg disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  Удалить
+                </button>
+              </div>
+            ) : null}
+          </div>
         </div>
       </div>
     </div>

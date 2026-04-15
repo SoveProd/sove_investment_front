@@ -54,7 +54,7 @@ export function RequestsBlockEditor({
   return (
     <AdminSectionCard title='Блок "Заявки"'>
       <div className="rounded-[18px] bg-surface p-4">
-        <div className="grid gap-6 xl:grid-cols-[1fr_1fr_420px]">
+        <div className="grid items-start gap-6 xl:grid-cols-[1fr_1fr_420px]">
           <AdminTextareaField
             label="Заголовок"
             value={value.title}
@@ -85,7 +85,7 @@ export function RequestsBlockEditor({
             />
           </div>
 
-          <div className="pt-[30px]">
+          <div className="self-start">
             <AdminMediaField
               label="Фото"
               fileName={value.fileName}

@@ -41,10 +41,24 @@ export function normalizeCmsMediaUrl(url?: string | null) {
 
 import type { CmsMedia } from "./types";
 
+export function isLikelyVideoUrl(url?: string | null) {
+  const u = (url || "").toLowerCase();
+  return (
+    u.endsWith(".mp4") ||
+    u.endsWith(".webm") ||
+    u.endsWith(".mov") ||
+    u.endsWith(".m4v") ||
+    u.endsWith(".ogg") ||
+    u.endsWith(".ogv")
+  );
+}
+
 export function getCmsMediaUrl(media?: CmsMedia | null) {
   if (!media) return undefined;
 
   return (
+    // Prefer a stable same-origin URL (works with `next/image` without remotePatterns).
+    // The API route redirects to the real file location for streaming/CDN.
     getPublicMediaApiUrl(media.id) ||
     normalizeCmsMediaUrl(media.url) ||
     normalizeCmsMediaUrl(media.large_url) ||

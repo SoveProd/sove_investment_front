@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useMemo, useState } from "react";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 
 export type ConceptCard = {
   id: string;
@@ -30,6 +31,7 @@ type Props = {
 export default function PopularConceptsClient({ tabs }: Props) {
   const [activeKey, setActiveKey] = useState(tabs[0]?.key ?? "popular");
   const [activeSlide, setActiveSlide] = useState(0);
+  const reduceMotion = useReducedMotion();
 
   const activeTab = useMemo(() => {
     return tabs.find((t) => t.key === activeKey) ?? tabs[0];
@@ -51,6 +53,16 @@ export default function PopularConceptsClient({ tabs }: Props) {
   const handleNext = () => {
     if (!items.length) return;
     setActiveSlide((prev) => (prev === items.length - 1 ? 0 : prev + 1));
+  };
+
+  const tabTransition = reduceMotion
+    ? { duration: 0 }
+    : { duration: 0.35, ease: [0.22, 1, 0.36, 1] as const };
+
+  const tabVariants = {
+    initial: { opacity: 0, y: 10, filter: "blur(4px)" },
+    animate: { opacity: 1, y: 0, filter: "blur(0px)" },
+    exit: { opacity: 0, y: -8, filter: "blur(4px)" },
   };
 
   return (
@@ -89,15 +101,26 @@ export default function PopularConceptsClient({ tabs }: Props) {
           })}
         </div>
 
-        {currentCard && (
-          <MobileConceptCard
-            card={currentCard}
-            totalSlides={items.length}
-            activeSlide={activeSlide}
-            onPrev={handlePrev}
-            onNext={handleNext}
-          />
-        )}
+        <AnimatePresence mode="wait" initial={false}>
+          {currentCard ? (
+            <motion.div
+              key={activeKey}
+              variants={tabVariants}
+              initial="initial"
+              animate="animate"
+              exit="exit"
+              transition={tabTransition}
+            >
+              <MobileConceptCard
+                card={currentCard}
+                totalSlides={items.length}
+                activeSlide={activeSlide}
+                onPrev={handlePrev}
+                onNext={handleNext}
+              />
+            </motion.div>
+          ) : null}
+        </AnimatePresence>
       </div>
 
       {/* DESKTOP */}
@@ -138,11 +161,21 @@ export default function PopularConceptsClient({ tabs }: Props) {
           </div>
         </div>
 
-        <div className="mt-8 grid gap-8 lg:grid-cols-2">
-          {activeTab.items.map((card) => (
-            <ConceptCardView key={card.id} card={card} />
-          ))}
-        </div>
+        <AnimatePresence mode="wait" initial={false}>
+          <motion.div
+            key={activeKey}
+            className="mt-8 grid gap-8 lg:grid-cols-2"
+            variants={tabVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            transition={tabTransition}
+          >
+            {activeTab.items.map((card) => (
+              <ConceptCardView key={card.id} card={card} />
+            ))}
+          </motion.div>
+        </AnimatePresence>
       </div>
     </div>
   );
@@ -166,7 +199,7 @@ function MobileConceptCard({
   return (
     <article className="mt-6 w-full">
       <div className="relative overflow-hidden rounded-[24px]">
-        <div className="relative aspect-[335/254] w-full">
+        <div className="relative aspect-335/254 w-full">
           <Image
             src={card.image.src}
             alt={card.image.alt}
@@ -263,7 +296,7 @@ function ConceptCardView({ card }: { card: ConceptCard }) {
   return (
     <article className="w-full">
       <div className="relative overflow-hidden rounded-[35px]">
-        <div className="relative aspect-[16/9] w-full">
+        <div className="relative aspect-video w-full">
           <Image
             src={card.image.src}
             alt={card.image.alt}

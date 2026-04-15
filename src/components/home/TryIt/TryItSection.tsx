@@ -7,7 +7,7 @@ import { Container } from "@/src/components/layout/Container";
 import { ArrowButton } from "@/src/components/ui/ArrowBtn";
 import { TryItCarousel } from "./TryItCarousel";
 import type { CmsBlock, CmsButton } from "@/lib/cms/types";
-import { getCmsMediaUrl } from "@/lib/cms/mediaUrl";
+import { getCmsMediaUrl, isLikelyVideoUrl } from "@/lib/cms/mediaUrl";
 
 type Props = {
   block?: CmsBlock;
@@ -27,11 +27,32 @@ function getBlockItems(block?: CmsBlock): TryItItem[] {
       ? (block.content as { items: Array<{ text?: string }> }).items
       : [];
 
-  const media = [...(block?.media || [])].sort((a, b) => {
-    const aPos = a.position ?? Number.MAX_SAFE_INTEGER;
-    const bPos = b.position ?? Number.MAX_SAFE_INTEGER;
-    return aPos - bPos;
-  });
+  // 1) Trim trailing empty texts so we don't generate tons of dots.
+  const lastNonEmptyTextIndex = (() => {
+    for (let i = contentItems.length - 1; i >= 0; i--) {
+      const t = (contentItems[i]?.text || "").trim();
+      if (t) return i;
+    }
+    return -1;
+  })();
+  const trimmedContentItems =
+    lastNonEmptyTextIndex >= 0
+      ? contentItems.slice(0, lastNonEmptyTextIndex + 1)
+      : [];
+
+  // 2) Media in CMS sometimes contains duplicates with same position.
+  // Take the newest (largest id) per position.
+  const mediaByPos = new Map<number, (NonNullable<CmsBlock["media"]>[number])>();
+  for (const m of block?.media || []) {
+    const pos = m.position ?? 0;
+    const prev = mediaByPos.get(pos);
+    if (!prev || (m.id ?? 0) > (prev.id ?? 0)) {
+      mediaByPos.set(pos, m);
+    }
+  }
+  const media = Array.from(mediaByPos.entries())
+    .sort((a, b) => a[0] - b[0])
+    .map(([, m]) => m);
 
   const fallbackItems: TryItItem[] = [
     { title: "Подрядчики", img: "/images/pathimg.jpg" },
@@ -41,20 +62,25 @@ function getBlockItems(block?: CmsBlock): TryItItem[] {
     { title: "Арендаторы", img: "/images/pathimg.jpg" },
   ];
 
-  const maxLength = Math.max(
-    contentItems.length,
-    media.length,
-    fallbackItems.length,
-  );
+  const cmsLength =
+    trimmedContentItems.length > 0 || media.length > 0
+      ? Math.max(trimmedContentItems.length, media.length)
+      : 0;
 
-  return Array.from({ length: maxLength })
+  const maxLength = cmsLength || fallbackItems.length;
+  const cappedLength = Math.min(maxLength, 5);
+
+  return Array.from({ length: cappedLength })
     .map((_, index) => ({
       title:
-        contentItems[index]?.text ||
+        trimmedContentItems[index]?.text ||
         fallbackItems[index]?.title ||
         `Item ${index + 1}`,
       img:
-        getCmsMediaUrl(media[index]) ||
+        (() => {
+          const cmsSrc = getCmsMediaUrl(media[index]);
+          return cmsSrc && !isLikelyVideoUrl(cmsSrc) ? cmsSrc : undefined;
+        })() ||
         fallbackItems[index]?.img ||
         "/images/pathimg.jpg",
     }))
@@ -97,12 +123,12 @@ export default function TryItSection({ block }: Props) {
   return (
     <section className="w-full bg-white py-[56px] sm:py-[80px] lg:py-[110px] 2xl:py-[150px]">
       <div className="lg:hidden">
-        <div className="rounded-[28px] bg-surface py-6 pl-6">
+        <div className="rounded-[28px] bg-surface pl-[clamp(16px,5vw,24px)] pr-0 py-[clamp(18px,5vw,24px)]">
           <h2 className="text-[18px] font-medium leading-[1.05] tracking-[-0.03em] text-text">
             {title}
           </h2>
 
-          <p className="mt-2 max-w-[240px] text-[11px] leading-[1.2] text-text-graphite">
+          <p className="mt-2 text-[11px] leading-[1.2] text-text-graphite">
             {description}
           </p>
 
@@ -125,16 +151,16 @@ export default function TryItSection({ block }: Props) {
             })}
           </div>
 
-          <div className="mt-4 overflow-hidden">
-            <div className="flex items-start gap-[10px]">
-              <div className="w-[263px] shrink-0">
+          <div className="mt-4 overflow-x-auto scroll-smooth md:overflow-visible [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+            <div className="flex snap-x snap-mandatory items-start gap-[10px] md:grid md:grid-cols-2 md:gap-4 md:snap-none">
+              <div className="w-[clamp(220px,78vw,263px)] shrink-0 snap-start md:w-auto md:shrink md:snap-none">
                 <div className="relative overflow-hidden rounded-[22px] bg-white">
-                  <div className="relative h-[290px] w-[263px]">
+                  <div className="relative w-full aspect-263/290">
                     <Image
                       src={items[safeActiveIndex].img}
                       alt={items[safeActiveIndex].title}
                       fill
-                      sizes="263px"
+                      sizes="(max-width: 640px) 78vw, 263px"
                       className="object-cover"
                     />
                   </div>
@@ -169,14 +195,14 @@ export default function TryItSection({ block }: Props) {
                 </div>
               </div>
 
-              <div className="w-[264px] shrink-0">
+              <div className="w-[clamp(220px,78vw,264px)] shrink-0 snap-start md:w-auto md:shrink md:snap-none">
                 <div className="relative overflow-hidden rounded-[22px] bg-white">
-                  <div className="relative h-[356px] w-[264px]">
+                  <div className="relative w-full aspect-264/356">
                     <Image
                       src={items[nextIndex].img}
                       alt={items[nextIndex].title}
                       fill
-                      sizes="264px"
+                      sizes="(max-width: 640px) 78vw, 264px"
                       className="object-cover"
                     />
                   </div>
@@ -186,7 +212,11 @@ export default function TryItSection({ block }: Props) {
           </div>
 
           <div className="mt-6">
-            <ArrowButton label={buttonLabel} href="#" />
+            <ArrowButton
+              label={buttonLabel}
+              href="#"
+              size="compact"
+            />
           </div>
         </div>
       </div>
@@ -224,12 +254,16 @@ export default function TryItSection({ block }: Props) {
               </div>
 
               <div className="mt-10 lg:mt-12 2xl:mt-16">
-                <h2 className="text-[30px] font-medium tracking-tight text-text sm:text-[34px] lg:text-[34px] 2xl:text-[56px]">
+                <h2 className="text-[30px] tracking-tight text-text sm:text-[34px] lg:text-[34px] 2xl:text-[45px]">
                   {title}
                 </h2>
 
                 <div className="mt-5 2xl:mt-6">
-                  <ArrowButton label={buttonLabel} href="#" />
+                  <ArrowButton
+                    label={buttonLabel}
+                    href="#"
+                    size="compact"
+                  />
                 </div>
               </div>
             </div>

@@ -1,7 +1,7 @@
 "use client";
 
 import type { CmsBlock } from "@/lib/cms/types";
-import { getCmsMediaUrl } from "@/lib/cms/mediaUrl";
+import { getCmsMediaUrl, isLikelyVideoUrl } from "@/lib/cms/mediaUrl";
 import { CtaBanner } from "@/src/components/home/CtaBanner/CtaBanner";
 import { usePublishedHomepageBlock } from "@/src/components/home/hooks/usePublishedHomepageBlock";
 
@@ -19,13 +19,16 @@ export function RequestsLiveBanner({ initialBlock }: Props) {
   const block = usePublishedHomepageBlock({
     blockType: "requests:main",
     initialBlock,
-    refreshIntervalMs: 4000,
+    refreshIntervalMs: 0,
   });
+
+  const cmsBgSrc = block?.media?.[0] ? getCmsMediaUrl(block.media[0]) || undefined : undefined;
+  const bgSrc = cmsBgSrc && !isLikelyVideoUrl(cmsBgSrc) ? cmsBgSrc : undefined;
 
   return (
     <CtaBanner
       title={block?.title || undefined}
-      bgSrc={block?.media?.[0] ? getCmsMediaUrl(block.media[0]) || undefined : undefined}
+      bgSrc={bgSrc}
       primaryButtonLabel={getButtonLabel(block, 0)}
       secondaryButtonLabel={block?.subtitle || undefined}
     />

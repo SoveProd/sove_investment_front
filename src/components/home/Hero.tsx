@@ -3,11 +3,31 @@ import { Container } from "@/src/components/layout/Container";
 import { Button } from "@/src/components/ui/Button";
 import { Reveal } from "@/src/components/ui/Reveal";
 import type { CmsHeroBlock, CmsButton } from "@/lib/cms/types";
-import { getCmsMediaUrl } from "@/lib/cms/mediaUrl";
+import { getCmsMediaUrl, normalizeCmsMediaUrl } from "@/lib/cms/mediaUrl";
 
 type Props = {
   block?: CmsHeroBlock;
 };
+
+function isVideoMedia(
+  mediaUrl?: string,
+  fileName?: string | null,
+  fileType?: string | null,
+) {
+  const type = (fileType || "").toLowerCase();
+  if (type.startsWith("video/")) return true;
+
+  const name = (fileName || mediaUrl || "").toLowerCase();
+
+  return (
+    name.endsWith(".mp4") ||
+    name.endsWith(".webm") ||
+    name.endsWith(".mov") ||
+    name.endsWith(".m4v") ||
+    name.endsWith(".ogg") ||
+    name.endsWith(".ogv")
+  );
+}
 
 export function Hero({ block }: Props) {
   const title = block?.title || "SOVE. PROPTECH\nPLATFORM & DESIGN.";
@@ -15,7 +35,20 @@ export function Hero({ block }: Props) {
     block?.text ||
     "Инвестиционный ремонт по новым правилам. Технологии, прозрачность, контроль.";
 
-  const mediaSrc = getCmsMediaUrl(block?.media?.[0]) || "/images/hero.jpg";
+  const heroMedia = block?.media?.[0] ?? null;
+  const mediaSrc = getCmsMediaUrl(heroMedia) || "/images/hero.jpg";
+
+  const isVideo = isVideoMedia(
+    mediaSrc,
+    heroMedia?.file_name ?? null,
+    heroMedia?.file_type ?? null,
+  );
+
+  const videoPoster =
+    normalizeCmsMediaUrl(heroMedia?.thumbnail_url) ||
+    normalizeCmsMediaUrl(heroMedia?.medium_url) ||
+    normalizeCmsMediaUrl(heroMedia?.large_url) ||
+    undefined;
 
   const buttons: CmsButton[] = Array.isArray(block?.button)
     ? block.button
@@ -24,54 +57,71 @@ export function Hero({ block }: Props) {
       : [];
 
   const primaryButtonLabel =
-    buttons.find((btn) => btn.position === 0)?.name || "НАЧАТЬ ИНВЕСТ-РЕМОНТ";
+    block?.primary_button_label ||
+    buttons.find((btn) => btn.position === 0)?.name ||
+    "ПРЕДЗАПИСЬ";
 
   const secondaryButtonLabel =
-    buttons.find((btn) => btn.position === 1)?.name || "ПОСМОТРЕТЬ КОНЦЕПЦИИ";
+    block?.secondary_button_label ||
+    buttons.find((btn) => btn.position === 1)?.name ||
+    "ГОТОВЫЕ ИНТЕРЬЕРНЫЕ РЕШЕНИЯ";
 
   return (
     <section className="relative min-h-screen overflow-hidden">
       <div className="absolute inset-0">
-        <Image
-          src={mediaSrc}
-          alt={title}
-          fill
-          priority
-          unoptimized
-          className="object-cover"
-          sizes="100vw"
-        />
+        {isVideo ? (
+          <video
+            className="h-full w-full object-cover"
+            src={mediaSrc}
+            poster={videoPoster}
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="metadata"
+          />
+        ) : (
+          <Image
+            src={mediaSrc}
+            alt={title}
+            fill
+            priority
+            unoptimized
+            className="object-cover"
+            sizes="100vw"
+          />
+        )}
 
-        <div className="absolute inset-0 bg-black/25" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/15 to-transparent" />
+        <div className="absolute inset-0 bg-black/30" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/20 to-black/10" />
       </div>
 
-      <Container className="relative z-10 flex min-h-screen items-end pb-12 sm:pb-14 lg:pb-16">
-        <div className="grid w-full items-end gap-10 lg:grid-cols-12">
-          <div className="lg:col-span-7">
+      <Container className="relative z-10 flex min-h-screen items-end pb-12 sm:pb-12 lg:pb-22">
+        <div className="flex w-full flex-col gap-8 lg:flex-row lg:items-end lg:justify-between lg:gap-8">
+          <div className="w-full max-w-[1040px] flex-1">
             <Reveal delay={0}>
-              <h1 className="whitespace-pre-line font-light leading-[1.02] tracking-wide text-white text-[34px] sm:text-[44px] lg:text-[52px] xl:text-[60px]">
+              <h1 className="whitespace-pre-line uppercase font-light leading-[0.98] tracking-[-0.02em] text-white text-[34px] sm:text-[42px] lg:text-[48px] xl:text-[55px]">
                 {title}
               </h1>
             </Reveal>
 
             <Reveal delay={0.12}>
-              <p className="mt-4 max-w-[620px] leading-relaxed text-white/75 text-[12px] sm:text-[13px] lg:text-[13px] xl:text-[14px]">
+              <p className="mt-4 max-w-[860px] text-white/85 font-normal leading-[1.3] text-[16px] sm:text-[18px] lg:text-[20px] xl:text-[23px] normal-case">
                 {text}
               </p>
             </Reveal>
           </div>
 
-          <div className="lg:col-span-5 lg:flex lg:justify-end">
-            <div className="flex w-full flex-col gap-3 sm:gap-4 sm:max-w-[420px]">
+          <div className="w-full lg:w-[561px] lg:flex-shrink-0">
+            <div className="flex w-full flex-col gap-3 sm:gap-4 max-w-[561px]">
               <Reveal delay={0.22}>
                 <Button
                   href="/packages"
                   variant="primary"
-                  size="md"
+                  size="lg"
                   fullWidth
                   maxWidth={false}
-                  className="rounded-full"
+                  className="w-full max-w-[561px]"
                 >
                   {primaryButtonLabel}
                 </Button>
@@ -81,10 +131,10 @@ export function Hero({ block }: Props) {
                 <Button
                   href="/concepts"
                   variant="outlineDark"
-                  size="md"
+                  size="lg"
                   fullWidth
                   maxWidth={false}
-                  className="rounded-full border-white/40 hover:border-white/70"
+                  className="w-full max-w-[561px]"
                 >
                   {secondaryButtonLabel}
                 </Button>

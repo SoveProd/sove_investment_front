@@ -49,9 +49,11 @@ const testimonials: Testimonial[] = [
 function clampRating(value: unknown): 1 | 2 | 3 | 4 | 5 {
   const n = typeof value === "number" ? value : Number(value);
   if (!Number.isFinite(n)) return 5;
+
   const rounded = Math.round(n);
   if (rounded <= 1) return 1;
   if (rounded >= 5) return 5;
+
   return rounded as 2 | 3 | 4;
 }
 
@@ -88,7 +90,7 @@ function mapReviewsBlockToTestimonials(block?: CmsBlock): Testimonial[] {
 
 function Stars({ rating }: { rating: number }) {
   return (
-    <div className="flex items-center gap-1">
+    <div className="flex items-center gap-[2px]">
       {Array.from({ length: 5 }).map((_, i) => {
         const filled = i < rating;
 
@@ -96,13 +98,24 @@ function Stars({ rating }: { rating: number }) {
           <span
             key={i}
             className={[
-              "leading-none",
-              "text-[18px]",
-              filled ? "text-primary" : "text-borderSoft",
+              "inline-flex h-[35px] w-[35px] items-center justify-center",
             ].join(" ")}
             aria-hidden="true"
           >
-            ★
+            <span
+              className="block h-[35px] w-[35px]"
+              style={{
+                backgroundColor: filled ? "#A85B3B" : "#D8D1CC",
+                WebkitMaskImage: "url(/icons/Star.svg)",
+                maskImage: "url(/icons/Star.svg)",
+                WebkitMaskRepeat: "no-repeat",
+                maskRepeat: "no-repeat",
+                WebkitMaskPosition: "center",
+                maskPosition: "center",
+                WebkitMaskSize: "contain",
+                maskSize: "contain",
+              }}
+            />
           </span>
         );
       })}
@@ -111,9 +124,6 @@ function Stars({ rating }: { rating: number }) {
 }
 
 function TestimonialShape() {
-  const fill = "var(--color-surface)";
-  const stroke = "var(--color-border)";
-
   return (
     <svg
       viewBox="0 0 419 470"
@@ -123,14 +133,13 @@ function TestimonialShape() {
     >
       <path
         d="M0 30C0 13.4315 13.4315 0 30 0H302C318.569 0 332 13.4315 332 30V41C332 66.4051 352.595 87 378 87H389C405.569 87 419 100.431 419 117V440C419 456.569 405.569 470 389 470H30C13.4315 470 0 456.569 0 440V30Z"
-        fill={fill}
-        stroke={stroke}
-        strokeWidth="1"
+        fill="#F7F7F7"
       />
     </svg>
   );
 }
 
+// (ReviewButton removed: unused)
 function TestimonialCard({
   data,
   mobile = false,
@@ -146,21 +155,20 @@ function TestimonialCard({
       ].join(" ")}
     >
       <div
-        className={[
-          "relative w-full",
-          mobile ? "h-[372px]" : "h-[440px] sm:h-[470px]",
-        ].join(" ")}
+        className={["relative w-full", mobile ? "h-[372px]" : "h-[470px]"].join(
+          " ",
+        )}
       >
         <TestimonialShape />
 
         <button
           type="button"
           className={[
-            "absolute z-3",
-            "top-0 right-0",
+            "absolute z-[3] top-0 right-0",
+            "cursor-pointer",
             mobile
-              ? "grid h-[58px] w-[58px] place-items-center rounded-full bg-white shadow-[0_8px_24px_rgba(0,0,0,0.10)] border border-border"
-              : "grid h-[70px] w-[70px] place-items-center rounded-full bg-white shadow-[0_10px_30px_rgba(0,0,0,0.10)] border border-border",
+              ? "grid h-[58px] w-[58px] place-items-center rounded-full bg-[#F1F1F1] shadow-[0_8px_24px_rgba(0,0,0,0.10)]"
+              : "grid h-[70px] w-[70px] place-items-center rounded-full bg-[#F1F1F1] shadow-[0_10px_30px_rgba(0,0,0,0.10)]",
           ].join(" ")}
           aria-label="Открыть отзыв"
         >
@@ -174,69 +182,43 @@ function TestimonialCard({
 
         <div
           className={[
-            "relative z-2",
-            mobile ? "px-5 py-5" : "px-6 py-7 sm:px-8 sm:py-8",
+            "relative z-[2] h-full flex flex-col",
+            // Match design: 34px from top/left to name block
+            mobile ? "pl-[34px] pt-[34px] pr-5 pb-5" : "pl-[34px] pt-[34px] pr-8 pb-8",
           ].join(" ")}
         >
-          <div className="flex items-start justify-between gap-4">
-            <div>
-              <div
-                className={[
-                  "font-medium text-text",
-                  mobile ? "text-[16px]" : "text-[20px] sm:text-[22px]",
-                ].join(" ")}
-              >
-                {data.name}
-              </div>
-
-              <div className={mobile ? "mt-3" : "mt-3"}>
-                <Stars rating={data.rating} />
-              </div>
-
-              <div
-                className={[
-                  "text-textSecondary",
-                  mobile ? "mt-3 text-[11px]" : "mt-3 text-[12px]",
-                ].join(" ")}
-              >
-                {data.date}
-              </div>
+          <div className="flex-1 pr-[60px] flex flex-col ">
+            <div className="text-[28px] font-medium leading-[1.1] text-[#202020]">
+              {data.name}
             </div>
 
-            <div
-              className={mobile ? "w-[46px]" : "w-[60px]"}
-              aria-hidden="true"
-            />
+            <div className="mt-3">
+              <Stars rating={data.rating} />
+            </div>
+
+            <div className="mt-3 text-[18px] leading-[1.2] text-[#B9B9B9]">
+              {data.date}
+            </div>
           </div>
 
-          <div
-            className={[
-              "w-full border-t border-dashed border-borderSoft",
-              mobile ? "mt-6" : "mt-7 sm:mt-8",
-            ].join(" ")}
-          />
+          <div className="w-full border-t border-dashed border-[#D8D8D8]" />
 
-          <p
-            className={[
-              "text-textSecondary",
-              mobile
-                ? "mt-5 text-[12px] leading-[1.45]"
-                : "mt-6 sm:mt-8 text-[13px] leading-[1.6]",
-            ].join(" ")}
-          >
-            {data.text}
-          </p>
+          <div className="flex-1 flex items-center">
+            <p className="text-[18px] leading-[1.25] text-[#2C2C2C]">
+              {data.text}
+            </p>
+          </div>
         </div>
       </div>
     </article>
   );
 }
-
 export function TestimonialsSection() {
   const block = usePublishedHomepageBlock({
     blockType: "reviews:main",
-    refreshIntervalMs: 4000,
+    refreshIntervalMs: 0,
   });
+
   const mobileTrackRef = useRef<HTMLDivElement | null>(null);
   const desktopTrackRef = useRef<HTMLDivElement | null>(null);
 
@@ -252,6 +234,7 @@ export function TestimonialsSection() {
   useEffect(() => {
     const calc = () => {
       const w = window.innerWidth;
+
       if (w >= 1280) setPerView(3);
       else if (w >= 1024) setPerView(2);
       else setPerView(1);
@@ -259,6 +242,7 @@ export function TestimonialsSection() {
 
     calc();
     window.addEventListener("resize", calc);
+
     return () => window.removeEventListener("resize", calc);
   }, []);
 
@@ -360,16 +344,15 @@ export function TestimonialsSection() {
   const isDesktopSlider = perView >= 2;
 
   return (
-    <section className="w-full bg-bg py-[70px] lg:py-[120px]">
+    <section className="w-full bg-[#ECECEC] py-[70px] lg:py-[120px]">
       <Container>
-        {/* MOBILE */}
         <div className="lg:hidden">
-          <h2 className="text-center text-[24px] font-medium leading-[1.1] tracking-[-0.02em] text-text">
+          <h2 className="text-center text-[24px] font-medium leading-[1.08] tracking-[-0.02em] text-[#202020]">
             {block?.title || (
               <>
                 Что о нас
                 <br />
-                думаютнаши клиенты
+                думают наши клиенты
               </>
             )}
           </h2>
@@ -393,7 +376,7 @@ export function TestimonialsSection() {
               type="button"
               onClick={handlePrev}
               disabled={safeMobileIndex === 0}
-              className="grid h-[30px] w-[78px] place-items-center rounded-full bg-graphite transition disabled:opacity-40 disabled:cursor-not-allowed"
+              className="grid h-[30px] w-[78px] place-items-center rounded-full bg-[#2A2A2A] transition disabled:cursor-not-allowed disabled:opacity-40"
               aria-label="Назад"
             >
               <span className="text-[18px] leading-none text-white">←</span>
@@ -403,7 +386,7 @@ export function TestimonialsSection() {
               type="button"
               onClick={handleNext}
               disabled={safeMobileIndex >= items.length - 1}
-              className="grid h-[30px] w-[78px] place-items-center rounded-full bg-[#F1F1F1] transition disabled:opacity-40 disabled:cursor-not-allowed"
+              className="grid h-[30px] w-[78px] place-items-center rounded-full bg-[#F1F1F1] transition disabled:cursor-not-allowed disabled:opacity-40"
               aria-label="Вперёд"
             >
               <span className="text-[18px] leading-none text-[#D4D4D4]">→</span>
@@ -411,10 +394,9 @@ export function TestimonialsSection() {
           </div>
         </div>
 
-        {/* DESKTOP */}
         <div className="hidden lg:block">
           <div className="flex items-center justify-between gap-6">
-            <h2 className="text-[46px] font-medium tracking-[-0.02em] text-text max-lg:text-[28px]">
+            <h2 className="text-[46px] font-medium tracking-[-0.02em] text-[#202020] max-lg:text-[28px]">
               {block?.title || "Что о нас думают наши клиенты"}
             </h2>
 
@@ -423,20 +405,20 @@ export function TestimonialsSection() {
                 type="button"
                 onClick={handlePrev}
                 disabled={!isDesktopSlider || safeDesktopIndex === 0}
-                className="grid h-[44px] w-[66px] place-items-center rounded-full border border-border bg-white transition hover:bg-surfaceAlt disabled:opacity-40 disabled:cursor-not-allowed"
+                className="grid h-[44px] w-[66px] place-items-center rounded-full border border-[#D8D8D8] bg-white transition hover:bg-[#F5F5F5] disabled:cursor-not-allowed disabled:opacity-40"
                 aria-label="Назад"
               >
-                <span className="text-[18px]">←</span>
+                <span className="text-[18px] text-[#2A2A2A]">←</span>
               </button>
 
               <button
                 type="button"
                 onClick={handleNext}
                 disabled={!isDesktopSlider || safeDesktopIndex >= maxIndex}
-                className="grid h-[44px] w-[66px] place-items-center rounded-full bg-graphite transition hover:opacity-95 disabled:opacity-40 disabled:cursor-not-allowed"
+                className="grid h-[44px] w-[66px] place-items-center rounded-full bg-[#2A2A2A] transition hover:opacity-95 disabled:cursor-not-allowed disabled:opacity-40"
                 aria-label="Вперёд"
               >
-                <span className="text-[18px] text-primary">→</span>
+                <span className="text-[18px] text-white">→</span>
               </button>
             </div>
           </div>

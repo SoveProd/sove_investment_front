@@ -59,7 +59,7 @@ export function SoveGroupBlockEditor({
   return (
     <AdminSectionCard title='Блок "SOVE GROUP"'>
       <div className="space-y-4 p-4">
-        <div className="grid gap-4 xl:grid-cols-[1fr_1fr_420px]">
+        <div className="grid items-start gap-4 xl:grid-cols-[1fr_1fr_420px]">
           <div className="space-y-4">
             {value.zones.map((zone) => (
               <AdminTextareaField
@@ -90,7 +90,7 @@ export function SoveGroupBlockEditor({
             ))}
           </div>
 
-          <div className="pt-[30px]">
+          <div className="self-start">
             <AdminMediaField
               label="Фото"
               fileName={value.fileName}

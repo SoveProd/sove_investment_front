@@ -3,7 +3,7 @@ import Link from "next/link";
 import { Container } from "../layout/Container";
 import { ArrowButton } from "../ui/ArrowBtn";
 import type { CmsBlock, CmsButton } from "@/lib/cms/types";
-import { getCmsMediaUrl } from "@/lib/cms/mediaUrl";
+import { getCmsMediaUrl, isLikelyVideoUrl } from "@/lib/cms/mediaUrl";
 
 type Props = {
   block?: CmsBlock;
@@ -55,7 +55,10 @@ export function FindYourPathSection({ block }: Props) {
           title:
             item.text || fallbackItems[index]?.title || `Карточка ${index + 1}`,
           img:
-            getCmsMediaUrl(media[index]) ||
+            (() => {
+              const cmsSrc = getCmsMediaUrl(media[index]);
+              return cmsSrc && !isLikelyVideoUrl(cmsSrc) ? cmsSrc : undefined;
+            })() ||
             fallbackItems[index]?.img ||
             "/images/pathimg.jpg",
           href: item.href || "#",
@@ -66,12 +69,12 @@ export function FindYourPathSection({ block }: Props) {
     <section className="w-full bg-bg py-[56px] sm:py-[80px] lg:py-[110px] 2xl:py-[150px]">
       <Container>
         <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
-          <div className="max-w-[920px]">
-            <h2 className="font-medium tracking-[-0.02em] text-dark text-[34px] leading-[0.95] sm:text-[38px] lg:text-[40px] 2xl:text-[55px]">
+          <div className="max-w-[1800px]">
+            <h2 className="font-medium tracking-[-0.02em] text-dark text-[34px] leading-[0.95] sm:text-[38px] lg:text-[40px] 2xl:text-[50px]">
               {title}
             </h2>
 
-            <p className="mt-3 max-w-[760px] text-text text-[14px] leading-[1.35] sm:text-[16px] lg:text-[16px] 2xl:text-[18px]">
+            <p className="mt-3 max-w-[1800px] text-text text-[14px] leading-[1.35] sm:text-[16px] lg:text-[16px] 2xl:text-[23px]">
               {description}
             </p>
           </div>

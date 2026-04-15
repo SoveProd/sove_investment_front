@@ -9,7 +9,7 @@ type MakeWithSoveBlockEditorProps = {
   onTitleBlur?: () => void;
   onDescriptionBlur?: () => void;
   onButtonBlur?: () => void;
-  onItemTextBlur?: () => void;
+  onItemTextBlur?: (nextValue?: RepeatableFeatureBlockData) => void;
   onMediaUpload?: (id: number, file: File) => void | Promise<void>;
   onMediaRemove?: (id: number) => void | Promise<void>;
   isSaving?: boolean;

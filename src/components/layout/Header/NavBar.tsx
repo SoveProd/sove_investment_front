@@ -24,6 +24,7 @@ export function NavBar({ variant = "transparent" }: Props) {
   const pathname = usePathname();
 
   const [scrolled, setScrolled] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 10);
@@ -31,6 +32,12 @@ export function NavBar({ variant = "transparent" }: Props) {
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
+
+  useEffect(() => {
+    // Close mobile menu on navigation (only if it was open).
+    if (isMenuOpen) setIsMenuOpen(false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pathname]);
 
   const isLight = variant === "light";
   const isDark = variant === "dark";
@@ -70,7 +77,7 @@ export function NavBar({ variant = "transparent" }: Props) {
       <div className={`absolute inset-x-0 bottom-0 h-px ${lineColor}`} />
 
       <Container>
-        <div className="flex items-center justify-between py-[22px] md:py-[28px]">
+        <div className="flex items-center justify-between py-[18px] md:py-[28px]">
           {/* Logo */}
           <Link
             href="/"
@@ -83,6 +90,7 @@ export function NavBar({ variant = "transparent" }: Props) {
               width={300}
               height={100}
               priority
+              className="h-auto w-[170px] sm:w-[220px] md:w-[260px]"
             />
           </Link>
 
@@ -118,9 +126,13 @@ export function NavBar({ variant = "transparent" }: Props) {
             {/* Burger */}
             <button
               type="button"
-              aria-label="Открыть меню"
+              aria-label={isMenuOpen ? "Закрыть меню" : "Открыть меню"}
+              aria-expanded={isMenuOpen}
+              aria-controls="mobile-nav"
+              onClick={() => setIsMenuOpen((v) => !v)}
               className={[
                 "inline-flex h-10 w-10 items-center justify-center rounded-full transition",
+                "cursor-pointer",
                 iconColor,
                 burgerHover,
               ].join(" ")}
@@ -135,6 +147,48 @@ export function NavBar({ variant = "transparent" }: Props) {
           </div>
         </div>
       </Container>
+
+      {/* Mobile menu */}
+      <div
+        id="mobile-nav"
+        className={[
+          "md:hidden",
+          "overflow-hidden transition-[max-height,opacity] duration-200",
+          isMenuOpen ? "max-h-[520px] opacity-100" : "max-h-0 opacity-0",
+        ].join(" ")}
+      >
+        <div className={`mx-auto w-full max-w-7xl px-4 pb-6 sm:px-6 ${isLight ? "text-black" : "text-white"}`}>
+          <nav aria-label="Мобильная навигация">
+            <ul className="flex flex-col gap-2">
+              {NAV_ITEMS.map((item) => {
+                const isActive =
+                  pathname === item.href || pathname.startsWith(item.href + "/");
+
+                return (
+                  <li key={item.href}>
+                    <Link
+                      href={item.href}
+                      className={[
+                        "block rounded-[14px] px-4 py-3 text-[16px] transition",
+                        isLight ? "hover:bg-black/5" : "hover:bg-white/10",
+                        isActive
+                          ? isLight
+                            ? "bg-black/5 text-black"
+                            : "bg-white/10 text-white"
+                          : isLight
+                            ? "text-black/80"
+                            : "text-white/85",
+                      ].join(" ")}
+                    >
+                      {item.label}
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          </nav>
+        </div>
+      </div>
     </header>
   );
 }

@@ -1,8 +1,7 @@
 "use client";
 
-import { Container } from "@/src/components/layout/Container";
 import Image from "next/image";
-import React, {
+import {
   useCallback,
   useEffect,
   useMemo,
@@ -35,6 +34,8 @@ export default function RealEstateClient({
   items,
   className = "",
 }: RealEstateClientProps) {
+  const TRACK_SIDE_PADDING_PX = 18;
+
   const trackRef = useRef<HTMLDivElement | null>(null);
   const viewportRef = useRef<HTMLDivElement | null>(null);
   const slideRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -49,11 +50,15 @@ export default function RealEstateClient({
   const [stepPx, setStepPx] = useState<number>(0);
   const [slideWidth, setSlideWidth] = useState<number>(0);
   const [viewportWidth, setViewportWidth] = useState<number>(0);
+  const [isDragging, setIsDragging] = useState(false);
 
   const isDraggingRef = useRef(false);
   const startXRef = useRef(0);
   const deltaXRef = useRef(0);
   const pointerIdRef = useRef<number | null>(null);
+  const rafRef = useRef<number | null>(null);
+  const pendingDxRef = useRef(0);
+  const baseTranslateRef = useRef(0);
 
   const maxIndex = Math.max(0, items.length - 1);
 
@@ -62,6 +67,9 @@ export default function RealEstateClient({
   }, [initialActive]);
 
   const measure = useCallback(() => {
+    // During drag, measuring causes state updates that fight with pointer-driven transforms.
+    if (isDraggingRef.current) return;
+
     const vp = viewportRef.current;
     const first = slideRefs.current[0];
     const second = slideRefs.current[1];
@@ -95,6 +103,24 @@ export default function RealEstateClient({
     return () => window.removeEventListener("resize", onResize);
   }, [measure]);
 
+  useEffect(() => {
+    const vp = viewportRef.current;
+    const first = slideRefs.current[0];
+    if (!vp && !first) return;
+
+    const ro = new ResizeObserver(() => measure());
+    if (vp) ro.observe(vp);
+    if (first) ro.observe(first);
+
+    return () => ro.disconnect();
+  }, [measure, items.length]);
+
+  useEffect(() => {
+    return () => {
+      if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
+    };
+  }, []);
+
   const canGoPrev = active > 0;
   const canGoNext = active < maxIndex;
 
@@ -122,39 +148,52 @@ export default function RealEstateClient({
     const centerOffset =
       viewportWidth && slideWidth ? (viewportWidth - slideWidth) / 2 : 0;
 
-    return centerOffset - active * stepPx;
+    // Track has explicit side padding, account for it when centering slides.
+    return centerOffset - TRACK_SIDE_PADDING_PX - active * stepPx;
   }, [active, stepPx, viewportWidth, slideWidth]);
 
-  const getCurrentTranslate = () => {
-    if (!isDraggingRef.current) return baseTranslate;
-    return baseTranslate + deltaXRef.current;
-  };
+  useEffect(() => {
+    baseTranslateRef.current = baseTranslate;
+  }, [baseTranslate]);
 
   const setTrackTransform = useCallback(() => {
     const track = trackRef.current;
     if (!track) return;
 
-    const x = getCurrentTranslate();
+    const base = baseTranslateRef.current;
+    const x = isDraggingRef.current ? base + deltaXRef.current : base;
     track.style.transform = `translate3d(${x}px, 0, 0)`;
-  }, [baseTranslate]);
+  }, []);
 
   useEffect(() => {
     const track = trackRef.current;
     if (!track) return;
 
+    // While dragging, pointer events control transform (no snapping).
+    if (isDraggingRef.current) return;
+
     track.style.transition = "transform 320ms cubic-bezier(0.22, 1, 0.36, 1)";
-    track.style.transform = `translate3d(${baseTranslate}px, 0, 0)`;
+    track.style.transform = `translate3d(${baseTranslateRef.current}px, 0, 0)`;
   }, [baseTranslate]);
 
   const onPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
     if (!viewportRef.current) return;
+    if (e.pointerType === "mouse" && e.button !== 0) return;
+
+    // Don't start dragging when interacting with controls (arrows / dots).
+    const target = e.target as HTMLElement | null;
+    if (target?.closest?.('[data-carousel-control="true"]')) return;
+
+    e.preventDefault();
 
     pointerIdRef.current = e.pointerId;
     viewportRef.current.setPointerCapture(e.pointerId);
 
     isDraggingRef.current = true;
+    setIsDragging(true);
     startXRef.current = e.clientX;
     deltaXRef.current = 0;
+    pendingDxRef.current = 0;
 
     const track = trackRef.current;
     if (track) track.style.transition = "none";
@@ -163,19 +202,30 @@ export default function RealEstateClient({
   const onPointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
     if (!isDraggingRef.current) return;
 
+    e.preventDefault();
     const dx = e.clientX - startXRef.current;
 
     const resistance =
       (active === 0 && dx > 0) || (active === maxIndex && dx < 0) ? 0.35 : 1;
 
-    deltaXRef.current = dx * resistance;
-    setTrackTransform();
+    const raw = dx * resistance;
+    // Prevent huge drags from producing wild transforms (common on trackpads).
+    const limit = stepPx ? stepPx * 1.25 : 320;
+    pendingDxRef.current = clamp(raw, -limit, limit);
+
+    if (rafRef.current !== null) return;
+    rafRef.current = requestAnimationFrame(() => {
+      rafRef.current = null;
+      deltaXRef.current = pendingDxRef.current;
+      setTrackTransform();
+    });
   };
 
   const finishDrag = () => {
     if (!isDraggingRef.current) return;
 
     isDraggingRef.current = false;
+    setIsDragging(false);
 
     const dx = deltaXRef.current;
     deltaXRef.current = 0;
@@ -222,6 +272,12 @@ export default function RealEstateClient({
     finishDrag();
   };
 
+  const onPointerLeave = () => {
+    if (!isDraggingRef.current) return;
+    pointerIdRef.current = null;
+    finishDrag();
+  };
+
   return (
     <section
       className={["w-full rounded-[28px] bg-white  py-20 ", className].join(
@@ -248,7 +304,8 @@ export default function RealEstateClient({
           onPointerMove={onPointerMove}
           onPointerUp={onPointerUp}
           onPointerCancel={onPointerCancel}
-          style={{ touchAction: "pan-y", cursor: "grab" }}
+          onPointerLeave={onPointerLeave}
+          style={{ touchAction: "pan-y", cursor: isDragging ? "grabbing" : "grab" }}
         >
           {/* Track */}
           <div
@@ -256,8 +313,8 @@ export default function RealEstateClient({
             className="flex items-stretch gap-6"
             style={{
               willChange: "transform",
-              paddingLeft: "18px",
-              paddingRight: "18px",
+              paddingLeft: `${TRACK_SIDE_PADDING_PX}px`,
+              paddingRight: `${TRACK_SIDE_PADDING_PX}px`,
             }}
           >
             {items.map((it, idx) => (
@@ -277,7 +334,7 @@ export default function RealEstateClient({
                   fill
                   priority={idx === active}
                   className="object-cover"
-                  sizes="(max-width: 640px) 78vw, (max-width: 1024px) 66vw, 760px"
+                  sizes="(max-width: 640px) 78vw, (max-width: 1024px) 66vw, 1161px"
                 />
 
                 <div className="absolute inset-0 bg-black/10" />
@@ -302,6 +359,8 @@ export default function RealEstateClient({
             aria-label="Previous slide"
             onClick={goPrev}
             disabled={!canGoPrev}
+            data-carousel-control="true"
+            onPointerDown={(e) => e.stopPropagation()}
             className={[
               "absolute left-4 top-1/2 -translate-y-1/2",
               "h-10 w-10 rounded-full bg-white/90 shadow-md backdrop-blur",
@@ -317,6 +376,8 @@ export default function RealEstateClient({
             aria-label="Next slide"
             onClick={goNext}
             disabled={!canGoNext}
+            data-carousel-control="true"
+            onPointerDown={(e) => e.stopPropagation()}
             className={[
               "absolute right-4 top-1/2 -translate-y-1/2",
               "h-10 w-10 rounded-full bg-white/90 shadow-md backdrop-blur",
@@ -338,6 +399,8 @@ export default function RealEstateClient({
                 type="button"
                 aria-label={`Go to slide ${idx + 1}`}
                 onClick={() => goTo(idx)}
+                data-carousel-control="true"
+                onPointerDown={(e) => e.stopPropagation()}
                 className={[
                   "h-2 rounded-full transition-all",
                   isActive ? "w-8 bg-neutral-900" : "w-2 bg-neutral-300",

@@ -162,7 +162,9 @@ export const initialWeTakeCareBlock: MediaListBlockData = {
 };
 
 export const initialCapitalizedTextBlock: TextButtonBlockData = {
-  text: "",
+  grayTextTop: "",
+  blackTextMain: "",
+  grayTextBottom: "",
   buttonLabel: "",
 };
 

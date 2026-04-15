@@ -1,25 +1,22 @@
 import Image from "next/image";
-import Link from "next/link";
 import { Container } from "../layout/Container";
 import type { CmsMetricsBlock, CmsMetricsContent } from "@/lib/cms/types";
-import { getCmsMediaUrl } from "@/lib/cms/mediaUrl";
-
-type NotchSide = "br" | "bl";
+import { getCmsMediaUrl, isLikelyVideoUrl } from "@/lib/cms/mediaUrl";
 
 type StatNotchedCardProps = {
   value: string;
   label: string;
-  notchSide: NotchSide;
   variant?: "dark" | "light";
   withArrow?: boolean;
+  arrowTone?: "default" | "muted";
 };
 
 function StatNotchedCard({
   value,
   label,
-  notchSide,
   variant = "dark",
   withArrow = true,
+  arrowTone = "muted",
 }: StatNotchedCardProps) {
   const isDark = variant === "dark";
 
@@ -27,29 +24,24 @@ function StatNotchedCard({
   const textClass = isDark ? "text-white" : "text-text";
   const labelClass = isDark ? "text-white/80" : "text-text-secondary";
 
-  const pathBR =
+  // Shape from `public/objects/Rectangle.svg` (notch bottom-right).
+  const rectPath =
     "M0 35C0 15.67 15.67 0 35 0H387C406.33 0 422 15.67 422 35V263C422 282.33 406.33 298 387 298H380C352.938 298 331 319.938 331 347V354C331 373.33 315.33 389 296 389H35C15.67 389 0 373.33 0 354V35Z";
 
-  const pathBL =
-    "M422 35C422 15.67 406.33 0 387 0H35C15.67 0 0 15.67 0 35V263C0 282.33 15.67 298 35 298H42C69.062 298 91 319.938 91 347V354C91 373.33 106.67 389 126 389H387C406.33 389 422 373.33 422 354V35Z";
-
-  const arrowPos =
-    notchSide === "br"
-      ? "absolute z-[3] bottom-2 right-2 sm:bottom-3 sm:right-3"
-      : "absolute z-[3] bottom-2 left-2 sm:bottom-3 sm:left-3";
+  const arrowPos = "absolute z-10 bottom-2 right-2 sm:bottom-3 sm:right-3";
 
   return (
-    <div className="relative h-full w-full overflow-hidden">
+    <div className="relative h-full w-full overflow-hidden rounded-[22px]">
       <svg
         viewBox="0 0 422 389"
         className="absolute inset-0 h-full w-full"
         aria-hidden="true"
-        preserveAspectRatio="none"
+        preserveAspectRatio="xMidYMid slice"
       >
-        <path d={notchSide === "br" ? pathBR : pathBL} fill={shapeFill} />
+        <path d={rectPath} fill={shapeFill} />
       </svg>
 
-      <div className="relative z-[2] flex h-full flex-col items-center justify-center px-4 sm:px-5 md:px-6 text-center">
+      <div className="relative z-2 flex h-full flex-col items-center justify-center px-4 sm:px-5 md:px-6 text-center">
         <div
           className={[
             "font-medium leading-none tracking-[-0.03em]",
@@ -75,9 +67,9 @@ function StatNotchedCard({
 
       {withArrow && (
         <div className={arrowPos}>
-          <Link
-            href="#"
-            aria-label="Open"
+          <button
+            type="button"
+            aria-label="Открыть"
             className={[
               "grid place-items-center rounded-full bg-surface border border-border",
               "shadow-[0_10px_30px_rgba(0,0,0,0.12)]",
@@ -86,14 +78,19 @@ function StatNotchedCard({
               "lg:h-[64px] lg:w-[64px] min-[1536px]:h-[81px] min-[1536px]:w-[81px]",
             ].join(" ")}
           >
-            <img
+            <Image
               src="/objects/Arrow.svg"
               alt=""
-              width={14}
-              height={14}
-              className="block h-3.5 w-3.5 opacity-70 sm:h-4 sm:w-4 md:h-5 md:w-5"
+              width={20}
+              height={20}
+              className={[
+                "block h-3.5 w-3.5 sm:h-4 sm:w-4 md:h-5 md:w-5",
+                arrowTone === "muted"
+                  ? "opacity-70 filter-[grayscale(1)_saturate(0)_brightness(0.55)]"
+                  : "opacity-70",
+              ].join(" ")}
             />
-          </Link>
+          </button>
         </div>
       )}
     </div>
@@ -171,9 +168,11 @@ const fallbackMetricImages = [
 export function StatsMosaic({ block }: Props) {
   const content = block?.content as CmsMetricsContent | null;
   const items = content?.items?.length ? content.items : fallbackItems;
+  const firstCms = getCmsMediaUrl(block?.media?.[0]);
+  const secondCms = getCmsMediaUrl(block?.media?.[1]);
   const metricImages = [
-    getCmsMediaUrl(block?.media?.[0]) || fallbackMetricImages[0],
-    getCmsMediaUrl(block?.media?.[1]) || fallbackMetricImages[1],
+    firstCms && !isLikelyVideoUrl(firstCms) ? firstCms : fallbackMetricImages[0],
+    secondCms && !isLikelyVideoUrl(secondCms) ? secondCms : fallbackMetricImages[1],
   ];
 
   const first = items[0] || fallbackItems[0];
@@ -196,11 +195,10 @@ export function StatsMosaic({ block }: Props) {
       <Container>
         {/* DESKTOP */}
         <div className="hidden lg:grid grid-cols-12 gap-6">
-          <div className="col-span-3 h-[280px] min-[1280px]:h-[300px] min-[1440px]:h-[340px] min-[1536px]:h-[389px]">
+          <div className="col-span-3 aspect-422/389">
             <StatNotchedCard
               value={firstSafe.value}
               label={firstSafe.label}
-              notchSide="br"
               variant="dark"
             />
           </div>
@@ -209,24 +207,23 @@ export function StatsMosaic({ block }: Props) {
             <ImageTile src={metricImages[0]} />
           </div>
 
-          <div className="col-span-3 h-[280px] min-[1280px]:h-[300px] min-[1440px]:h-[340px] min-[1536px]:h-[389px]">
+          <div className="col-span-3 aspect-422/389">
             <StatNotchedCard
               value={secondSafe.value}
               label={secondSafe.label}
-              notchSide="bl"
               variant="dark"
+              arrowTone="muted"
             />
           </div>
 
-          <div className="col-span-3 h-[280px] min-[1280px]:h-[300px] min-[1440px]:h-[340px] min-[1536px]:h-[389px]">
+          <div className="col-span-3 aspect-422/389">
             <LightInfoCard value={thirdSafe.value} label={thirdSafe.label} />
           </div>
 
-          <div className="col-span-3 h-[280px] min-[1280px]:h-[300px] min-[1440px]:h-[340px] min-[1536px]:h-[389px]">
+          <div className="col-span-3 aspect-422/389">
             <StatNotchedCard
               value={fourthSafe.value}
               label={fourthSafe.label}
-              notchSide="br"
               variant="dark"
             />
           </div>
@@ -238,21 +235,19 @@ export function StatsMosaic({ block }: Props) {
 
         {/* MOBILE / TABLET */}
         <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:hidden">
-          <div className="h-[150px] sm:h-[180px] md:h-[210px]">
+          <div className="aspect-422/389">
             <StatNotchedCard
               value={firstSafe.value}
               label={firstSafe.label}
-              notchSide="br"
               variant="dark"
               withArrow
             />
           </div>
 
-          <div className="h-[150px] sm:h-[180px] md:h-[210px]">
+          <div className="aspect-422/389">
             <StatNotchedCard
               value={secondSafe.value}
               label={secondSafe.label}
-              notchSide="br"
               variant="dark"
               withArrow
             />
@@ -262,15 +257,14 @@ export function StatsMosaic({ block }: Props) {
             <ImageTile src={metricImages[0]} />
           </div>
 
-          <div className="h-[150px] sm:h-[180px] md:h-[210px]">
+          <div className="aspect-422/389">
             <LightInfoCard value={thirdSafe.value} label={thirdSafe.label} />
           </div>
 
-          <div className="h-[150px] sm:h-[180px] md:h-[210px]">
+          <div className="aspect-422/389">
             <StatNotchedCard
               value={fourthSafe.value}
               label={fourthSafe.label}
-              notchSide="br"
               variant="dark"
               withArrow
             />

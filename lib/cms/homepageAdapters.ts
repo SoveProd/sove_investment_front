@@ -19,14 +19,23 @@ import type {
 // ==============================
 
 export function mapHeroBlockToAdmin(block?: CmsHeroBlock): HeroBlockData {
+  const buttons = Array.isArray(block?.button)
+    ? block.button
+    : block?.button
+      ? [block.button]
+      : [];
+
+  const primaryFromButtons = buttons.find((btn) => btn.position === 0)?.name || "";
+  const secondaryFromButtons = buttons.find((btn) => btn.position === 1)?.name || "";
+
   return {
     mediaId: block?.media?.[0]?.id || undefined,
     title: block?.title || "",
     description: block?.text || "",
     videoName: block?.media?.[0]?.file_name || "Видео.mp4",
     videoPreview: getCmsMediaUrl(block?.media?.[0]),
-    primaryButtonLabel: block?.primary_button_label || "",
-    secondaryButtonLabel: block?.secondary_button_label || "",
+    primaryButtonLabel: block?.primary_button_label || primaryFromButtons,
+    secondaryButtonLabel: block?.secondary_button_label || secondaryFromButtons,
   };
 }
 
@@ -34,8 +43,10 @@ export function mapHeroAdminToPatch(data: HeroBlockData) {
   return {
     title: data.title,
     text: data.description,
-    primary_button_label: data.primaryButtonLabel,
-    secondary_button_label: data.secondaryButtonLabel,
+    button: [
+      { name: data.primaryButtonLabel, position: 0 },
+      { name: data.secondaryButtonLabel, position: 1 },
+    ].filter((btn) => Boolean(btn.name?.trim())),
   };
 }
 
@@ -102,7 +113,9 @@ export function mapDoItWithSoveBlockToAdmin(
   const media = [...(block?.media || [])].sort((a, b) => {
     const aPos = a.position ?? Number.MAX_SAFE_INTEGER;
     const bPos = b.position ?? Number.MAX_SAFE_INTEGER;
-    return aPos - bPos;
+    if (aPos !== bPos) return aPos - bPos;
+    // If backend keeps multiple media with same position, prefer the newest one.
+    return (b.id ?? 0) - (a.id ?? 0);
   });
 
   const contentItems =
@@ -122,7 +135,6 @@ export function mapDoItWithSoveBlockToAdmin(
 
   const maxLength = Math.max(
     contentItems.length,
-    media.length,
     fallbackTexts.length,
   );
 
@@ -151,15 +163,105 @@ export function mapCapitalizedTextBlockToAdmin(
     ? block.button[0]
     : block?.button || null;
 
+  const content =
+    block?.content && typeof block.content === "object" ? block.content : null;
+
+  // Preferred backend format:
+  // content: { grey_1: string, dark: string, grey_2: string }
+  const backendParts = content
+    ? {
+        grayTextTop:
+          "grey_1" in content && typeof content.grey_1 === "string"
+            ? content.grey_1
+            : "",
+        blackTextMain:
+          "dark" in content && typeof content.dark === "string"
+            ? content.dark
+            : "",
+        grayTextBottom:
+          "grey_2" in content && typeof content.grey_2 === "string"
+            ? content.grey_2
+            : "",
+      }
+    : null;
+
+  // Legacy format we previously wrote:
+  // content: { accent_text: { grayTop, blackMain, grayBottom } }
+  const legacyParts =
+    content &&
+    "accent_text" in content &&
+    content.accent_text &&
+    typeof content.accent_text === "object"
+      ? (content.accent_text as {
+          grayTop?: unknown;
+          blackMain?: unknown;
+          grayBottom?: unknown;
+        })
+      : null;
+
+  const fromContent =
+    backendParts &&
+    (backendParts.grayTextTop || backendParts.blackTextMain || backendParts.grayTextBottom)
+      ? backendParts
+      : legacyParts
+        ? {
+            grayTextTop:
+              typeof legacyParts.grayTop === "string" ? legacyParts.grayTop : "",
+            blackTextMain:
+              typeof legacyParts.blackMain === "string"
+                ? legacyParts.blackMain
+                : "",
+            grayTextBottom:
+              typeof legacyParts.grayBottom === "string"
+                ? legacyParts.grayBottom
+                : "",
+          }
+        : null;
+
+  const rawText = block?.text || "";
+
+  const splitLegacy = (raw: string) => {
+    const text = (raw || "").trim();
+    if (!text) return { primary: "", secondary: "" };
+    if (text.includes("||")) {
+      const [primary, ...rest] = text.split("||");
+      return {
+        primary: (primary || "").trim(),
+        secondary: rest.join("||").trim(),
+      };
+    }
+    const sentences = text.split(/(?<=[.!?])\s+/);
+    return {
+      primary: sentences.slice(0, 2).join(" ").trim(),
+      secondary: sentences.slice(2).join(" ").trim(),
+    };
+  };
+
+  const legacy = splitLegacy(rawText);
+
   return {
-    text: block?.text || "",
+    grayTextTop: fromContent?.grayTextTop || "",
+    blackTextMain: fromContent?.blackTextMain || legacy.primary || rawText,
+    grayTextBottom: fromContent?.grayTextBottom || legacy.secondary || "",
     buttonLabel: button?.name || "Посмотри наши кейсы",
   };
 }
 
 export function mapCapitalizedTextAdminToPatch(data: TextButtonBlockData) {
+  const grayTop = (data.grayTextTop || "").trim();
+  const blackMain = (data.blackTextMain || "").trim();
+  const grayBottom = (data.grayTextBottom || "").trim();
+
+  const combinedText = [grayTop, blackMain, grayBottom].filter(Boolean).join(" ");
+
   return {
-    text: data.text,
+    text: combinedText,
+    content: {
+      // Backend-agreed structure
+      grey_1: data.grayTextTop,
+      dark: data.blackTextMain,
+      grey_2: data.grayTextBottom,
+    },
     button: {
       name: data.buttonLabel,
       position: 0,
@@ -177,7 +279,9 @@ export function mapDiyBlockToAdmin(
   const media = [...(block?.media || [])].sort((a, b) => {
     const aPos = a.position ?? Number.MAX_SAFE_INTEGER;
     const bPos = b.position ?? Number.MAX_SAFE_INTEGER;
-    return aPos - bPos;
+    if (aPos !== bPos) return aPos - bPos;
+    // If backend keeps multiple media with same position, prefer the newest one.
+    return (b.id ?? 0) - (a.id ?? 0);
   });
 
   const contentItems =
@@ -192,7 +296,6 @@ export function mapDiyBlockToAdmin(
 
   const maxLength = Math.max(
     contentItems.length,
-    media.length,
     fallbackTexts.length,
   );
 
@@ -237,10 +340,17 @@ export function mapFeaturedBlockToAdmin(
       ? (block.content as { ids: number[] }).ids
       : [];
 
+  // If we don't yet have a fallback list (e.g. first load),
+  // preserve the selection by creating placeholder items from selected ids.
+  const baseItems =
+    fallbackItems.length > 0
+      ? fallbackItems
+      : selectedIds.map((id) => ({ id, label: `Элемент #${id}`, checked: true }));
+
   return {
     title: block?.title || "",
     subtitle: block?.subtitle || "",
-    items: fallbackItems.map((item) => ({
+    items: baseItems.map((item) => ({
       ...item,
       checked: selectedIds.includes(item.id),
     })),

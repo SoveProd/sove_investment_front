@@ -5,8 +5,9 @@ import { useMemo, useState, useRef, useEffect } from "react";
 import { Container } from "@/src/components/layout/Container";
 import { ArrowButton } from "@/src/components/ui/ArrowBtn";
 import type { CmsBlock, CmsMedia } from "@/lib/cms/types";
-import { getCmsMediaUrl } from "@/lib/cms/mediaUrl";
+import { getCmsMediaUrl, isLikelyVideoUrl } from "@/lib/cms/mediaUrl";
 import { usePublishedHomepageBlock } from "@/src/components/home/hooks/usePublishedHomepageBlock";
+import { AnimatePresence, motion } from "framer-motion";
 
 type Step = {
   id: string;
@@ -96,8 +97,11 @@ function mapCmsHowItWorksToSteps(block?: CmsBlock | null): Step[] {
     const fallback = fallbackSteps[index] || fallbackSteps[0];
     const item = contentItems[index];
     const m = media[index];
+    const cmsSrc = m ? getCmsMediaUrl(m) : null;
     const imageSrc =
-      (m ? getCmsMediaUrl(m) : null) || fallback?.imageSrc || "/images/hero.jpg";
+      (cmsSrc && !isLikelyVideoUrl(cmsSrc) ? cmsSrc : null) ||
+      fallback?.imageSrc ||
+      "/images/hero.jpg";
 
     return {
       id: String(index + 1),
@@ -115,7 +119,7 @@ function mapCmsHowItWorksToSteps(block?: CmsBlock | null): Step[] {
 export default function HowItWorksSection() {
   const block = usePublishedHomepageBlock({
     blockType: "how_it_works:main",
-    refreshIntervalMs: 4000,
+    refreshIntervalMs: 0,
   });
   const [active, setActive] = useState(0);
 
@@ -235,6 +239,7 @@ export default function HowItWorksSection() {
                     className={[
                       "px-4 py-2 rounded-full text-[14px] whitespace-nowrap transition",
                       "border border-border",
+                      "cursor-pointer",
                       isActive
                         ? "bg-white text-text"
                         : "bg-transparent text-text",
@@ -342,6 +347,7 @@ export default function HowItWorksSection() {
                     className={[
                       "flex h-[79px] w-full items-center justify-center rounded-[79px] px-6 text-center transition-all duration-300",
                       "text-[18px] font-medium leading-none xl:text-[20px]",
+                      "cursor-pointer",
                       isActive
                         ? "bg-graphite text-white"
                         : "border border-border bg-surface text-text hover:border-graphite/40",
@@ -373,40 +379,68 @@ export default function HowItWorksSection() {
 
           <div className="mt-10 grid grid-cols-1 gap-6 lg:grid-cols-12">
             <div className="lg:col-span-6">
-              <div className="relative flex h-full flex-col rounded-[48px] border border-border bg-white p-18 max-lg:p-8 lg:h-[730px]">
-                <div className="text-[45px] font-medium text-adminSoft">
-                  [{current.id}]
-                </div>
+              <div className="relative overflow-hidden rounded-[48px] border border-border bg-white lg:h-[730px]">
+                <AnimatePresence mode="wait" initial={false}>
+                  <motion.div
+                    key={current.id}
+                    className="relative flex h-full flex-col p-18 max-lg:p-8"
+                    initial={{ opacity: 0, y: 16, filter: "blur(6px)" }}
+                    animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                    exit={{ opacity: 0, y: -16, filter: "blur(6px)" }}
+                    transition={{
+                      duration: 0.55,
+                      ease: [0.22, 1, 0.36, 1],
+                    }}
+                  >
+                    <div className="text-[45px] font-medium text-adminSoft">
+                      [{current.id}]
+                    </div>
 
-                <div className="mt-auto">
-                  <h3 className="text-[50px] font-medium tracking-[-0.02em] text-text max-lg:text-[28px] whitespace-pre-line">
-                    {current.title}
-                  </h3>
+                    <div className="mt-auto">
+                      <h3 className="text-[50px] font-medium tracking-[-0.02em] text-text max-lg:text-[28px] whitespace-pre-line">
+                        {current.title}
+                      </h3>
 
-                  <p className="mt-5 max-w-[520px] text-[22px] leading-6 text-text max-lg:text-[22px]">
-                    {current.description}
-                  </p>
+                      <p className="mt-5 max-w-[520px] text-[22px] leading-6 text-text max-lg:text-[22px]">
+                        {current.description}
+                      </p>
 
-                  <div className="mt-10">
-                    <ArrowButton
-                      label={current.ctaLabel}
-                      href={current.ctaHref}
-                    />
-                  </div>
-                </div>
+                      <div className="mt-10">
+                        <ArrowButton
+                          label={current.ctaLabel}
+                          href={current.ctaHref}
+                        />
+                      </div>
+                    </div>
+                  </motion.div>
+                </AnimatePresence>
               </div>
             </div>
 
             <div className="lg:col-span-6">
               <div className="relative overflow-hidden rounded-[48px] border border-border bg-white lg:h-[730px]">
-                <Image
-                  src={current.imageSrc}
-                  alt={current.imageAlt || ""}
-                  fill
-                  className="object-cover"
-                  sizes="(max-width: 1024px) 100vw, 50vw"
-                  priority
-                />
+                <AnimatePresence mode="wait" initial={false}>
+                  <motion.div
+                    key={current.imageSrc}
+                    className="absolute inset-0"
+                    initial={{ opacity: 0, scale: 1.015, filter: "blur(8px)" }}
+                    animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
+                    exit={{ opacity: 0, scale: 0.99, filter: "blur(8px)" }}
+                    transition={{
+                      duration: 0.7,
+                      ease: [0.22, 1, 0.36, 1],
+                    }}
+                  >
+                    <Image
+                      src={current.imageSrc}
+                      alt={current.imageAlt || ""}
+                      fill
+                      className="object-cover"
+                      sizes="(max-width: 1024px) 100vw, 50vw"
+                      priority
+                    />
+                  </motion.div>
+                </AnimatePresence>
               </div>
             </div>
           </div>
