@@ -13,7 +13,8 @@ function getApiOrigin() {
 function getPublicMediaApiUrl(mediaId?: number | null) {
   if (!mediaId) return undefined;
 
-  return `/api/media/public/${mediaId}`;
+  // Disabled: in production `/api` is owned by backend and this path 404s.
+  return undefined;
 }
 
 export function normalizeCmsMediaUrl(url?: string | null) {
@@ -30,6 +31,18 @@ export function normalizeCmsMediaUrl(url?: string | null) {
   try {
     const parsed = new URL(url);
     if (parsed.protocol === "http:" || parsed.protocol === "https:") {
+      // Yandex Object Storage: bucket names with dots break TLS in virtual-hosted style:
+      // https://my.bucket.storage.yandexcloud.net/... => ERR_CERT_COMMON_NAME_INVALID
+      // Rewrite to path-style: https://storage.yandexcloud.net/my.bucket/...
+      if (parsed.hostname.endsWith(".storage.yandexcloud.net")) {
+        const suffix = ".storage.yandexcloud.net";
+        const bucketHost = parsed.hostname.slice(0, -suffix.length); // e.g. "sove.pub.bucket"
+        // If bucketHost contains a dot, wildcard cert won't match -> rewrite.
+        if (bucketHost.includes(".")) {
+          return `https://storage.yandexcloud.net/${bucketHost}${parsed.pathname}${parsed.search}`;
+        }
+      }
+
       return url;
     }
   } catch {
@@ -57,9 +70,6 @@ export function getCmsMediaUrl(media?: CmsMedia | null) {
   if (!media) return undefined;
 
   return (
-    // Prefer a stable same-origin URL (works with `next/image` without remotePatterns).
-    // The API route redirects to the real file location for streaming/CDN.
-    getPublicMediaApiUrl(media.id) ||
     normalizeCmsMediaUrl(media.url) ||
     normalizeCmsMediaUrl(media.large_url) ||
     normalizeCmsMediaUrl(media.medium_url) ||
