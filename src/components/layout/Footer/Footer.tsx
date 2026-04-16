@@ -16,12 +16,12 @@ const columns: FooterColumn[] = [
   {
     title: "Основная навигация",
     links: [
-      { label: "Главная", href: "/" },
-      { label: "Преимущества", href: "/#benefits" },
-      { label: "Популярные концепции", href: "/#popular-concepts" },
-      { label: "Готовые проекты", href: "/#ready-projects" },
-      { label: "Как это работает?", href: "/#how-it-works" },
-      { label: "Отзывы", href: "/#testimonials" },
+      { label: "Главная", href: "/homepage" },
+      { label: "Преимущества", href: "/homepage#benefits" },
+      { label: "Популярные концепции", href: "/homepage#popular-concepts" },
+      { label: "Готовые проекты", href: "/homepage#ready-projects" },
+      { label: "Как это работает?", href: "/homepage#how-it-works" },
+      { label: "Отзывы", href: "/homepage#testimonials" },
     ],
   },
   {

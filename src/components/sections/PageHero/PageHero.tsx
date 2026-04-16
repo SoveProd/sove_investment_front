@@ -3,6 +3,8 @@ import { Container } from "@/src/components/layout/Container";
 
 type Props = {
   kicker?: string;
+  kickerLogoSrc?: string;
+  kickerLogoAlt?: string;
   title: string | string[];
   subtitle?: string;
   imageSrc: string;
@@ -11,6 +13,8 @@ type Props = {
 
 export function PageHero({
   kicker,
+  kickerLogoSrc,
+  kickerLogoAlt = "",
   title,
   subtitle,
   imageSrc,
@@ -40,6 +44,17 @@ export function PageHero({
           {/* MOBILE */}
           <div className="flex h-full flex-col justify-end pb-10 sm:pb-12 md:hidden">
             <div className="max-w-[340px] text-left">
+              {kickerLogoSrc && (
+                <div className="mb-3">
+                  <Image
+                    src={kickerLogoSrc}
+                    alt={kickerLogoAlt}
+                    width={303}
+                    height={29}
+                    className="h-[18px] w-auto opacity-90"
+                  />
+                </div>
+              )}
               {kicker && (
                 <div className="mb-3 text-[12px] font-normal uppercase tracking-[0.22em] text-white/80">
                   {kicker}
@@ -65,6 +80,17 @@ export function PageHero({
           {/* TABLET / DESKTOP */}
           <div className="hidden h-full md:flex md:flex-col md:items-center md:justify-center md:text-center">
             <div className="max-w-[1800px]">
+              {kickerLogoSrc && (
+                <div className="mb-5 flex justify-center">
+                  <Image
+                    src={kickerLogoSrc}
+                    alt={kickerLogoAlt}
+                    width={303}
+                    height={29}
+                    className="h-[22px] w-auto opacity-90 lg:h-[26px]"
+                  />
+                </div>
+              )}
               {kicker && (
                 <div className="mb-5 text-[12px] font-normal uppercase tracking-[0.28em] text-white/80 md:text-[13px] lg:text-[14px]">
                   {kicker}

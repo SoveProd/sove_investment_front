@@ -43,8 +43,31 @@ export async function PackagesPage() {
   const qnaBlock = getServicePackagesQnaBlock(cmsPage);
   const requestsBlock = getServicePackagesRequestsBlock(cmsPage);
 
-  const package1Props = mapPackageBlockToReadyConceptProps(package1Block);
-  const package2Props = mapPackageBlockToReadyConceptProps(package2Block);
+  const package1PropsRaw = mapPackageBlockToReadyConceptProps(package1Block);
+  const package2PropsRaw = mapPackageBlockToReadyConceptProps(package2Block);
+
+  function withFallback(
+    raw: ReturnType<typeof mapPackageBlockToReadyConceptProps>,
+    fallback: Partial<ReturnType<typeof mapPackageBlockToReadyConceptProps>>,
+  ) {
+    const hasMeaningfulContent =
+      Boolean(raw.title?.trim()) ||
+      Boolean(raw.description?.trim()) ||
+      (raw.metrics?.length ?? 0) > 0;
+
+    if (hasMeaningfulContent) return raw;
+    return { ...raw, ...fallback };
+  }
+
+  const package1Props = withFallback(package1PropsRaw, {
+    title: "Пакет реализации №1",
+    description: "Описание пакета будет добавлено из CMS.",
+  });
+
+  const package2Props = withFallback(package2PropsRaw, {
+    title: "Пакет реализации №2",
+    description: "Описание пакета будет добавлено из CMS.",
+  });
   const otherServices = mapOtherServicesToThreeHoverZones(otherServicesBlock);
   const faqItems = mapQnaBlockToFaqItems(qnaBlock);
   const requestsCta = mapRequestsPackToCtaProps(requestsBlock);
@@ -53,6 +76,8 @@ export async function PackagesPage() {
     <main className="bg-[#f3f3f3] text-black">
       <SectionReveal delay={0}>
         <PageHero
+          kickerLogoSrc="/sovegroupLogo.svg"
+          kickerLogoAlt="SOVE GROUP"
           title={["ПАКЕТЫ РЕАЛИЗАЦИИ", "Твой путь к ликвидной недвижимости"]}
           subtitle={
             headerBlock?.subtitle?.trim() ||

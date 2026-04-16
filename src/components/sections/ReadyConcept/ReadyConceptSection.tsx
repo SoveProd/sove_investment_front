@@ -41,10 +41,6 @@ export function ReadyConceptSection({
   description,
   metricsTitle,
   metrics,
-  includedTitle,
-  included,
-  alsoIncludedTitle,
-  alsoIncluded,
   primaryCtaLabel,
   primaryCtaHref,
   secondaryCtaLabel,
@@ -86,38 +82,6 @@ export function ReadyConceptSection({
               </div>
             </div>
 
-            {/* Included */}
-            <div className="mt-4">
-              <p className="text-[12px] font-medium text-[#1f1f1f]">
-                {includedTitle}
-              </p>
-
-              <ul className="mt-2 space-y-1 text-[10px] leading-[1.3] text-black/65">
-                {included.map((item) => (
-                  <li key={item} className="flex gap-2">
-                    <span className="mt-[5px] h-[3px] w-[3px] shrink-0 rounded-full bg-black/40" />
-                    <span>{item}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            {/* Also included */}
-            <div className="mt-4">
-              <p className="text-[12px] font-medium text-[#1f1f1f]">
-                {alsoIncludedTitle}
-              </p>
-
-              <ul className="mt-2 space-y-1 text-[10px] leading-[1.3] text-black/65">
-                {alsoIncluded.map((item) => (
-                  <li key={item} className="flex gap-2">
-                    <span className="mt-[5px] h-[3px] w-[3px] shrink-0 rounded-full bg-black/40" />
-                    <span>{item}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
             {/* Images */}
             <div className="mt-4 grid grid-cols-2 gap-2">
               <div
@@ -152,6 +116,7 @@ export function ReadyConceptSection({
               <ArrowButton
                 href={primaryCtaHref}
                 label={primaryCtaLabel}
+                size="compact"
                 className="w-[151px] shrink-0"
               />
 
@@ -169,36 +134,36 @@ export function ReadyConceptSection({
         </div>
 
         {/* DESKTOP */}
-        <div className="hidden rounded-[40px] bg-white p-8 md:p-12 lg:block">
+        <div className="hidden rounded-[40px] bg-white p-8 md:p-12 xl:p-[90px] lg:block">
           <div
             className={[
               "grid gap-10 lg:items-start",
               reverse
-                ? "lg:grid-cols-[minmax(0,1fr)_minmax(0,559px)]"
-                : "lg:grid-cols-[minmax(0,559px)_minmax(0,1fr)]",
+                ? "lg:grid-cols-[minmax(0,820px)_minmax(0,1fr)] xl:grid-cols-[minmax(0,clamp(720px,60vw,980px))_minmax(0,1fr)]"
+                : "lg:grid-cols-[minmax(0,820px)_minmax(0,1fr)] xl:grid-cols-[minmax(0,1fr)_minmax(0,clamp(800px,60vw,980px))]",
             ].join(" ")}
           >
             {reverse && <ImagesBlock images={images} />}
 
-            <div className="lg:max-w-[559px]">
-              <h2 className="text-[34px] font-medium leading-tight text-[#1f1f1f]">
+            <div className="lg:max-w-[820px]">
+              <h2 className="text-[50px] font-medium leading-[1.08] text-[#1f1f1f]">
                 {title}
               </h2>
 
-              <p className="mt-4 max-w-[520px] text-[16px] leading-relaxed text-black/60">
+              <p className="mt-[20px] max-w-none text-[21px] leading-[1.45] text-black/60">
                 {description}
               </p>
 
-              <div className="mt-7">
-                <p className="text-[16px] font-medium text-[#1f1f1f]">
+              <div className="mt-[36px]">
+                <p className="text-[24px] font-medium text-[#1f1f1f]">
                   {metricsTitle}
                 </p>
 
-                <div className="mt-3 space-y-2">
+                <div className="mt-3 space-y-0.5">
                   {metrics.map((m) => (
                     <div
                       key={m.label}
-                      className="flex items-center justify-between gap-6 border-b border-black/10 py-2 text-[14px]"
+                      className="flex items-center justify-between gap-6 border-b border-black/10 py-2 text-[21px]"
                     >
                       <span className="text-black/65">{m.label}</span>
                       <span className="font-medium text-black/70">
@@ -209,37 +174,7 @@ export function ReadyConceptSection({
                 </div>
               </div>
 
-              <div className="mt-7">
-                <p className="text-[16px] font-medium text-[#1f1f1f]">
-                  {includedTitle}
-                </p>
-
-                <ul className="mt-3 space-y-2 text-[14px] leading-relaxed text-black/65">
-                  {included.map((item) => (
-                    <li key={item} className="flex gap-3">
-                      <span className="mt-[8px] h-[4px] w-[4px] rounded-full bg-black/40" />
-                      <span>{item}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              <div className="mt-7">
-                <p className="text-[16px] font-medium text-[#1f1f1f]">
-                  {alsoIncludedTitle}
-                </p>
-
-                <ul className="mt-3 space-y-2 text-[14px] leading-relaxed text-black/65">
-                  {alsoIncluded.map((item) => (
-                    <li key={item} className="flex gap-3">
-                      <span className="mt-[8px] h-[4px] w-[4px] rounded-full bg-black/40" />
-                      <span>{item}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              <div className="mt-10 flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-[22px] sm:flex-nowrap">
+              <div className="mt-[91px] flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-[22px] sm:flex-nowrap">
                 <div className="shrink-0">
                   <ArrowButton href={primaryCtaHref} label={primaryCtaLabel} />
                 </div>
@@ -267,30 +202,31 @@ export function ReadyConceptSection({
 
 function ImagesBlock({ images }: { images: Props["images"] }) {
   return (
-    <div className="flex flex-wrap justify-start gap-[22px] xl:flex-nowrap xl:items-start">
+    <div className="grid grid-cols-2 gap-[22px]">
       <div
-        className="relative w-full max-w-[536px] overflow-hidden rounded-[40px] bg-black/5"
-        style={{ aspectRatio: "536 / 825" }}
+        className="relative w-full overflow-hidden rounded-[40px] bg-black/5"
+        style={{ aspectRatio: "536 / 656" }}
       >
         <Image
           src={images.left.src}
           alt={images.left.alt}
           fill
           className="object-cover"
+          sizes="(min-width: 1280px) 536px, (min-width: 1024px) 40vw, 50vw"
         />
       </div>
 
       <div
-        className="relative w-full max-w-[536px] overflow-hidden rounded-[40px] bg-black/5"
-        style={{ aspectRatio: "536 / 737" }}
+        className="relative w-full overflow-hidden rounded-[40px] bg-black/5"
+        style={{ aspectRatio: "536 / 586" }}
       >
         <Image
           src={images.right.src}
           alt={images.right.alt}
           fill
           className="object-cover"
+          sizes="(min-width: 1280px) 536px, (min-width: 1024px) 40vw, 50vw"
         />
-        <div className="absolute inset-0 bg-black/20" />
       </div>
     </div>
   );

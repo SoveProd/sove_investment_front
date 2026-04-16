@@ -732,7 +732,10 @@ export function useContentToolsServicePackages() {
   }, [package2, package2CmsBlockId, reloadFromServer, token]);
 
   const handleOtherServicesBlur = useCallback(async () => {
-    const patch = mapOtherServicesAdminToPatch(otherServices);
+    const patch = ensureContentHasId(
+      mapOtherServicesAdminToPatch(otherServices),
+      otherServicesCmsBlockId,
+    );
     await patchBlock({
       apiBase: API_BASE,
       blockId: otherServicesCmsBlockId,
@@ -804,7 +807,7 @@ export function useContentToolsServicePackages() {
   }, [otherServices, otherServicesCmsBlockId, reloadFromServer, token]);
 
   const handleQnaBlur = useCallback(async () => {
-    const patch = mapQnaAdminToPatch(qna);
+    const patch = ensureContentHasId(mapQnaAdminToPatch(qna), qnaCmsBlockId);
     await patchBlock({
       apiBase: API_BASE,
       blockId: qnaCmsBlockId,

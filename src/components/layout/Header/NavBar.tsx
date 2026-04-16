@@ -80,7 +80,7 @@ export function NavBar({ variant = "transparent" }: Props) {
         <div className="flex items-center justify-between py-[18px] md:py-[28px]">
           {/* Logo */}
           <Link
-            href="/"
+            href="/homepage"
             aria-label="SOVE Group"
             className="inline-flex items-center select-none"
           >

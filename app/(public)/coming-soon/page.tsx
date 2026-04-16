@@ -10,14 +10,14 @@ export default function ComingSoonPage() {
           SOVE
         </p>
         <h1 className="mt-3 text-[32px] font-medium tracking-tight text-neutral-900 sm:text-[48px]">
-          Скоро будет
+          Платформа в разработке
         </h1>
         <p className="mt-4 max-w-2xl text-[15px] leading-6 text-neutral-600">
-          Мы готовим эту страницу к запуску. Пока доступна только главная.
+          Скоро открытие. Маркетинговая главная доступна по адресу /homepage.
         </p>
         <div className="mt-8 flex flex-wrap gap-3">
           <Link
-            href="/"
+            href="/homepage"
             className="inline-flex items-center justify-center rounded-full bg-neutral-900 px-5 py-2.5 text-[14px] font-medium text-white transition hover:bg-neutral-800"
           >
             На главную

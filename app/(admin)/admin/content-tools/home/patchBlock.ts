@@ -34,7 +34,10 @@ export async function patchBlock({
     });
 
     if (!response.ok) {
-      throw new Error(`${errorMessage}: ${response.status}`);
+      const details = await response.text().catch(() => "");
+      throw new Error(
+        `${errorMessage}: ${response.status}${details ? ` — ${details}` : ""}`,
+      );
     }
   } catch (err) {
     setError(err instanceof Error ? err.message : errorMessage);
@@ -85,7 +88,10 @@ export async function patchBlockWithFallback({
         return true;
       }
 
-      lastError = new Error(`${errorMessage}: ${response.status}`);
+      const details = await response.text().catch(() => "");
+      lastError = new Error(
+        `${errorMessage}: ${response.status}${details ? ` — ${details}` : ""}`,
+      );
     }
 
     throw lastError ?? new Error(errorMessage);

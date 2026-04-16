@@ -7,6 +7,12 @@ import type {
 
 type OtherServicesContent = {
   items?: Array<{
+    // New API shape (required by backend validation)
+    label?: string | null;
+    description?: string | null;
+    button?: string | null;
+
+    // Legacy shape (keep for backward compatibility)
     title?: string | null;
     subtitle?: string | null;
     button_label?: string | null;
@@ -43,15 +49,16 @@ export function mapOtherServicesBlockToAdmin(block?: CmsBlock): OtherServicesBlo
       title: "",
       subtitle: "",
       buttonLabel: "Попробовать",
-      href: "/",
+      href: "/homepage",
     };
     const cmsItem = itemsFromCms[idx];
     return {
       id: idx + 1,
-      title: cmsItem?.title || fallback.title,
-      subtitle: cmsItem?.subtitle || fallback.subtitle,
-      buttonLabel: cmsItem?.button_label || fallback.buttonLabel,
-      href: cmsItem?.href || fallback.href,
+      title: cmsItem?.label || cmsItem?.title || fallback.title,
+      subtitle: cmsItem?.description || cmsItem?.subtitle || fallback.subtitle,
+      buttonLabel:
+        cmsItem?.button_label || fallback.buttonLabel,
+      href: cmsItem?.button || cmsItem?.href || fallback.href,
     };
   });
 
@@ -72,10 +79,10 @@ export function mapOtherServicesAdminToPatch(data: OtherServicesBlockData) {
     title: data.title,
     content: {
       items: data.items.map((it) => ({
-        title: it.title,
-        subtitle: it.subtitle,
-        button_label: it.buttonLabel,
-        href: it.href,
+        label: it.title,
+        description: it.subtitle,
+        // Backend expects a string here (see 422 validation errors)
+        button: it.href,
       })),
     },
   } as Record<string, unknown>;

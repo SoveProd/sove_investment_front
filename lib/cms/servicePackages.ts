@@ -137,12 +137,30 @@ export function mapPackageBlockToReadyConceptProps(block?: CmsBlock) {
 
 type OtherServicesContent = {
   items?: Array<{
+    /** API / admin (new) */
+    label?: string | null;
+    description?: string | null;
+    /** Often the link URL (string), not a nested object */
+    button?: string | null;
+    /** Legacy */
     title?: string | null;
     subtitle?: string | null;
     button_label?: string | null;
     href?: string | null;
   }>;
 };
+
+function otherServiceItemToZone(it: NonNullable<OtherServicesContent["items"]>[number]) {
+  const title = (it.label ?? it.title ?? "").trim();
+  const text = (it.description ?? it.subtitle ?? "").trim();
+  const ctaHrefRaw =
+    typeof it.button === "string" && it.button.trim()
+      ? it.button.trim()
+      : (it.href ?? "").trim();
+  const ctaHref = ctaHrefRaw || "/homepage";
+  const ctaLabel = (it.button_label ?? "").trim() || "Попробовать";
+  return { title, text, ctaLabel, ctaHref };
+}
 
 export function mapOtherServicesToThreeHoverZones(block?: CmsBlock) {
   const content =
@@ -154,12 +172,15 @@ export function mapOtherServicesToThreeHoverZones(block?: CmsBlock) {
 
   const zones = Array.from({ length: Math.max(items.length, 3) }).map((_, i) => {
     const it = items[i];
-    return {
-      title: it?.title || "",
-      text: it?.subtitle || "",
-      ctaLabel: it?.button_label || "Попробовать",
-      ctaHref: it?.href || "/",
-    };
+    if (!it) {
+      return {
+        title: "",
+        text: "",
+        ctaLabel: "Попробовать",
+        ctaHref: "/homepage",
+      };
+    }
+    return otherServiceItemToZone(it);
   });
 
   const hero = mediaByPosition(block, 0);

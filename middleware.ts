@@ -1,10 +1,11 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-const ALLOWLIST = new Set<string>(["/", "/login", "/packages"]);
+const ALLOWLIST = new Set<string>(["/homepage", "/login", "/packages"]);
 
 function normalizePathname(pathname: string) {
-  if (pathname.length > 1 && pathname.endsWith("/")) return pathname.slice(0, -1);
+  if (pathname.length > 1 && pathname.endsWith("/"))
+    return pathname.slice(0, -1);
   return pathname;
 }
 
@@ -30,6 +31,11 @@ export function middleware(req: NextRequest) {
     return NextResponse.next();
   }
 
+  // Корень не ведёт на маркетинговую главную (она на /homepage).
+  if (pathname === "/") {
+    return NextResponse.redirect(new URL("/coming-soon", req.url));
+  }
+
   // Allow only these public pages for production launch.
   if (ALLOWLIST.has(pathname)) {
     return NextResponse.next();
@@ -48,4 +54,3 @@ export function middleware(req: NextRequest) {
 export const config = {
   matcher: ["/:path*"],
 };
-
