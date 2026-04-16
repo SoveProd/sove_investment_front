@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-const ALLOWLIST = new Set<string>(["/", "/login"]);
+const ALLOWLIST = new Set<string>(["/", "/login", "/packages"]);
 
 function normalizePathname(pathname: string) {
   if (pathname.length > 1 && pathname.endsWith("/")) return pathname.slice(0, -1);

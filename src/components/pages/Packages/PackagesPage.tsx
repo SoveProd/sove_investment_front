@@ -17,22 +17,28 @@ import {
 } from "@/lib/cms/servicePackages";
 import { mapQnaBlockToFaqItems } from "@/lib/cms/qnaAdapters";
 
-function pickHeroImage(block: { media?: Array<{ large_url?: string | null; file_url?: string }> } | undefined) {
+function pickHeroImage(
+  block:
+    | { media?: Array<{ large_url?: string | null; file_url?: string }> }
+    | undefined,
+) {
   const media0 = block?.media?.[0];
-  return media0?.large_url || media0?.file_url || "/images/PageHero/packagesHero.png";
-}
-
-function toHeroTitle(title: string | null | undefined) {
-  const t = (title || "").trim();
-  if (!t) return ["ПАКЕТЫ ИНВЕСТИРОВАНИЯ", "В НЕДВИЖИМОСТЬ"];
-  return [t];
+  return (
+    media0?.large_url || media0?.file_url || "/images/PageHero/packagesHero.png"
+  );
 }
 
 export async function PackagesPage() {
   const cmsPage = await getPublishedServicePackagesPage();
   const headerBlock = getServicePackagesHeaderBlock(cmsPage);
-  const package1Block = getServicePackagesPackageBlock(cmsPage, "s_package_1:pack");
-  const package2Block = getServicePackagesPackageBlock(cmsPage, "s_package_2:pack");
+  const package1Block = getServicePackagesPackageBlock(
+    cmsPage,
+    "s_package_1:pack",
+  );
+  const package2Block = getServicePackagesPackageBlock(
+    cmsPage,
+    "s_package_2:pack",
+  );
   const otherServicesBlock = getServicePackagesOtherServicesBlock(cmsPage);
   const qnaBlock = getServicePackagesQnaBlock(cmsPage);
   const requestsBlock = getServicePackagesRequestsBlock(cmsPage);
@@ -47,7 +53,7 @@ export async function PackagesPage() {
     <main className="bg-[#f3f3f3] text-black">
       <SectionReveal delay={0}>
         <PageHero
-          title={toHeroTitle(headerBlock?.title)}
+          title={["ПАКЕТЫ РЕАЛИЗАЦИИ", "Твой путь к ликвидной недвижимости"]}
           subtitle={
             headerBlock?.subtitle?.trim() ||
             "Выбери комплексное решение под свои задачи"
